@@ -15,7 +15,7 @@ class GameManager:
         # Game setup
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT), pygame.SCALED)
-        pygame.display.set_caption('Star Fighter')
+        pygame.display.set_caption('Star Hero')
         self.clock = pygame.time.Clock()
         self.game_active = False
         self.crt = CRT(self.screen)

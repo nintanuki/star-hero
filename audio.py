@@ -7,7 +7,7 @@ class Audio():
         self.master_volume = 0.5 # default value is 1.0
 
         """Music"""
-        self.intro_music = pygame.mixer.Sound('audio/star_fighter_intro.ogg')
+        self.intro_music = pygame.mixer.Sound('audio/star_hero_intro.ogg')
         self.intro_music.set_volume(self.master_volume * 2) # Low volume for some reason
         self.channel_0 = pygame.mixer.Channel(0)
         self.play_intro_music = True # Set to False after user begins, only plays once

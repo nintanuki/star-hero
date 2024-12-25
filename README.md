@@ -19,7 +19,7 @@ Your ship starts at the center of the screen. You can move in four directions an
 
 ### Enemy Aliens
 Each alien sprite behaves differently and is worth a different score value based on color:
-* <img src="https://github.com/frankiebry/star_hero/blob/main/graphics/red.png" width="20" height="16"> Slow - **100 Points**
+* <img src="[https://github.com/frankiebry/star_hero/blob/main/graphics/red.png](https://github.com/frankiebry/star-hero/blob/main/graphics/red.png)" width="20" height="16"> Slow - **100 Points**
 * <img src="https://github.com/frankiebry/star_hero/blob/main/graphics/green.png" width="20" height="16"> Moderate Speed - **200 Points**
 * <img src="https://github.com/frankiebry/star_hero/blob/main/graphics/yellow.png" width="20" height="16"> Fast - Moves in a Zigzag Pattern - **300 Points**
 * <img src="https://github.com/frankiebry/star_hero/blob/main/graphics/blue.png" width="20" height="10"> Very Fast and Rare - **500 Points**

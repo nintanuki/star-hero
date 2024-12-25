@@ -1,4 +1,5 @@
 ### Issues That Need to be Fixed
+* Fix broken icons in README
 * Player ship sprite can still move and shoot lasers briefly after death
 * Windows flags exe made with Pyinstaller as a virus... [try this.](https://plainenglish.io/blog/pyinstaller-exe-false-positive-trojan-virus-resolved-b33842bd3184)
 * Using joystick module laser only fires sometimes.

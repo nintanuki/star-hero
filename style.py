@@ -29,7 +29,7 @@ class Style():
 
     def display_title(self):
         """# Displays the title on the intro and game over screens"""
-        title = self.large_font.render('STAR FIGHTER',False,(self.font_color))
+        title = self.large_font.render('STAR HERO',False,(self.font_color))
         title_rect = title.get_rect(center = (SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - 100))
         self.screen.blit(title,title_rect)
 

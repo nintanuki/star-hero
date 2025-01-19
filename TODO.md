@@ -20,6 +20,8 @@
 * Bosses?
 * Multiple levels/stages?
 * Speed boost that uses energy?
+* Add thrusters animation
+* Make player flash white when hit
 
 ### Refactoring Changes to Make
 * Add timer class, remove this responsibility from GameManager

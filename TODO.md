@@ -3,6 +3,7 @@
 * Windows flags exe made with Pyinstaller as a virus... [try this.](https://plainenglish.io/blog/pyinstaller-exe-false-positive-trojan-virus-resolved-b33842bd3184)
 * Using joystick module laser only fires sometimes.
 * Using joystick module program crashes if controller not plugged in.
+* Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
 
 ### Ideas for Future Changes and Additions
 * Enemy shoots a beam (in the style of the ship stealer from Galaga) that makes play purple and reverses controls.

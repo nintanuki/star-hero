@@ -35,8 +35,15 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (pos)) # make pos = 400,500?
         self.speed = 2
         self.ready = True
+        
         self.laser_time = 0
-        self.laser_cooldown = 600 # lower numbers = faster rate of fire
+        self.default_laser_cooldown = 600 # lower numbers = faster rate of fire
+        self.powerup_laser_cooldown = 200
+        self.laser_cooldown = self.default_laser_cooldown
+
+        self.powerup_active = False
+        self.powerup_duration = 5000  # milliseconds
+        self.powerup_start_time = 0
 
         self.lasers = pygame.sprite.Group()
 
@@ -125,10 +132,23 @@ class Player(pygame.sprite.Sprite):
         # self.lasers.add(Laser(((self.rect.center[0] - 12),self.rect.center[1]),-8,'cyan','white'))
         # self.lasers.add(Laser(((self.rect.center[0] + 12),self.rect.center[1]),-8,'cyan','white'))
 
+    def activate_powerup(self):
+        self.powerup_active = True
+        self.powerup_start_time = pygame.time.get_ticks()
+        self.laser_cooldown = self.powerup_laser_cooldown
+
+    def check_powerup_timeout(self):
+        if self.powerup_active:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.powerup_start_time >= self.powerup_duration:
+                self.powerup_active = False
+                self.laser_cooldown = self.default_laser_cooldown
+
     def update(self):
         self.get_input()
         self.constraint()
         self.recharge()
+        self.check_powerup_timeout()
         self.lasers.update()
 
 class Alien(pygame.sprite.Sprite):
@@ -176,4 +196,20 @@ class Alien(pygame.sprite.Sprite):
             self.rect.x += self.blue_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1
+        self.destroy()
+
+class PowerUp(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        self.image = pygame.image.load('graphics/yellow_ball1.png').convert_alpha()
+        # self.image = pygame.transform.rotozoom(self.image, 0, 0.12)
+        self.rect = self.image.get_rect(center=pos)
+        self.speed = 2
+
+    def destroy(self):
+        if self.rect.top > SCREEN_HEIGHT:
+            self.kill()
+
+    def update(self):
+        self.rect.y += self.speed
         self.destroy()

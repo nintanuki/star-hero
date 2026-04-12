@@ -3,7 +3,7 @@ import sys, random, time
 import json
 from settings import *
 from animations import Background, Explosion, CRT
-from sprites import Laser, Player, Alien
+from sprites import Laser, Player, Alien, PowerUp
 from style import Style
 from audio import Audio
 import debug
@@ -66,6 +66,10 @@ class GameManager:
         self.aliens = pygame.sprite.Group()
         self.alien_lasers = pygame.sprite.Group()
 
+        # Powerup setup
+        self.powerups = pygame.sprite.Group()
+        self.powerup_drop_chance = 0.2  # 20% chance
+
         # Explosion setup
         self.exploding_sprites = pygame.sprite.Group()
 
@@ -76,6 +80,9 @@ class GameManager:
         self.aliens.add(Alien(alien_color,SCREEN_WIDTH,SCREEN_HEIGHT))
         if alien_color == 'blue':
             self.audio.channel_5.play(self.audio.ufo_sound)
+
+    def spawn_powerup(self, pos):
+        self.powerups.add(PowerUp(pos))
 
     def alien_shoot(self):
         if self.aliens.sprites():
@@ -96,10 +103,13 @@ class GameManager:
             for laser in self.player.sprite.lasers:
                 aliens_hit = pygame.sprite.spritecollide(laser,self.aliens,True)
                 if aliens_hit:
+                    laser.kill()
                     for alien in aliens_hit:
                         self.score += alien.value
-                    laser.kill()
-                    self.explode(alien.rect.x - 25,alien.rect.y - 25) # why isn't this centered?
+                        self.explode(alien.rect.x - 25,alien.rect.y - 25) # why isn't this centered?
+
+                        if random.random() < self.powerup_drop_chance:
+                            self.spawn_powerup(alien.rect.center)
 
         # when an alien shoots the player
         if self.alien_lasers:
@@ -134,6 +144,10 @@ class GameManager:
                 self.audio.channel_1.pause()
                 self.player_alive = False
                 pygame.time.set_timer(self.player_death_timer,500)
+
+        powerups_collected = pygame.sprite.spritecollide(self.player.sprite, self.powerups, True)
+        if powerups_collected:
+            self.player.sprite.activate_powerup()
 
     def score_check(self):
         """checks the current score against the high score"""
@@ -215,6 +229,7 @@ class GameManager:
                     if event.type == self.player_death_timer:
                         self.audio.player_down.play()
                         self.aliens.empty()
+                        self.powerups.empty()
                         self.game_active = False
                         pygame.time.set_timer(self.player_death_timer,0)
                 else:
@@ -223,6 +238,7 @@ class GameManager:
                         self.player.sprite.rect.center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
                         self.hearts = 3
                         self.alien_lasers.empty()
+                        self.powerups.empty()
                         self.player_alive = True
                         self.game_active = True
 
@@ -239,8 +255,8 @@ class GameManager:
                     self.audio.channel_1.play(self.audio.bg_music)
                 self.player.update()
                 self.alien_lasers.update()
-
                 self.aliens.update()
+                self.powerups.update()
                 self.collision_checks()
                 self.display_hearts()
 
@@ -254,6 +270,8 @@ class GameManager:
 
                 self.aliens.draw(self.screen)
                 self.alien_lasers.draw(self.screen)
+                self.powerups.draw(self.screen)
+
                 self.score_check()
                 self.style.update('game_active',self.save_data,self.score)
             else:

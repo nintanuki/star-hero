@@ -201,10 +201,41 @@ class Alien(pygame.sprite.Sprite):
 class PowerUp(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        self.image = pygame.image.load('graphics/yellow_ball1.png').convert_alpha()
-        # self.image = pygame.transform.rotozoom(self.image, 0, 0.12)
+
+        self.radius = 12
+        self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
         self.rect = self.image.get_rect(center=pos)
+
         self.speed = 2
+
+        # Flashing control
+        self.color1 = (0, 150, 255)   # blue
+        self.color2 = (255, 255, 255) # white
+        self.current_color = self.color1
+
+        self.flash_timer = 0
+        self.flash_speed = 200  # milliseconds
+
+    def animate(self):
+        current_time = pygame.time.get_ticks()
+
+        if current_time - self.flash_timer >= self.flash_speed:
+            self.flash_timer = current_time
+
+            # toggle color
+            if self.current_color == self.color1:
+                self.current_color = self.color2
+            else:
+                self.current_color = self.color1
+
+        # redraw circle every frame
+        self.image.fill((0, 0, 0, 0))  # clear (transparent)
+        pygame.draw.circle(
+            self.image,
+            self.current_color,
+            (self.radius, self.radius),
+            self.radius
+        )
 
     def destroy(self):
         if self.rect.top > SCREEN_HEIGHT:
@@ -212,4 +243,5 @@ class PowerUp(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.y += self.speed
+        self.animate()
         self.destroy()

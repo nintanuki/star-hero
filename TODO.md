@@ -7,7 +7,7 @@
 
 ### Ideas for Future Changes and Additions
 * Enemy shoots a beam (in the style of the ship stealer from Galaga) that makes play purple and reverses controls.
-* Powerups randomly float down
+* Change powerups from different rates of fire to different effects (twin laser, etc)
 * Add twin laser powerup
 * Display sprites of aliens on screen with how many points they are worth
 * Allow player to enter initials if they get the high score

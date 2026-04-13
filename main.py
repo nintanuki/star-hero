@@ -149,7 +149,11 @@ class GameManager:
         powerups_collected = pygame.sprite.spritecollide(self.player.sprite, self.powerups, True)
         if powerups_collected:
             for powerup in powerups_collected:
-                self.player.sprite.activate_powerup(powerup)
+                if powerup.powerup_type == 'heal':
+                    if self.hearts < 3:
+                        self.hearts += 1
+                else:
+                    self.player.sprite.activate_powerup(powerup)
 
     def score_check(self):
         """checks the current score against the high score"""

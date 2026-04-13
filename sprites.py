@@ -238,13 +238,21 @@ class PowerUp(pygame.sprite.Sprite):
         self.flash_color = (255, 255, 255)
         self.current_color = self.draw_color
 
-        self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
-        self.rect = self.image.get_rect(center=pos)
+        if self.shape == 'heart':
+            self.image = pygame.image.load('graphics/heart.png').convert_alpha()
+            self.image = pygame.transform.scale(self.image, (24, 24))
+            self.rect = self.image.get_rect(center=pos)
+        else:
+            self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
+            self.rect = self.image.get_rect(center=pos)
 
         self.flash_timer = 0
         self.flash_speed = 200  # milliseconds
 
     def animate(self):
+        if self.shape == 'heart':
+            return  # skip animation, keep sprite static
+
         current_time = pygame.time.get_ticks()
 
         if current_time - self.flash_timer >= self.flash_speed:

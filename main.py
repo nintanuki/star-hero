@@ -84,7 +84,7 @@ class GameManager:
     def spawn_powerup(self, pos, color):
         self.powerups.add(PowerUp(pos, color))
 
-    def alien_shoot(self):
+    def alien_shoot(self):  
         if self.aliens.sprites():
             random_alien = random.choice(self.aliens.sprites())
             laser_sprite = Laser(random_alien.rect.center,4,'yellow','white') # 2nd arg is alien laser speed
@@ -148,8 +148,8 @@ class GameManager:
 
         powerups_collected = pygame.sprite.spritecollide(self.player.sprite, self.powerups, True)
         if powerups_collected:
-            strongest_powerup = min(powerups_collected, key=lambda p: p.cooldown_bonus)
-            self.player.sprite.activate_powerup(strongest_powerup.cooldown_bonus)
+            for powerup in powerups_collected:
+                self.player.sprite.activate_powerup(powerup)
 
     def score_check(self):
         """checks the current score against the high score"""

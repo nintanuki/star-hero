@@ -41,9 +41,13 @@ class Player(pygame.sprite.Sprite):
         # self.powerup_laser_cooldown = 200
         self.laser_cooldown = self.default_laser_cooldown
 
-        self.powerup_active = False
-        self.powerup_duration = 5000  # milliseconds
-        self.powerup_start_time = 0
+        self.powerup_duration = 10000  # milliseconds
+
+        self.twin_laser_active = False
+        self.twin_laser_start_time = 0
+
+        self.rapid_fire_active = False
+        self.rapid_fire_start_time = 0
 
         self.lasers = pygame.sprite.Group()
 
@@ -125,23 +129,45 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = SCREEN_HEIGHT
 
     def shoot_laser(self):
-        # Single Laser
-        self.lasers.add(Laser(self.rect.center,-8,'cyan','white'))
+        if self.rapid_fire_active:
+            laser_color_1 = 'cyan'
+            laser_color_2 = 'white'
+        else:
+            laser_color_1 = 'green'
+            laser_color_2 = 'white'
+
+        if self.twin_laser_active:
+            self.lasers.add(Laser((self.rect.centerx - 12, self.rect.centery), -8, laser_color_1, laser_color_2))
+            self.lasers.add(Laser((self.rect.centerx + 12, self.rect.centery), -8, laser_color_1, laser_color_2))
+        else:
+            self.lasers.add(Laser(self.rect.center, -8, laser_color_1, laser_color_2))
 
         # Twin Lasers
         # self.lasers.add(Laser(((self.rect.center[0] - 12),self.rect.center[1]),-8,'cyan','white'))
         # self.lasers.add(Laser(((self.rect.center[0] + 12),self.rect.center[1]),-8,'cyan','white'))
 
-    def activate_powerup(self, new_cooldown):
-        self.powerup_active = True
-        self.powerup_start_time = pygame.time.get_ticks()
-        self.laser_cooldown = new_cooldown
+    def activate_powerup(self, powerup):
+        current_time = pygame.time.get_ticks()
+
+        if powerup.powerup_type == 'twin_laser':
+            self.twin_laser_active = True
+            self.twin_laser_start_time = current_time
+
+        elif powerup.powerup_type in ('fast_fire', 'extreme_fire'):
+            self.rapid_fire_active = True
+            self.rapid_fire_start_time = current_time
+            self.laser_cooldown = powerup.cooldown_bonus
 
     def check_powerup_timeout(self):
-        if self.powerup_active:
-            current_time = pygame.time.get_ticks()
-            if current_time - self.powerup_start_time >= self.powerup_duration:
-                self.powerup_active = False
+        current_time = pygame.time.get_ticks()
+
+        if self.twin_laser_active:
+            if current_time - self.twin_laser_start_time >= self.powerup_duration:
+                self.twin_laser_active = False
+
+        if self.rapid_fire_active:
+            if current_time - self.rapid_fire_start_time >= self.powerup_duration:
+                self.rapid_fire_active = False
                 self.laser_cooldown = self.default_laser_cooldown
 
     def update(self):
@@ -201,12 +227,13 @@ class Alien(pygame.sprite.Sprite):
 class PowerUp(pygame.sprite.Sprite):
     def __init__(self, pos, color):
         super().__init__()
-        self.powerup_type = color
         self.radius = 12
         self.speed = 2
+        self.shape = POWERUP_DATA[color].get('shape', 'circle')
 
         self.draw_color = POWERUP_DATA[color]['draw_color']
-        self.cooldown_bonus = POWERUP_DATA[color]['cooldown']
+        self.powerup_type = POWERUP_DATA[color]['type']
+        self.cooldown_bonus = POWERUP_DATA[color].get('cooldown', None)
 
         self.flash_color = (255, 255, 255)
         self.current_color = self.draw_color
@@ -231,12 +258,22 @@ class PowerUp(pygame.sprite.Sprite):
 
         # redraw circle every frame
         self.image.fill((0, 0, 0, 0))
-        pygame.draw.circle(
-            self.image,
-            self.current_color,
-            (self.radius, self.radius),
-            self.radius
-        )
+
+        if self.shape == 'diamond':
+            points = [
+                (self.radius, 0),                    # top
+                (self.radius * 2, self.radius),      # right
+                (self.radius, self.radius * 2),      # bottom
+                (0, self.radius)                     # left
+            ]
+            pygame.draw.polygon(self.image, self.current_color, points)
+        else:
+            pygame.draw.circle(
+                self.image,
+                self.current_color,
+                (self.radius, self.radius),
+                self.radius
+            )
 
     def destroy(self):
         if self.rect.top > SCREEN_HEIGHT:

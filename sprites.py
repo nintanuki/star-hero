@@ -38,7 +38,7 @@ class Player(pygame.sprite.Sprite):
         
         self.laser_time = 0
         self.default_laser_cooldown = 600 # lower numbers = faster rate of fire
-        self.powerup_laser_cooldown = 200
+        # self.powerup_laser_cooldown = 200
         self.laser_cooldown = self.default_laser_cooldown
 
         self.powerup_active = False
@@ -132,10 +132,10 @@ class Player(pygame.sprite.Sprite):
         # self.lasers.add(Laser(((self.rect.center[0] - 12),self.rect.center[1]),-8,'cyan','white'))
         # self.lasers.add(Laser(((self.rect.center[0] + 12),self.rect.center[1]),-8,'cyan','white'))
 
-    def activate_powerup(self):
+    def activate_powerup(self, new_cooldown):
         self.powerup_active = True
         self.powerup_start_time = pygame.time.get_ticks()
-        self.laser_cooldown = self.powerup_laser_cooldown
+        self.laser_cooldown = new_cooldown
 
     def check_powerup_timeout(self):
         if self.powerup_active:
@@ -199,19 +199,20 @@ class Alien(pygame.sprite.Sprite):
         self.destroy()
 
 class PowerUp(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, color):
         super().__init__()
-
+        self.powerup_type = color
         self.radius = 12
-        self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
-        self.rect = self.image.get_rect(center=pos)
-
         self.speed = 2
 
-        # Flashing control
-        self.color1 = (0, 150, 255)   # blue
-        self.color2 = (255, 255, 255) # white
-        self.current_color = self.color1
+        self.draw_color = POWERUP_DATA[color]['draw_color']
+        self.cooldown_bonus = POWERUP_DATA[color]['cooldown']
+
+        self.flash_color = (255, 255, 255)
+        self.current_color = self.draw_color
+
+        self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
+        self.rect = self.image.get_rect(center=pos)
 
         self.flash_timer = 0
         self.flash_speed = 200  # milliseconds
@@ -222,14 +223,14 @@ class PowerUp(pygame.sprite.Sprite):
         if current_time - self.flash_timer >= self.flash_speed:
             self.flash_timer = current_time
 
-            # toggle color
-            if self.current_color == self.color1:
-                self.current_color = self.color2
+            # toggle between the orb's color and white
+            if self.current_color == self.draw_color:
+                self.current_color = self.flash_color
             else:
-                self.current_color = self.color1
+                self.current_color = self.draw_color
 
         # redraw circle every frame
-        self.image.fill((0, 0, 0, 0))  # clear (transparent)
+        self.image.fill((0, 0, 0, 0))
         pygame.draw.circle(
             self.image,
             self.current_color,

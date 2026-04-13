@@ -68,7 +68,7 @@ class GameManager:
 
         # Powerup setup
         self.powerups = pygame.sprite.Group()
-        self.powerup_drop_chance = 0.2  # 20% chance
+        # self.powerup_drop_chance = 0.2  # 20% chance
 
         # Explosion setup
         self.exploding_sprites = pygame.sprite.Group()
@@ -81,8 +81,8 @@ class GameManager:
         if alien_color == 'blue':
             self.audio.channel_5.play(self.audio.ufo_sound)
 
-    def spawn_powerup(self, pos):
-        self.powerups.add(PowerUp(pos))
+    def spawn_powerup(self, pos, color):
+        self.powerups.add(PowerUp(pos, color))
 
     def alien_shoot(self):
         if self.aliens.sprites():
@@ -104,12 +104,13 @@ class GameManager:
                 aliens_hit = pygame.sprite.spritecollide(laser,self.aliens,True)
                 if aliens_hit:
                     laser.kill()
+
                     for alien in aliens_hit:
                         self.score += alien.value
                         self.explode(alien.rect.x - 25,alien.rect.y - 25) # why isn't this centered?
 
-                        if alien.color == 'blue' and random.random() < self.powerup_drop_chance:
-                            self.spawn_powerup(alien.rect.center)
+                        if random.random() < DROP_CHANCES[alien.color]:
+                            self.spawn_powerup(alien.rect.center, alien.color)
 
         # when an alien shoots the player
         if self.alien_lasers:
@@ -147,7 +148,8 @@ class GameManager:
 
         powerups_collected = pygame.sprite.spritecollide(self.player.sprite, self.powerups, True)
         if powerups_collected:
-            self.player.sprite.activate_powerup()
+            strongest_powerup = min(powerups_collected, key=lambda p: p.cooldown_bonus)
+            self.player.sprite.activate_powerup(strongest_powerup.cooldown_bonus)
 
     def score_check(self):
         """checks the current score against the high score"""

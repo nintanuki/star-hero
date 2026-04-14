@@ -211,10 +211,7 @@ class Alien(pygame.sprite.Sprite):
         # Give green aliens twin lasers
         self.is_twin = True if color == 'green' else False
 
-        if color == 'red': self.value = 100
-        elif color == 'green': self.value = 200
-        elif color == 'yellow': self.value = 300
-        else: self.value = 500
+        self.value = ALIEN_VALUES.get(color, 0)
 
     def destroy(self):
         if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease

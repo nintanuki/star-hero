@@ -164,8 +164,8 @@ class GameManager:
     def display_hearts(self):
         """displays the heart icons on the top right"""
         for heart in range(self.hearts):
-            x = self.heart_x_start_pos + (heart * (self.heart_surf.get_size()[0] + 10))
-            self.screen.blit(self.heart_surf,(x,8))
+            x = self.heart_x_start_pos + (heart * (self.heart_surf.get_size()[0] + HEART_SPACING))
+            self.screen.blit(self.heart_surf,(x,HEART_TOP_MARGIN))
 
     def pause(self):
         """Pauses game when ESC is pressed"""
@@ -213,13 +213,13 @@ class GameManager:
                         self.audio.master_volume += 0.1
                         self.audio.master_volume = min(self.audio.master_volume, 1.0)
                         self.audio.update()
-                        pygame.time.set_timer(self.volume_display_timer,1000)
+                        pygame.time.set_timer(self.volume_display_timer,VOLUME_DISPLAY_TIME)
                         self.show_volume = True
                     elif event.key == pygame.K_KP_MINUS or event.key == pygame.K_MINUS:
                         self.audio.master_volume -= 0.1
                         self.audio.master_volume = max(self.audio.master_volume, 0.0)
                         self.audio.update()
-                        pygame.time.set_timer(self.volume_display_timer,1000)
+                        pygame.time.set_timer(self.volume_display_timer,VOLUME_DISPLAY_TIME)
                         self.show_volume = True
                 if event.type == self.volume_display_timer:
                     self.show_volume = False

@@ -45,9 +45,10 @@ EXPLOSION_SPEED = 0.15 # smaller numbers = slower explosion animation. Always 0.
 EXPLOSION_SIZE = 192 # size of each frame in the spritesheet, definse both width and height
 EXPLOSION_SCALE = 0.5
 
+# UI Settings
 HEART_SPACING = 10
 HEART_TOP_MARGIN = 8
-VOLUME_DISPLAY_TIME = 1000 # ms
+VOLUME_DISPLAY_TIME = 1000
 CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
 
 # Powerup Visuals

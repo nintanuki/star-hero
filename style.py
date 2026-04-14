@@ -24,7 +24,7 @@ class Style():
         # Load image of ship for intro and game over screens
         self.player_ship = pygame.image.load('graphics/player_ship.png').convert_alpha()
         self.player_ship = pygame.transform.rotozoom(self.player_ship,0,0.2)
-        self.player_ship_rect = self.player_ship.get_rect(center = (SCREEN_WIDTH/2,SCREEN_HEIGHT/2))
+        self.player_ship_rect = self.player_ship.get_rect(center = (SCREEN_CENTER))
 
     def display_title(self):
         """# Displays the title on the intro and game over screens"""
@@ -80,7 +80,7 @@ class Style():
     def display_pause_text(self):
         """Displays the Pause message on pause"""
         pause_text = self.medium_font.render('PAUSED', False, (self.font_color))
-        pause_text_rect = pause_text.get_rect(center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
+        pause_text_rect = pause_text.get_rect(center = (SCREEN_CENTER))
         self.screen.blit(pause_text,pause_text_rect)
 
     def display_volume(self):

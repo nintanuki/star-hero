@@ -34,7 +34,7 @@ class GameManager:
         Background(self.background)
 
         # Player setup
-        player_sprite = Player((SCREEN_WIDTH/2,SCREEN_HEIGHT/2),self.audio)
+        player_sprite = Player((SCREEN_CENTER),self.audio)
         self.player = pygame.sprite.GroupSingle(player_sprite)
         self.player_alive = True
 
@@ -51,13 +51,11 @@ class GameManager:
             print('No file created yet')
 
         # Timers
-        self.alien_spawn_rate = 600 # lower numbers = faster rate of enemy spawn
         self.alien_spawn_timer = pygame.event.custom_type()
-        pygame.time.set_timer(self.alien_spawn_timer,self.alien_spawn_rate)
+        pygame.time.set_timer(self.alien_spawn_timer,ALIEN_SPAWN_RATE)
 
-        self.alien_laser_rate = 400 # lower numbers = more lasers
         self.alien_laser_timer = pygame.event.custom_type()
-        pygame.time.set_timer(self.alien_laser_timer,self.alien_laser_rate)
+        pygame.time.set_timer(self.alien_laser_timer,ALIEN_LASER_RATE)
 
         self.player_death_timer = pygame.event.custom_type()
         self.volume_display_timer = pygame.event.custom_type()
@@ -68,7 +66,6 @@ class GameManager:
 
         # Powerup setup
         self.powerups = pygame.sprite.Group()
-        # self.powerup_drop_chance = 0.2  # 20% chance
 
         # Explosion setup
         self.exploding_sprites = pygame.sprite.Group()
@@ -87,7 +84,7 @@ class GameManager:
     def alien_shoot(self):  
         if self.aliens.sprites():
             random_alien = random.choice(self.aliens.sprites())
-            laser_sprite = Laser(random_alien.rect.center,4,'yellow','white') # 2nd arg is alien laser speed
+            laser_sprite = Laser(random_alien.rect.center,ALIEN_LASER_SPEED,'yellow','white')
             self.alien_lasers.add(laser_sprite)
 
     def explode(self,x_pos,y_pos):
@@ -225,10 +222,7 @@ class GameManager:
                     pygame.time.set_timer(self.volume_display_timer,0)
                 if self.game_active:
                     if event.type == self.alien_spawn_timer:
-                        alien_color = random.choice(['red','red','red','red','red',
-                                                     'green','green','green',
-                                                     'yellow','yellow',
-                                                     'blue'])
+                        alien_color = random.choice(ALIEN_TYPES)
                         self.spawn_aliens(alien_color)
                     if event.type == self.alien_laser_timer:
                         self.alien_shoot()
@@ -241,7 +235,7 @@ class GameManager:
                 else:
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                         self.score = 0
-                        self.player.sprite.rect.center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+                        self.player.sprite.rect.center = SCREEN_CENTER
                         self.hearts = 3
                         self.alien_lasers.empty()
                         self.powerups.empty()
@@ -271,8 +265,7 @@ class GameManager:
                     self.player.draw(self.screen)
                 self.exploding_sprites.draw(self.screen)
 
-                # smaller numbers = slower explosion animation. Always 0.x
-                self.exploding_sprites.update(0.15)
+                self.exploding_sprites.update(EXPLOSION_SPEED)
 
                 self.aliens.draw(self.screen)
                 self.alien_lasers.draw(self.screen)

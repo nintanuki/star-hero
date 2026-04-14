@@ -31,17 +31,16 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,pos,audio):
         super().__init__()
         self.image = pygame.image.load('graphics/player_ship.png').convert_alpha()
-        self.image = pygame.transform.rotozoom(self.image,0,0.15)
+        self.image = pygame.transform.rotozoom(self.image,0,PLAYER_SCALE)
         self.rect = self.image.get_rect(center = (pos)) # make pos = 400,500?
-        self.speed = 2
+        self.speed = PLAYER_SPEED
         self.ready = True
         
         self.laser_time = 0
-        self.default_laser_cooldown = 600 # lower numbers = faster rate of fire
-        # self.powerup_laser_cooldown = 200
+        self.default_laser_cooldown = DEFAULT_LASER_COOLDOWN
         self.laser_cooldown = self.default_laser_cooldown
 
-        self.powerup_duration = 10000  # milliseconds
+        self.powerup_duration = POWERUP_DURATION
 
         self.twin_laser_active = False
         self.twin_laser_start_time = 0
@@ -137,14 +136,10 @@ class Player(pygame.sprite.Sprite):
             laser_color_2 = 'white'
 
         if self.twin_laser_active:
-            self.lasers.add(Laser((self.rect.centerx - 12, self.rect.centery), -8, laser_color_1, laser_color_2))
-            self.lasers.add(Laser((self.rect.centerx + 12, self.rect.centery), -8, laser_color_1, laser_color_2))
+            self.lasers.add(Laser((self.rect.centerx - 12, self.rect.centery), PLAYER_LASER_SPEED, laser_color_1, laser_color_2))
+            self.lasers.add(Laser((self.rect.centerx + 12, self.rect.centery), PLAYER_LASER_SPEED, laser_color_1, laser_color_2))
         else:
-            self.lasers.add(Laser(self.rect.center, -8, laser_color_1, laser_color_2))
-
-        # Twin Lasers
-        # self.lasers.add(Laser(((self.rect.center[0] - 12),self.rect.center[1]),-8,'cyan','white'))
-        # self.lasers.add(Laser(((self.rect.center[0] + 12),self.rect.center[1]),-8,'cyan','white'))
+            self.lasers.add(Laser(self.rect.center, PLAYER_LASER_SPEED, laser_color_1, laser_color_2))
 
     def activate_powerup(self, powerup):
         current_time = pygame.time.get_ticks()
@@ -206,10 +201,10 @@ class Alien(pygame.sprite.Sprite):
 
     # numbers round down if decimals are used? .05 doesn't move and 1 is the same as 1.5, etc
     def update(self):
-        if self.color == 'red': self.rect.y += 1
-        elif self.color == 'green': self.rect.y += 2
+        if self.color == 'red': self.rect.y += ALIEN_DESCEND_SPEED_RED
+        elif self.color == 'green': self.rect.y += ALIEN_DESCEND_SPEED_GREEN
         elif self.color == 'yellow':
-            self.rect.y += 3
+            self.rect.y += ALIEN_DESCEND_SPEED_YELLOW
             self.yellow_zigzag_counter += 1
             if self.yellow_zigzag_counter >= 100: # change direction every 100 updates
                 self.yellow_zigzag_counter = 0
@@ -218,7 +213,7 @@ class Alien(pygame.sprite.Sprite):
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.yellow_zigzag_direction *= -1
         else: # color is blue
-            self.rect.y += 5
+            self.rect.y += ALIEN_DESCEND_SPEED_BLUE
             self.rect.x += self.blue_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1

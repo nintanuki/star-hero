@@ -93,6 +93,22 @@ class GameManager:
         self.exploding_sprites.add(self.explosion)
         self.explosion.explode()
 
+    def player_damage(self):
+        self.hearts -= 1
+        
+        # Handle alarms
+        if self.hearts == 2:
+            self.audio.channel_4.play(self.audio.low_health_alarm1)
+        elif self.hearts == 1:
+            self.audio.channel_4.play(self.audio.low_health_alarm2)
+        
+        # Handle death
+        if self.hearts <= 0:
+            self.explode(self.player.sprite.rect.centerx, self.player.sprite.rect.centery)
+            self.audio.channel_1.pause()
+            self.player_alive = False
+            pygame.time.set_timer(self.player_death_timer, PLAYER_DEATH_DELAY)
+
     def collision_checks(self):
         """All collisions between player, aliens and lasers"""
         # when the player shoots an alien
@@ -104,7 +120,7 @@ class GameManager:
 
                     for alien in aliens_hit:
                         self.score += alien.value
-                        self.explode(alien.rect.x - 25,alien.rect.y - 25)
+                        self.explode(alien.rect.centerx, alien.rect.centery)
 
                         if random.random() < DROP_CHANCES[alien.color]:
                             self.spawn_powerup(alien.rect.center, alien.color)
@@ -114,16 +130,7 @@ class GameManager:
             for laser in self.alien_lasers:
                 if pygame.sprite.spritecollide(laser,self.player,False):
                     laser.kill()
-                    self.hearts -= 1
-                    if self.hearts == 2:
-                        self.audio.channel_4.play(self.audio.low_health_alarm1)
-                    if self.hearts == 1:
-                        self.audio.channel_4.play(self.audio.low_health_alarm2)
-                    if self.hearts <= 0:
-                        self.explode(self.player.sprite.rect.x - 25,self.player.sprite.rect.y - 25)
-                        self.audio.channel_1.pause()
-                        self.player_alive = False
-                        pygame.time.set_timer(self.player_death_timer,500)
+                    self.player_damage()
 
         # when an alien and the player collide
         aliens_crash = pygame.sprite.spritecollide(self.player.sprite,self.aliens,True)
@@ -131,17 +138,8 @@ class GameManager:
             for alien in aliens_crash:
                 self.score += alien.value
                 if self.hearts > 1:
-                    self.explode(alien.rect.x - 25,alien.rect.y - 25)
-            self.hearts -= 1
-            if self.hearts == 2:
-                self.audio.channel_4.play(self.audio.low_health_alarm1)
-            if self.hearts == 1:
-                self.audio.channel_4.play(self.audio.low_health_alarm2)
-            if self.hearts <= 0:
-                self.explode(self.player.sprite.rect.x - 25,self.player.sprite.rect.y - 25)
-                self.audio.channel_1.pause()
-                self.player_alive = False
-                pygame.time.set_timer(self.player_death_timer,500)
+                    self.explode(alien.rect.centerx, alien.rect.centery)
+            self.player_damage()
 
         powerups_collected = pygame.sprite.spritecollide(self.player.sprite, self.powerups, True)
         if powerups_collected:

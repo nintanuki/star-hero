@@ -20,6 +20,7 @@ PLAYER_SCALE = 0.15
 PLAYER_LASER_SPEED = -8
 DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
 POWERUP_DURATION = 10000 # 10000 milliseconds = 10 seconds
+PLAYER_DEATH_DELAY = 500
 
 # Alien Settings
 ALIEN_SPAWN_RATE = 600 # lower numbers = faster rate of enemy spawn
@@ -36,13 +37,16 @@ ALIEN_TYPES = ['red','red','red','red','red',
 'blue']
 
 # Visual Effects
-CRT_ALPHA_RANGE = (75, 90)
+EXPLOSION_FRAMES = 7 # there are seven unique images in the explosion sprite sheet
 EXPLOSION_SPEED = 0.15 # smaller numbers = slower explosion animation. Always 0.x
+EXPLOSION_SIZE = 192 # size of each frame in the spritesheet, definse both width and height
 EXPLOSION_SCALE = 0.5
+
+CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
 
 # Powerup Visuals
 POWERUP_RADIUS = 12
-POWERUP_SPEED = 2
+POWERUP_SPEED = 2 # how fast the powerup floats down?
 POWERUP_FLASH_SPEED = 200
 
 POWERUP_DATA = {

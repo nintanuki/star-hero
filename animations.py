@@ -33,20 +33,13 @@ class Explosion(pygame.sprite.Sprite):
         # sprite sheet from https://www.pngwing.com/en/free-png-xiyem/
         sprite_sheet = pygame.image.load('graphics/explosion.png').convert_alpha()
 
-        self.sprites = []
-        self.sprites.append(self.get_image(sprite_sheet,0,192,192,.5))
-        self.sprites.append(self.get_image(sprite_sheet,1,192,192,.5))
-        self.sprites.append(self.get_image(sprite_sheet,2,192,192,.5))
-        self.sprites.append(self.get_image(sprite_sheet,3,192,192,.5))
-        self.sprites.append(self.get_image(sprite_sheet,4,192,192,.5))
-        self.sprites.append(self.get_image(sprite_sheet,5,192,192,.5))
-        self.sprites.append(self.get_image(sprite_sheet,6,192,192,.5))
+        # Using list comprehension to build the explosion animation fromt he sprite sheet
+        self.sprites = [self.get_image(sprite_sheet, frame, EXPLOSION_SIZE, EXPLOSION_SIZE, EXPLOSION_SCALE) for frame in range(EXPLOSION_FRAMES)]
 
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]
 
-        self.rect = self.image.get_rect()
-        self.rect.topleft = [pos_x,pos_y] # center this?
+        self.rect = self.image.get_rect(center = (pos_x, pos_y))
 
     # see sprite sheet tutorials by Coding With Russ:
     # https://www.youtube.com/watch?v=M6e3_8LHc7A
@@ -85,6 +78,6 @@ class CRT:
             pygame.draw.line(self.tv,'black',(0,y_pos),(SCREEN_WIDTH,y_pos),1)
 
     def draw(self):
-        self.tv.set_alpha(random.randint(75,90))
+        self.tv.set_alpha(random.randint(75,90)) # can't pass in CRT_ALPHA_RANGE from settings
         self.create_crt_lines()
         self.screen.blit(self.tv,(0,0))

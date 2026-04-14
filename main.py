@@ -107,7 +107,7 @@ class GameManager:
 
                     for alien in aliens_hit:
                         self.score += alien.value
-                        self.explode(alien.rect.x - 25,alien.rect.y - 25) # why isn't this centered?
+                        self.explode(alien.rect.x - 25,alien.rect.y - 25)
 
                         if random.random() < DROP_CHANCES[alien.color]:
                             self.spawn_powerup(alien.rect.center, alien.color)

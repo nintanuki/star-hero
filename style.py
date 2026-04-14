@@ -4,7 +4,6 @@ from settings import *
 class Style():
     """Class for displaying text"""
     def __init__(self,screen,audio):
-        super().__init__() # why is this necessary?
         self.screen = screen
         self.small_font = pygame.font.Font('font/Pixeled.ttf',10)
         self.medium_font = pygame.font.Font('font/Pixeled.ttf',20)

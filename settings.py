@@ -34,6 +34,7 @@ ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing
 
 # Laser Settings
 DEFAULT_LASER_WIDTH = 4
+BEAM_LASER_WIDTH = 12
 LASER_HEIGHT = 20
 PLAYER_LASER_SPEED = -8
 ALIEN_LASER_SPEED = 4
@@ -56,14 +57,15 @@ POWERUP_FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
 LASER_COLORS = {
     'standard': ('green', 'white'),
     'rapid':    ('cyan', 'white'),
-    'alien':    ('yellow', 'white')
+    'alien':    ('yellow', 'white'),
+    'beam':     ('white', 'blue')
 }
 
 POWERUP_DATA = {
-    'red':    {'draw_color': (255, 80, 80),   'type': 'heal', 'shape': 'heart'},
-    'green':  {'draw_color': (60, 255, 100),  'type': 'twin_laser',  'shape': 'diamond'},
-    'yellow': {'draw_color': (255, 220, 60),  'type': 'rapid_fire',   'shape': 'circle', 'cooldown': 150},
-    'blue':   {'draw_color': (80, 160, 255),  'type': 'beam','shape': 'circle', 'cooldown': 0},
+    'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},
+    'green':  {'draw_color': (60, 255, 100), 'type': 'twin_laser', 'shape': 'diamond'},
+    'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': 150},
+    'blue':   {'draw_color': (80, 160, 255), 'type': 'beam',       'shape': 'circle', 'cooldown': 0},
 }
 
 DROP_CHANCES = {

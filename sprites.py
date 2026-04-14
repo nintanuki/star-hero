@@ -3,11 +3,11 @@ import random
 from settings import *
 
 class Laser(pygame.sprite.Sprite):
-    def __init__(self,pos,speed,colors):
+    def __init__(self, pos, speed, colors, width):
         super().__init__()
         self.colors = colors
         self.color_index = 0
-        self.image = pygame.Surface((DEFAULT_LASER_WIDTH, LASER_HEIGHT))
+        self.image = pygame.Surface((width, LASER_HEIGHT))
         self.image.fill(self.colors[self.color_index])
         self.rect = self.image.get_rect(center = pos)
         self.speed = speed
@@ -33,10 +33,9 @@ class Player(pygame.sprite.Sprite):
         self.ready = True
         
         self.laser_time = 0
-        self.default_laser_cooldown = DEFAULT_LASER_COOLDOWN
-        self.laser_cooldown = self.default_laser_cooldown
-
-        self.powerup_duration = POWERUP_DURATION
+        self.laser_cooldown = DEFAULT_LASER_COOLDOWN
+        self.beam_active = False
+        self.beam_start_time = 0
 
         self.twin_laser_active = False
         self.twin_laser_start_time = 0
@@ -124,16 +123,27 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = SCREEN_HEIGHT
 
     def shoot_laser(self):
-        # 1. Determine the colors
-        laser_type = 'rapid' if self.rapid_fire_active else 'standard'
-        colors = LASER_COLORS[laser_type]
+        
+        # 1. Determine the colors and size of the lasers
+        if self.beam_active:
+            colors = LASER_COLORS['beam']
+            width = BEAM_LASER_WIDTH
+            offset = 20              # Extra space for thick beams
+        elif self.rapid_fire_active:
+            colors = LASER_COLORS['rapid']
+            width = DEFAULT_LASER_WIDTH
+            offset = 12
+        else:
+            colors = LASER_COLORS['standard']
+            width = DEFAULT_LASER_WIDTH
+            offset = 12
 
         # 2. Spawn the lasers
         if self.twin_laser_active:
-            self.lasers.add(Laser((self.rect.centerx - 12, self.rect.centery), PLAYER_LASER_SPEED, colors))
-            self.lasers.add(Laser((self.rect.centerx + 12, self.rect.centery), PLAYER_LASER_SPEED, colors))
+            self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), PLAYER_LASER_SPEED, colors, width))
+            self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), PLAYER_LASER_SPEED, colors, width))
         else:
-            self.lasers.add(Laser(self.rect.center, PLAYER_LASER_SPEED, colors))
+            self.lasers.add(Laser(self.rect.center, PLAYER_LASER_SPEED, colors, width))
 
     def activate_powerup(self, powerup):
         current_time = pygame.time.get_ticks()
@@ -142,22 +152,36 @@ class Player(pygame.sprite.Sprite):
             self.twin_laser_active = True
             self.twin_laser_start_time = current_time
 
-        elif powerup.powerup_type in ('rapid_fire', 'beam'):
+        elif powerup.powerup_type == 'rapid_fire':
             self.rapid_fire_active = True
             self.rapid_fire_start_time = current_time
             self.laser_cooldown = powerup.cooldown_bonus
+            # Turn off beam if it was active so they don't fight
+            self.beam_active = False 
+
+        elif powerup.powerup_type == 'beam':
+            self.beam_active = True
+            self.beam_start_time = current_time
+            self.laser_cooldown = powerup.cooldown_bonus
+            # Turn off rapid fire if it was active
+            self.rapid_fire_active = False
 
     def check_powerup_timeout(self):
         current_time = pygame.time.get_ticks()
 
         if self.twin_laser_active:
-            if current_time - self.twin_laser_start_time >= self.powerup_duration:
+            if current_time - self.twin_laser_start_time >= POWERUP_DURATION:
                 self.twin_laser_active = False
 
         if self.rapid_fire_active:
-            if current_time - self.rapid_fire_start_time >= self.powerup_duration:
+            if current_time - self.rapid_fire_start_time >= POWERUP_DURATION:
                 self.rapid_fire_active = False
-                self.laser_cooldown = self.default_laser_cooldown
+                self.laser_cooldown = DEFAULT_LASER_COOLDOWN
+
+        if self.beam_active:
+            if current_time - self.beam_start_time >= POWERUP_DURATION:
+                self.beam_active = False
+                self.laser_cooldown = DEFAULT_LASER_COOLDOWN
 
     def update(self):
         self.get_input()

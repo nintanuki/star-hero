@@ -84,7 +84,7 @@ class GameManager:
     def alien_shoot(self):  
         if self.aliens.sprites():
             random_alien = random.choice(self.aliens.sprites())
-            laser_sprite = Laser(random_alien.rect.center, ALIEN_LASER_SPEED, LASER_COLORS['alien'])
+            laser_sprite = Laser(random_alien.rect.center, ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH)
             self.alien_lasers.add(laser_sprite)
 
     def explode(self,x_pos,y_pos):

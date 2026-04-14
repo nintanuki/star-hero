@@ -78,6 +78,6 @@ class CRT:
             pygame.draw.line(self.tv,'black',(0,y_pos),(SCREEN_WIDTH,y_pos),1)
 
     def draw(self):
-        self.tv.set_alpha(random.randint(75,90)) # can't pass in CRT_ALPHA_RANGE from settings
+        self.tv.set_alpha(random.randint(*CRT_ALPHA_RANGE))
         self.create_crt_lines()
         self.screen.blit(self.tv,(0,0))

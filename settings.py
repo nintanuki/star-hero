@@ -45,6 +45,9 @@ EXPLOSION_SPEED = 0.15 # smaller numbers = slower explosion animation. Always 0.
 EXPLOSION_SIZE = 192 # size of each frame in the spritesheet, definse both width and height
 EXPLOSION_SCALE = 0.5
 
+HEART_SPACING = 10
+HEART_TOP_MARGIN = 8
+VOLUME_DISPLAY_TIME = 1000 # ms
 CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
 
 # Powerup Visuals
@@ -73,4 +76,12 @@ DROP_CHANCES = {
     'green': 0.20,
     'yellow': 0.15,
     'blue': 0.10,
+}
+
+# Scoring
+ALIEN_VALUES = {
+    'red': 100,
+    'green': 200,
+    'yellow': 300,
+    'blue': 500
 }

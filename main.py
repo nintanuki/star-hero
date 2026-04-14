@@ -213,6 +213,26 @@ class GameManager:
                         json.dump(self.save_data,high_score_file)
                     pygame.quit()
                     sys.exit()
+
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == 7:  # Button 7 is usually 'Start'
+                        if self.game_active:
+                            # Pause the game
+                            self.audio.channel_0.pause()
+                            self.audio.channel_1.pause()
+                            self.audio.channel_6.play(self.audio.pause_sound)
+                            self.pause()
+                        else:
+                            # Start/Restart the game
+                            self.score = 0
+                            self.player.sprite.rect.center = SCREEN_CENTER
+                            self.hearts = 3
+                            self.alien_lasers.empty()
+                            self.powerups.empty()
+                            self.player_alive = True
+                            self.game_active = True
+
+                # Keyboard input
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_F11:
                         pygame.display.toggle_fullscreen()
@@ -236,6 +256,7 @@ class GameManager:
                 if event.type == self.volume_display_timer:
                     self.show_volume = False
                     pygame.time.set_timer(self.volume_display_timer,0)
+
                 if self.game_active:
                     if event.type == self.alien_spawn_timer:
                         alien_color = random.choices(ALIEN_TYPES, weights=ALIEN_WEIGHTS)[0]

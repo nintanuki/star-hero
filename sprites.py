@@ -48,34 +48,48 @@ class Player(pygame.sprite.Sprite):
         self.audio = audio
 
     def get_input(self):
-        # Keyboard input
+        # 1. Determine current speed (check Keyboard 'F' or Controller 'X')
         keys = pygame.key.get_pressed()
+        current_speed = self.speed
+        
+        # Check all connected joysticks for the X button (Button 2)
+        controller_boost = False
+        for i in range(pygame.joystick.get_count()):
+            joy = pygame.joystick.Joystick(i)
+            if joy.get_button(2): # 2 is usually 'X' on Logitech/Xbox layouts
+                controller_boost = True
+
+        if keys[pygame.K_f] or controller_boost:
+            current_speed *= 2 # Doubles the movement speed
+
+        # 2. Keyboard Movement
         if (keys[pygame.K_w] or keys[pygame.K_UP]):
-            self.rect.y -= self.speed
+            self.rect.y -= current_speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]):
-            self.rect.y += self.speed
+            self.rect.y += current_speed
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]):
-            self.rect.x -= self.speed
+            self.rect.x -= current_speed
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]):
-            self.rect.x += self.speed
+            self.rect.x += current_speed
 
-        # Controller input
-        for joy in [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]:
-            # Left Thumbstick - Axis 0 (Horizontal) and Axis 1 (Vertical)
-            # 0.2 is a "deadzone" to prevent drifting
+        # 3. Controller Input
+        for i in range(pygame.joystick.get_count()):
+            joy = pygame.joystick.Joystick(i)
+            
+            # Left Thumbstick Movement
             if abs(joy.get_axis(0)) > 0.2:
-                self.rect.x += joy.get_axis(0) * self.speed
+                self.rect.x += joy.get_axis(0) * current_speed
             if abs(joy.get_axis(1)) > 0.2:
-                self.rect.y += joy.get_axis(1) * self.speed
+                self.rect.y += joy.get_axis(1) * current_speed
 
-            # A Button (usually button 0 or 1 depending on mode)
+            # A Button (Button 0) to Shoot
             if joy.get_button(0) and self.ready:
                 self.shoot_laser()
                 self.ready = False
                 self.laser_time = pygame.time.get_ticks()
                 self.audio.channel_3.play(self.audio.laser_sound)
 
-        # Keyboard shooting
+        # 4. Keyboard Shooting
         if keys[pygame.K_SPACE] and self.ready:
             self.shoot_laser()
             self.ready = False

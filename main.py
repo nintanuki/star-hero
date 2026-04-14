@@ -84,8 +84,14 @@ class GameManager:
     def alien_shoot(self):  
         if self.aliens.sprites():
             random_alien = random.choice(self.aliens.sprites())
-            laser_sprite = Laser(random_alien.rect.center, ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH)
-            self.alien_lasers.add(laser_sprite)
+            
+            if random_alien.color == 'green':
+                offset = 10
+                self.alien_lasers.add(Laser((random_alien.rect.centerx - offset, random_alien.rect.centery), ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH))
+                self.alien_lasers.add(Laser((random_alien.rect.centerx + offset, random_alien.rect.centery), ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH))
+            else:
+                laser_sprite = Laser(random_alien.rect.center, ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH)
+                self.alien_lasers.add(laser_sprite)
 
     def explode(self,x_pos,y_pos):
         self.audio.channel_2.play(self.audio.explosion_sound)

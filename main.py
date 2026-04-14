@@ -197,10 +197,24 @@ class GameManager:
                     if event.key == pygame.K_ESCAPE:
                         self.unpause_game()
 
-                # NEW: Check for Controller Start Button (Button 7)
+                # Check for Controller Start Button (Button 7)
                 if event.type == pygame.JOYBUTTONDOWN:
                     if event.button == 7:
                         self.unpause_game()
+
+                    # Select to Toggle Fullscreen
+                    if event.button == 6:
+                        pygame.display.toggle_fullscreen()
+
+                    # L1/R1 for Volume
+                    if event.button == 4: # L1
+                        self.audio.master_volume -= 0.1
+                        if self.audio.master_volume < 0: self.audio.master_volume = 0
+                        self.audio.update()
+                    if event.button == 5: # R1
+                        self.audio.master_volume += 0.1
+                        if self.audio.master_volume > 1: self.audio.master_volume = 1
+                        self.audio.update()
 
             self.screen.fill((0, 0, 0))
             self.style.update('pause',self.save_data,self.score)
@@ -243,6 +257,24 @@ class GameManager:
                             self.powerups.empty()
                             self.player_alive = True
                             self.game_active = True
+
+                    # Select Button (Toggle Fullscreen)
+                    if event.button == 6:
+                        pygame.display.toggle_fullscreen()
+
+                    # L1 Button (Decrease Volume)
+                    if event.button == 4:
+                        self.audio.master_volume -= 0.1
+                        if self.audio.master_volume < 0: self.audio.master_volume = 0
+                        self.audio.update()
+                        self.style.volume_display_timer = pygame.time.get_ticks()
+
+                    # R1 Button (Increase Volume)
+                    if event.button == 5:
+                        self.audio.master_volume += 0.1
+                        if self.audio.master_volume > 1: self.audio.master_volume = 1
+                        self.audio.update()
+                        self.style.volume_display_timer = pygame.time.get_ticks()
 
                 # Keyboard input
                 if event.type == pygame.KEYDOWN:

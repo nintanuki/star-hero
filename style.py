@@ -5,9 +5,9 @@ class Style():
     """Class for displaying text"""
     def __init__(self,screen,audio):
         self.screen = screen
-        self.small_font = pygame.font.Font('font/Pixeled.ttf',10)
-        self.medium_font = pygame.font.Font('font/Pixeled.ttf',20)
-        self.large_font = pygame.font.Font('font/Pixeled.ttf',30)
+        self.small_font = pygame.font.Font(UT_FONT,FONT_SIZE_SMALL)
+        self.medium_font = pygame.font.Font(UT_FONT,FONT_SIZE_MEDIUM)
+        self.large_font = pygame.font.Font(UT_FONT,FONT_SIZE_LARGE)
         self.font_color = 'white'
 
         # Needed to display the volume

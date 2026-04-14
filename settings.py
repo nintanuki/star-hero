@@ -1,8 +1,13 @@
-
 # Window & Display Settings
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 800
 FRAMERATE = 120
+
+# Font Settings
+UT_FONT = 'font/Pixeled.ttf'
+FONT_SIZE_SMALL = 10
+FONT_SIZE_MEDIUM = 20
+FONT_SIZE_LARGE = 30
 
 # Background
 BG_SCROLL_SPEED = 50

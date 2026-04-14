@@ -33,16 +33,10 @@ ALIEN_TYPES = ['red', 'green', 'yellow', 'blue']
 ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing
 
 # Laser Settings
-LASER_WIDTH = 4
+DEFAULT_LASER_WIDTH = 4
 LASER_HEIGHT = 20
-
-# Player Laser
 PLAYER_LASER_SPEED = -8
-PLAYER_LASER_COLORS = ('cyan', 'white')
-
-# Alien Laser
 ALIEN_LASER_SPEED = 4
-ALIEN_LASER_COLORS = ('red', 'white')
 
 # Visual Effects
 EXPLOSION_FRAMES = 7 # there are seven unique images in the explosion sprite sheet
@@ -56,6 +50,14 @@ CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
 POWERUP_RADIUS = 12
 POWERUP_SPEED = 2 # how fast the powerup floats down?
 POWERUP_FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
+
+# Dictionaries
+
+LASER_COLORS = {
+    'standard': ('green', 'white'),
+    'rapid':    ('cyan', 'white'),
+    'alien':    ('yellow', 'white')
+}
 
 POWERUP_DATA = {
     'red':    {'draw_color': (255, 80, 80),   'type': 'heal', 'shape': 'heart'},

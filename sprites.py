@@ -3,29 +3,25 @@ import random
 from settings import *
 
 class Laser(pygame.sprite.Sprite):
-    def __init__(self,pos,speed,color1,color2):
+    def __init__(self,pos,speed,colors):
         super().__init__()
-        self.color1 = color1
-        self.color2 = color2
-        self.color = color1
-        self.image = pygame.Surface((LASER_WIDTH,LASER_HEIGHT))
-        self.image.fill(self.color)
+        self.colors = colors
+        self.color_index = 0
+        self.image = pygame.Surface((DEFAULT_LASER_WIDTH, LASER_HEIGHT))
+        self.image.fill(self.colors[self.color_index])
         self.rect = self.image.get_rect(center = pos)
         self.speed = speed
-        self.height_y_constraint = SCREEN_HEIGHT
-
-    def destroy(self):
-        if self.rect.y <= -50 or self.rect.y >= self.height_y_constraint + 50:
-            self.kill()
 
     def update(self):
         self.rect.y += self.speed
-        if self.color == self.color1:
-            self.color = self.color2
-        else:
-            self.color = self.color1
-        self.image.fill(self.color)
-        self.destroy()
+        
+        # Color Flickering Logic
+        self.color_index = 1 - self.color_index # Toggles between 0 and 1 every frame
+        self.image.fill(self.colors[self.color_index])
+        
+        # Kill if off screen (using settings)
+        if self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT:
+            self.kill()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos,audio):
@@ -128,18 +124,16 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = SCREEN_HEIGHT
 
     def shoot_laser(self):
-        if self.rapid_fire_active:
-            laser_color_1 = 'cyan'
-            laser_color_2 = 'white'
-        else:
-            laser_color_1 = 'green'
-            laser_color_2 = 'white'
+        # 1. Determine the colors
+        laser_type = 'rapid' if self.rapid_fire_active else 'standard'
+        colors = LASER_COLORS[laser_type]
 
+        # 2. Spawn the lasers
         if self.twin_laser_active:
-            self.lasers.add(Laser((self.rect.centerx - 12, self.rect.centery), PLAYER_LASER_SPEED, laser_color_1, laser_color_2))
-            self.lasers.add(Laser((self.rect.centerx + 12, self.rect.centery), PLAYER_LASER_SPEED, laser_color_1, laser_color_2))
+            self.lasers.add(Laser((self.rect.centerx - 12, self.rect.centery), PLAYER_LASER_SPEED, colors))
+            self.lasers.add(Laser((self.rect.centerx + 12, self.rect.centery), PLAYER_LASER_SPEED, colors))
         else:
-            self.lasers.add(Laser(self.rect.center, PLAYER_LASER_SPEED, laser_color_1, laser_color_2))
+            self.lasers.add(Laser(self.rect.center, PLAYER_LASER_SPEED, colors))
 
     def activate_powerup(self, powerup):
         current_time = pygame.time.get_ticks()

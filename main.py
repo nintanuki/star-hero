@@ -180,7 +180,7 @@ class GameManager:
             self.screen.blit(self.heart_surf,(x,HEART_TOP_MARGIN))
 
     def pause(self):
-        """Pauses game when ESC is pressed"""
+        """Pauses game when ESC or START is pressed"""
         self.paused = not self.paused
         while self.paused:
             for event in pygame.event.get():
@@ -189,17 +189,29 @@ class GameManager:
                         json.dump(self.save_data,high_score_file)
                     pygame.quit()
                     sys.exit()
+                
+                # Check for Keyboard ESC
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_F11:
                         pygame.display.toggle_fullscreen()
                     if event.key == pygame.K_ESCAPE:
-                        self.audio.channel_0.unpause()
-                        self.audio.channel_1.unpause()
-                        self.audio.channel_7.play(self.audio.unpause_sound)
-                        self.paused = False
+                        self.unpause_game()
+
+                # NEW: Check for Controller Start Button (Button 7)
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == 7:
+                        self.unpause_game()
+
             self.screen.fill((0, 0, 0))
             self.style.update('pause',self.save_data,self.score)
             pygame.display.update()
+
+    def unpause_game(self):
+        """Helper to handle unpausing logic"""
+        self.audio.channel_0.unpause()
+        self.audio.channel_1.unpause()
+        self.audio.channel_7.play(self.audio.unpause_sound)
+        self.paused = False
 
     def run(self):
         last_time = time.time()

@@ -52,21 +52,30 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         if (keys[pygame.K_w] or keys[pygame.K_UP]):
             self.rect.y -= self.speed
-            if (keys[pygame.K_f]):
-                self.rect.y -= self.speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]):
             self.rect.y += self.speed
-            if (keys[pygame.K_f]):
-                self.rect.y += self.speed
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]):
             self.rect.x -= self.speed
-            if (keys[pygame.K_f]):
-                self.rect.x -= self.speed
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]):
             self.rect.x += self.speed
-            if (keys[pygame.K_f]):
-                self.rect.x += self.speed
 
+        # Controller input
+        for joy in [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]:
+            # Left Thumbstick - Axis 0 (Horizontal) and Axis 1 (Vertical)
+            # 0.2 is a "deadzone" to prevent drifting
+            if abs(joy.get_axis(0)) > 0.2:
+                self.rect.x += joy.get_axis(0) * self.speed
+            if abs(joy.get_axis(1)) > 0.2:
+                self.rect.y += joy.get_axis(1) * self.speed
+
+            # A Button (usually button 0 or 1 depending on mode)
+            if joy.get_button(0) and self.ready:
+                self.shoot_laser()
+                self.ready = False
+                self.laser_time = pygame.time.get_ticks()
+                self.audio.channel_3.play(self.audio.laser_sound)
+
+        # Keyboard shooting
         if keys[pygame.K_SPACE] and self.ready:
             self.shoot_laser()
             self.ready = False

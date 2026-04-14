@@ -59,6 +59,11 @@ class GameManager:
 
         # Game setup
         pygame.init()
+
+        # Controller setup
+        pygame.joystick.init()
+        self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+
         self.screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT), pygame.SCALED)
         pygame.display.set_caption('Star Hero')
         self.clock = pygame.time.Clock()

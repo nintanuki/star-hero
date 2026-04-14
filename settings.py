@@ -1,6 +1,11 @@
+
+# Window & Display Settings
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 800
 FRAMERATE = 120
+
+# Background
+BG_SCROLL_SPEED = 50
 
 POWERUP_DATA = {
     'red':    {'draw_color': (255, 80, 80),   'type': 'heal', 'shape': 'heart'},

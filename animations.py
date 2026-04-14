@@ -19,7 +19,7 @@ class Background(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(self.rect.bottomleft)
 
     def update(self,delta_time):
-        self.pos.y += 50 * delta_time
+        self.pos.y += BG_SCROLL_SPEED * delta_time
         if self.rect.top >= 0:
             self.pos.y = -self.image.get_height() / 2
         self.rect.y = round(self.pos.y)

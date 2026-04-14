@@ -220,7 +220,7 @@ class GameManager:
                     pygame.time.set_timer(self.volume_display_timer,0)
                 if self.game_active:
                     if event.type == self.alien_spawn_timer:
-                        alien_color = random.choice(ALIEN_TYPES)
+                        alien_color = random.choices(ALIEN_TYPES, weights=ALIEN_WEIGHTS)[0]
                         self.spawn_aliens(alien_color)
                     if event.type == self.alien_laser_timer:
                         self.alien_shoot()

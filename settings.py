@@ -31,10 +31,8 @@ ALIEN_DESCEND_SPEED_GREEN = 2
 ALIEN_DESCEND_SPEED_YELLOW = 3
 ALIEN_DESCEND_SPEED_BLUE = 5
 
-ALIEN_TYPES = ['red','red','red','red','red',
-'green','green','green',
-'yellow','yellow',
-'blue']
+ALIEN_TYPES = ['red', 'green', 'yellow', 'blue']
+ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing
 
 # Visual Effects
 EXPLOSION_FRAMES = 7 # there are seven unique images in the explosion sprite sheet
@@ -47,7 +45,7 @@ CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
 # Powerup Visuals
 POWERUP_RADIUS = 12
 POWERUP_SPEED = 2 # how fast the powerup floats down?
-POWERUP_FLASH_SPEED = 200
+POWERUP_FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
 
 POWERUP_DATA = {
     'red':    {'draw_color': (255, 80, 80),   'type': 'heal', 'shape': 'heart'},

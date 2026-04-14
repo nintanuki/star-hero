@@ -222,8 +222,7 @@ class Alien(pygame.sprite.Sprite):
 class PowerUp(pygame.sprite.Sprite):
     def __init__(self, pos, color):
         super().__init__()
-        self.radius = 12
-        self.speed = 2
+        self.speed = POWERUP_SPEED
         self.shape = POWERUP_DATA[color].get('shape', 'circle')
 
         self.draw_color = POWERUP_DATA[color]['draw_color']
@@ -238,11 +237,11 @@ class PowerUp(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(self.image, (24, 24))
             self.rect = self.image.get_rect(center=pos)
         else:
-            self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
+            self.image = pygame.Surface((POWERUP_RADIUS * 2, POWERUP_RADIUS * 2), pygame.SRCALPHA)
             self.rect = self.image.get_rect(center=pos)
 
         self.flash_timer = 0
-        self.flash_speed = 200  # milliseconds
+        self.flash_speed = POWERUP_FLASH_SPEED
 
     def animate(self):
         if self.shape == 'heart':
@@ -264,18 +263,18 @@ class PowerUp(pygame.sprite.Sprite):
 
         if self.shape == 'diamond':
             points = [
-                (self.radius, 0),                    # top
-                (self.radius * 2, self.radius),      # right
-                (self.radius, self.radius * 2),      # bottom
-                (0, self.radius)                     # left
+                (POWERUP_RADIUS, 0),                    # top
+                (POWERUP_RADIUS * 2, POWERUP_RADIUS),      # right
+                (POWERUP_RADIUS, POWERUP_RADIUS * 2),      # bottom
+                (0, POWERUP_RADIUS)                     # left
             ]
             pygame.draw.polygon(self.image, self.current_color, points)
         else:
             pygame.draw.circle(
                 self.image,
                 self.current_color,
-                (self.radius, self.radius),
-                self.radius
+                (POWERUP_RADIUS, POWERUP_RADIUS),
+                POWERUP_RADIUS
             )
 
     def destroy(self):

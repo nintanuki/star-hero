@@ -8,6 +8,51 @@ from style import Style
 from audio import Audio
 import debug
 
+class CollisionManager:
+    def __init__(self, game):
+        self.game = game
+
+    def check_all(self):
+        self._player_lasers()
+        self._alien_lasers()
+        self._ship_collisions()
+        self._powerups()
+
+    def _player_lasers(self):
+        if not self.game.player.sprite.lasers: return
+        for laser in self.game.player.sprite.lasers:
+            aliens_hit = pygame.sprite.spritecollide(laser, self.game.aliens, True)
+            if aliens_hit:
+                laser.kill()
+                for alien in aliens_hit:
+                    self.game.score += alien.value
+                    self.game.explode(alien.rect.centerx, alien.rect.centery)
+                    if random.random() < DROP_CHANCES[alien.color]:
+                        self.game.spawn_powerup(alien.rect.center, alien.color)
+
+    def _alien_lasers(self):
+        for laser in self.game.alien_lasers:
+            if pygame.sprite.spritecollide(laser, self.game.player, False):
+                laser.kill()
+                self.game.player_damage()
+
+    def _ship_collisions(self):
+        aliens_crash = pygame.sprite.spritecollide(self.game.player.sprite, self.game.aliens, True)
+        for alien in aliens_crash:
+            self.game.score += alien.value
+            if self.game.hearts > 1:
+                self.game.explode(alien.rect.centerx, alien.rect.centery)
+        if aliens_crash:
+            self.game.player_damage()
+
+    def _powerups(self):
+        powerups_collected = pygame.sprite.spritecollide(self.game.player.sprite, self.game.powerups, True)
+        for powerup in powerups_collected:
+            if powerup.powerup_type == 'heal' and self.game.hearts < 3:
+                self.game.hearts += 1
+            else:
+                self.game.player.sprite.activate_powerup(powerup)
+
 class GameManager:
     """Main game manager class"""
     def __init__(self):
@@ -23,6 +68,9 @@ class GameManager:
         self.style = Style(self.screen,self.audio)
         self.paused = False
         self.show_volume = False
+
+        # Collisions
+        self.collisions = CollisionManager(self)
 
         # Player Health
         self.hearts = 3
@@ -114,47 +162,6 @@ class GameManager:
             self.audio.channel_1.pause()
             self.player_alive = False
             pygame.time.set_timer(self.player_death_timer, PLAYER_DEATH_DELAY)
-
-    def collision_checks(self):
-        """All collisions between player, aliens and lasers"""
-        # when the player shoots an alien
-        if self.player.sprite.lasers:
-            for laser in self.player.sprite.lasers:
-                aliens_hit = pygame.sprite.spritecollide(laser,self.aliens,True)
-                if aliens_hit:
-                    laser.kill()
-
-                    for alien in aliens_hit:
-                        self.score += alien.value
-                        self.explode(alien.rect.centerx, alien.rect.centery)
-
-                        if random.random() < DROP_CHANCES[alien.color]:
-                            self.spawn_powerup(alien.rect.center, alien.color)
-
-        # when an alien shoots the player
-        if self.alien_lasers:
-            for laser in self.alien_lasers:
-                if pygame.sprite.spritecollide(laser,self.player,False):
-                    laser.kill()
-                    self.player_damage()
-
-        # when an alien and the player collide
-        aliens_crash = pygame.sprite.spritecollide(self.player.sprite,self.aliens,True)
-        if aliens_crash:
-            for alien in aliens_crash:
-                self.score += alien.value
-                if self.hearts > 1:
-                    self.explode(alien.rect.centerx, alien.rect.centery)
-            self.player_damage()
-
-        powerups_collected = pygame.sprite.spritecollide(self.player.sprite, self.powerups, True)
-        if powerups_collected:
-            for powerup in powerups_collected:
-                if powerup.powerup_type == 'heal':
-                    if self.hearts < 3:
-                        self.hearts += 1
-                else:
-                    self.player.sprite.activate_powerup(powerup)
 
     def score_check(self):
         """checks the current score against the high score"""
@@ -261,7 +268,7 @@ class GameManager:
                 self.alien_lasers.update()
                 self.aliens.update()
                 self.powerups.update()
-                self.collision_checks()
+                self.collisions.check_all()
                 self.display_hearts()
 
                 self.player.sprite.lasers.draw(self.screen)

@@ -6,16 +6,15 @@
 * Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
 
 ### Ideas for Future Changes and Additions
+* Add sound effects for when the player touches a powerup
+* Different rates of fire for different enemies (yellow shoots more, blue shoots the most, but blue's lasers are too slow)
 * Enemy shoots a beam (in the style of the ship stealer from Galaga) that makes play purple and reverses controls.
-* Change powerups from different rates of fire to different effects (twin laser, etc)
-* Add twin laser powerup
+* Add shield powerup?
 * Display sprites of aliens on screen with how many points they are worth
 * Allow player to enter initials if they get the high score
 * Figure out how to use increasing score to increase rate of alien and laser spawn
 * Show controls in game (create images with WASD, Spacebar and arrow keys, etc)
 * Menu and options
-* Add volume bar
-* Get extra hearts, maybe items that float down or reward for high score?
 * Quit game option
 * Enemy animations
 * Bosses?

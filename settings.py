@@ -17,7 +17,6 @@ SCREEN_CENTER = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 PLAYER_SPEED = 2
 PLAYER_ROTATION = 0
 PLAYER_SCALE = 0.15
-PLAYER_LASER_SPEED = -8
 DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
 POWERUP_DURATION = 10000 # 10000 milliseconds = 10 seconds
 PLAYER_DEATH_DELAY = 500
@@ -25,7 +24,6 @@ PLAYER_DEATH_DELAY = 500
 # Alien Settings
 ALIEN_SPAWN_RATE = 600 # lower numbers = faster rate of enemy spawn
 ALIEN_LASER_RATE = 400 # lower numbers = more lasers
-ALIEN_LASER_SPEED = 4
 ALIEN_DESCEND_SPEED_RED = 1
 ALIEN_DESCEND_SPEED_GREEN = 2
 ALIEN_DESCEND_SPEED_YELLOW = 3
@@ -33,6 +31,18 @@ ALIEN_DESCEND_SPEED_BLUE = 5
 
 ALIEN_TYPES = ['red', 'green', 'yellow', 'blue']
 ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing
+
+# Laser Settings
+LASER_WIDTH = 4
+LASER_HEIGHT = 20
+
+# Player Laser
+PLAYER_LASER_SPEED = -8
+PLAYER_LASER_COLORS = ('cyan', 'white')
+
+# Alien Laser
+ALIEN_LASER_SPEED = 4
+ALIEN_LASER_COLORS = ('red', 'white')
 
 # Visual Effects
 EXPLOSION_FRAMES = 7 # there are seven unique images in the explosion sprite sheet
@@ -50,8 +60,8 @@ POWERUP_FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
 POWERUP_DATA = {
     'red':    {'draw_color': (255, 80, 80),   'type': 'heal', 'shape': 'heart'},
     'green':  {'draw_color': (60, 255, 100),  'type': 'twin_laser',  'shape': 'diamond'},
-    'yellow': {'draw_color': (255, 220, 60),  'type': 'fast_fire',   'shape': 'circle', 'cooldown': 200},
-    'blue':   {'draw_color': (80, 160, 255),  'type': 'extreme_fire','shape': 'circle', 'cooldown': 60},
+    'yellow': {'draw_color': (255, 220, 60),  'type': 'rapid_fire',   'shape': 'circle', 'cooldown': 150},
+    'blue':   {'draw_color': (80, 160, 255),  'type': 'beam','shape': 'circle', 'cooldown': 0},
 }
 
 DROP_CHANCES = {

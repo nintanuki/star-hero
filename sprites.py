@@ -8,7 +8,7 @@ class Laser(pygame.sprite.Sprite):
         self.color1 = color1
         self.color2 = color2
         self.color = color1
-        self.image = pygame.Surface((4,20))
+        self.image = pygame.Surface((LASER_WIDTH,LASER_HEIGHT))
         self.image.fill(self.color)
         self.rect = self.image.get_rect(center = pos)
         self.speed = speed
@@ -148,7 +148,7 @@ class Player(pygame.sprite.Sprite):
             self.twin_laser_active = True
             self.twin_laser_start_time = current_time
 
-        elif powerup.powerup_type in ('fast_fire', 'extreme_fire'):
+        elif powerup.powerup_type in ('rapid_fire', 'beam'):
             self.rapid_fire_active = True
             self.rapid_fire_start_time = current_time
             self.laser_cooldown = powerup.cooldown_bonus

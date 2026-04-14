@@ -34,7 +34,7 @@ ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing
 
 # Laser Settings
 DEFAULT_LASER_WIDTH = 4
-BEAM_LASER_WIDTH = 12
+BEAM_LASER_WIDTH = 64
 LASER_HEIGHT = 20
 PLAYER_LASER_SPEED = -8
 ALIEN_LASER_SPEED = 4
@@ -60,9 +60,9 @@ POWERUP_FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
 
 LASER_COLORS = {
     'standard': ('green', 'white'),
-    'rapid':    ('cyan', 'white'),
-    'alien':    ('yellow', 'white'),
-    'beam':     ('white', 'blue')
+    'rapid':    ('yellow', 'white'),
+    'alien':    ('red', 'white'),
+    'beam':     ('cyan', 'white')
 }
 
 POWERUP_DATA = {

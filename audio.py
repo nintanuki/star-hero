@@ -4,6 +4,9 @@ from settings import *
 class Audio():
     def __init__(self):
         super().__init__()
+        # Increase the number of available channels from 8 to 16
+        pygame.mixer.set_num_channels(16)
+
         self.master_volume = 0.5 # default value is 1.0
 
         """Music"""
@@ -51,6 +54,16 @@ class Audio():
         self.unpause_sound.set_volume(self.master_volume / 2)
         self.channel_7 = pygame.mixer.Channel(7)
 
+        # Powerup SFX (for now all three are sharing channel 8)
+        self.powerup_twin = pygame.mixer.Sound('audio/sfx_sounds_powerup1.wav')
+        self.powerup_weapon = pygame.mixer.Sound('audio/sfx_sounds_powerup2.wav')
+        self.powerup_heart = pygame.mixer.Sound('audio/sfx_coin_cluster4.wav')
+        self.channel_8 = pygame.mixer.Channel(8)
+
+        self.powerup_twin.set_volume(self.master_volume / 2)
+        self.powerup_weapon.set_volume(self.master_volume / 2)
+        self.powerup_heart.set_volume(self.master_volume / 2)
+
     def update(self):
         """Updates volume of all sounds and music"""
         self.intro_music.set_volume(self.master_volume * 2)
@@ -63,3 +76,6 @@ class Audio():
         self.ufo_sound.set_volume(self.master_volume / 2)
         self.pause_sound.set_volume(self.master_volume / 2)
         self.unpause_sound.set_volume(self.master_volume / 2)
+        self.powerup_twin.set_volume(self.master_volume / 2)
+        self.powerup_weapon.set_volume(self.master_volume / 2)
+        self.powerup_heart.set_volume(self.master_volume / 2)

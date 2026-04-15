@@ -49,8 +49,13 @@ class CollisionManager:
         powerups_collected = pygame.sprite.spritecollide(self.game.player.sprite, self.game.powerups, True)
         for powerup in powerups_collected:
             if powerup.powerup_type == 'heal' and self.game.hearts < 3:
+                self.game.audio.channel_8.play(self.game.audio.powerup_heart)
                 self.game.hearts += 1
             else:
+                if powerup.powerup_type == 'twin_laser':
+                    self.game.audio.channel_8.play(self.game.audio.powerup_twin)
+                elif powerup.powerup_type in ['rapid_fire', 'beam']:
+                    self.game.audio.channel_8.play(self.game.audio.powerup_weapon)
                 self.game.player.sprite.activate_powerup(powerup)
 
 class GameManager:

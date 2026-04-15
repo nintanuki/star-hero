@@ -396,31 +396,62 @@ class GameManager:
                         pygame.time.set_timer(self.player_death_timer,0)
                         self.finalize_game_over_score()
                 else:
+                    # --- KEYBOARD INPUTS FOR INITIALS ---
                     if event.type == pygame.KEYDOWN:
                         if self.entering_initials:
                             if event.key == pygame.K_LEFT:
                                 self.initials_index = max(0, self.initials_index - 1)
-
                             elif event.key == pygame.K_RIGHT:
                                 self.initials_index = min(2, self.initials_index + 1)
-
                             elif event.key == pygame.K_UP:
                                 chars = list(self.initials)
                                 current = chars[self.initials_index]
                                 chars[self.initials_index] = 'A' if current == 'Z' else chr(ord(current) + 1)
                                 self.initials = ''.join(chars)
-
                             elif event.key == pygame.K_DOWN:
                                 chars = list(self.initials)
                                 current = chars[self.initials_index]
                                 chars[self.initials_index] = 'Z' if current == 'A' else chr(ord(current) - 1)
                                 self.initials = ''.join(chars)
-
                             elif event.key == pygame.K_RETURN:
                                 self.submit_initials()
-
                         else:
                             if event.key == pygame.K_RETURN:
+                                self.reset_for_new_game()
+
+                    # --- CONTROLLER INPUTS FOR INTIIALS ---
+                    if self.entering_initials:
+                        # Handle D-Pad (Hat) movement
+                        if event.type == pygame.JOYHATMOTION:
+                            hat_x, hat_y = event.value
+                            
+                            # Left/Right to change character index
+                            if hat_x == -1: # D-pad Left
+                                self.initials_index = max(0, self.initials_index - 1)
+                            elif hat_x == 1: # D-pad Right
+                                self.initials_index = min(2, self.initials_index + 1)
+                            
+                            # Up/Down to cycle through letters
+                            if hat_y == 1: # D-pad Up
+                                chars = list(self.initials)
+                                current = chars[self.initials_index]
+                                chars[self.initials_index] = 'A' if current == 'Z' else chr(ord(current) + 1)
+                                self.initials = ''.join(chars)
+                            elif hat_y == -1: # D-pad Down
+                                chars = list(self.initials)
+                                current = chars[self.initials_index]
+                                chars[self.initials_index] = 'Z' if current == 'A' else chr(ord(current) - 1)
+                                self.initials = ''.join(chars)
+
+                        # Handle Button Press (A button or Start)
+                        if event.type == pygame.JOYBUTTONDOWN:
+                            # Button 0 is usually 'A' (Xbox) or 'Cross' (PS), Button 7 is 'Start'
+                            if event.button == 0 or event.button == 7:
+                                self.submit_initials()
+                    else:
+                        # If not entering initials, press Start (7) or A (0) to restart
+                        if event.type == pygame.JOYBUTTONDOWN:
+                            if event.button == 0 or event.button == 7:
                                 self.reset_for_new_game()
 
             self.screen.fill(ScreenSettings.BG_COLOR)

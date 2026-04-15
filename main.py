@@ -107,8 +107,16 @@ class GameManager:
         # Score setup
         self.score = 0
         self.save_data = {
-            'high_score' : 0
+            'high_score': 0,
+            'leaderboard': []
         }
+
+        # Leaderboard / initials entry state
+        self.entering_initials = False
+        self.initials = "AAA"
+        self.initials_index = 0
+        self.pending_score = None
+        self.score_processed = False
 
         try:
             with open('high_score.txt') as high_score_file:
@@ -138,6 +146,75 @@ class GameManager:
 
         # Audio setup
         self.play_intro_music = True # Set to False after user begins, only place once
+
+    def _sort_and_trim_leaderboard(self):
+        self.save_data['leaderboard'] = sorted(
+            self.save_data.get('leaderboard', []),
+            key=lambda entry: entry['score'],
+            reverse=True
+        )[:10]
+
+        if self.save_data['leaderboard']:
+            self.save_data['high_score'] = self.save_data['leaderboard'][0]['score']
+        else:
+            self.save_data['high_score'] = 0
+
+    def save_scores(self):
+        self._sort_and_trim_leaderboard()
+        with open('high_score.txt', 'w') as high_score_file:
+            json.dump(self.save_data, high_score_file)
+
+    def qualifies_for_leaderboard(self, score):
+        leaderboard = self.save_data.get('leaderboard', [])
+        if len(leaderboard) < 10:
+            return score > 0
+        return score > leaderboard[-1]['score']
+
+    def start_initial_entry(self):
+        self.entering_initials = True
+        self.initials = "AAA"
+        self.initials_index = 0
+        self.pending_score = self.score
+
+    def submit_initials(self):
+        entry = {
+            'name': self.initials,
+            'score': self.pending_score
+        }
+        self.save_data['leaderboard'].append(entry)
+        self._sort_and_trim_leaderboard()
+        self.save_scores()
+
+        self.entering_initials = False
+        self.pending_score = None
+        self.score_processed = True
+
+    def finalize_game_over_score(self):
+        if self.score_processed:
+            return
+
+        if self.qualifies_for_leaderboard(self.score):
+            self.start_initial_entry()
+        else:
+            self._sort_and_trim_leaderboard()
+            self.save_scores()
+            self.score_processed = True
+
+    def reset_for_new_game(self):
+        self.score = 0
+        self.player.sprite.rect.center = ScreenSettings.CENTER
+        self.hearts = 3
+        self.alien_lasers.empty()
+        self.powerups.empty()
+        self.aliens.empty()
+        self.player_alive = True
+        self.game_active = True
+
+        self.entering_initials = False
+        self.initials = "AAA"
+        self.initials_index = 0
+        self.pending_score = None
+        self.score_processed = False
 
     def spawn_aliens(self,alien_color):
         self.aliens.add(Alien(alien_color,*ScreenSettings.RESOLUTION))
@@ -185,11 +262,6 @@ class GameManager:
             self.player_alive = False
             pygame.time.set_timer(self.player_death_timer, PlayerSettings.DEATH_DELAY)
 
-    def score_check(self):
-        """checks the current score against the high score"""
-        if self.score > self.save_data['high_score']:
-            self.save_data['high_score'] = self.score
-
     def display_hearts(self):
         """displays the heart icons on the top right"""
         for heart in range(self.hearts):
@@ -202,8 +274,7 @@ class GameManager:
         while self.paused:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    with open('high_score.txt','w') as high_score_file:
-                        json.dump(self.save_data,high_score_file)
+                    self.save_scores()
                     pygame.quit()
                     sys.exit()
                 
@@ -234,7 +305,7 @@ class GameManager:
                         self.audio.update()
 
             self.screen.fill((0, 0, 0))
-            self.style.update('pause',self.save_data,self.score)
+            self.style.update('pause', self.save_data, self.score)
             pygame.display.update()
 
     def unpause_game(self):
@@ -252,8 +323,7 @@ class GameManager:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    with open('high_score.txt','w') as high_score_file:
-                        json.dump(self.save_data,high_score_file)
+                    self.save_scores()
                     pygame.quit()
                     sys.exit()
 
@@ -266,14 +336,8 @@ class GameManager:
                             self.audio.channel_6.play(self.audio.pause_sound)
                             self.pause()
                         else:
-                            # Start/Restart the game
-                            self.score = 0
-                            self.player.sprite.rect.center = ScreenSettings.CENTER
-                            self.hearts = 3
-                            self.alien_lasers.empty()
-                            self.powerups.empty()
-                            self.player_alive = True
-                            self.game_active = True
+                            if not self.entering_initials:
+                                self.reset_for_new_game()
 
                     # Select Button (Toggle Fullscreen)
                     if event.button == 6:
@@ -330,15 +394,34 @@ class GameManager:
                         self.powerups.empty()
                         self.game_active = False
                         pygame.time.set_timer(self.player_death_timer,0)
+                        self.finalize_game_over_score()
                 else:
-                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                        self.score = 0
-                        self.player.sprite.rect.center = ScreenSettings.CENTER
-                        self.hearts = 3
-                        self.alien_lasers.empty()
-                        self.powerups.empty()
-                        self.player_alive = True
-                        self.game_active = True
+                    if event.type == pygame.KEYDOWN:
+                        if self.entering_initials:
+                            if event.key == pygame.K_LEFT:
+                                self.initials_index = max(0, self.initials_index - 1)
+
+                            elif event.key == pygame.K_RIGHT:
+                                self.initials_index = min(2, self.initials_index + 1)
+
+                            elif event.key == pygame.K_UP:
+                                chars = list(self.initials)
+                                current = chars[self.initials_index]
+                                chars[self.initials_index] = 'A' if current == 'Z' else chr(ord(current) + 1)
+                                self.initials = ''.join(chars)
+
+                            elif event.key == pygame.K_DOWN:
+                                chars = list(self.initials)
+                                current = chars[self.initials_index]
+                                chars[self.initials_index] = 'Z' if current == 'A' else chr(ord(current) - 1)
+                                self.initials = ''.join(chars)
+
+                            elif event.key == pygame.K_RETURN:
+                                self.submit_initials()
+
+                        else:
+                            if event.key == pygame.K_RETURN:
+                                self.reset_for_new_game()
 
             self.screen.fill(ScreenSettings.BG_COLOR)
             self.background.update(delta_time)
@@ -369,7 +452,6 @@ class GameManager:
                 self.alien_lasers.draw(self.screen)
                 self.powerups.draw(self.screen)
 
-                self.score_check()
                 self.style.update('game_active',self.save_data,self.score)
             else:
                 self.audio.channel_1.stop()
@@ -380,7 +462,14 @@ class GameManager:
                 if self.score == 0:
                     self.style.update('intro',self.save_data,self.score)
                 else:
-                    self.style.update('game_over',self.save_data,self.score)
+                    self.style.update(
+                        'game_over',
+                        self.save_data,
+                        self.score,
+                        entering_initials=self.entering_initials,
+                        initials=self.initials,
+                        initials_index=self.initials_index
+                    )
 
             self.crt.draw()
             pygame.display.flip()

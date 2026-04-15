@@ -16,7 +16,7 @@ class PlayerSettings:
     RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
     BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
     DEATH_DELAY = 500
-    FLASH_DURATION = 500 # Total time to flash in milliseconds
+    FLASH_DURATION = 1000 # Total time to flash in milliseconds
     FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
     JOYSTICK_DEADZONE = 0.2
 

@@ -155,6 +155,10 @@ class GameManager:
     def player_damage(self):
         self.hearts -= 1
         
+        # Trigger the visual flash effect
+        if self.player.sprite:
+            self.player.sprite.trigger_damage_effect()
+
         # Handle alarms
         if self.hearts == 2:
             self.audio.channel_4.play(self.audio.low_health_alarm1)

@@ -26,10 +26,22 @@ class Laser(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos,audio):
         super().__init__()
-        self.image = pygame.image.load('graphics/player_ship.png').convert_alpha()
-        self.image = pygame.transform.rotozoom(self.image,0,PLAYER_SCALE)
+        # Store original image to revert back after flashing
+        self.original_image = pygame.image.load('graphics/player_ship.png').convert_alpha()
+        self.original_image = pygame.transform.rotozoom(self.original_image, 0, PLAYER_SCALE)
+        self.image = self.original_image.copy()
+
         self.rect = self.image.get_rect(center = (pos)) # make pos = 400,500?
         self.speed = PLAYER_SPEED
+
+        # Damage Flash Logic
+        self.is_flashing = False
+        self.flash_duration = 500  # Total time to flash in milliseconds
+        self.flash_timer = 0
+        self.flash_interval = 50   # How fast it toggles (smaller = faster flicker)
+        self.last_flash_time = 0
+        self.is_red = False
+
         self.ready = True
         
         self.laser_time = 0
@@ -46,6 +58,37 @@ class Player(pygame.sprite.Sprite):
         self.lasers = pygame.sprite.Group()
 
         self.audio = audio
+
+    def trigger_damage_effect(self):
+        """Called when the player takes damage"""
+        self.is_flashing = True
+        self.flash_timer = pygame.time.get_ticks()
+
+    def animate_damage(self):
+        """Toggles the ship color between original and red tint"""
+        if self.is_flashing:
+            current_time = pygame.time.get_ticks()
+            
+            # Check if total duration has passed
+            if current_time - self.flash_timer >= self.flash_duration:
+                self.is_flashing = False
+                self.image = self.original_image.copy() # Reset to normal
+                return
+
+            # Toggle flash state based on interval
+            if current_time - self.last_flash_time >= self.flash_interval:
+                self.last_flash_time = current_time
+                self.is_red = not self.is_red
+
+                if self.is_red:
+                    # Create a red version of the ship
+                    red_surf = self.original_image.copy()
+                    # BLIT_RGBA_MULT multiplies the image by the color (R, G, B, A)
+                    # This keeps the transparency but turns the pixels red
+                    red_surf.fill((255, 0, 0, 255), special_flags=pygame.BLEND_RGBA_MULT)
+                    self.image = red_surf
+                else:
+                    self.image = self.original_image.copy()
 
     def get_input(self):
         # 1. Determine current speed (check Keyboard 'F' or Controller 'X')
@@ -178,6 +221,7 @@ class Player(pygame.sprite.Sprite):
         self.constraint()
         self.recharge()
         self.check_powerup_timeout()
+        self.animate_damage()
         self.lasers.update()
 
 class Alien(pygame.sprite.Sprite):

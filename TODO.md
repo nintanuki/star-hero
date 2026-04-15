@@ -7,6 +7,7 @@
 
 ### Ideas for Future Changes and Additions
 * Add sound effects for when the player touches a powerup
+* Make twin laser semi-permanent. There is no timer like rapid fire or beam, but all powerups are lost when damage is taken.
 * Different rates of fire for different enemies (yellow shoots more, blue shoots the most, but blue's lasers are too slow)
 * Enemy shoots a beam (in the style of the ship stealer from Galaga) that makes play purple and reverses controls.
 * Add shield powerup?
@@ -21,7 +22,6 @@
 * Multiple levels/stages?
 * Speed boost that uses energy?
 * Add thrusters animation
-* Make player flash white when hit
 
 ### Refactoring Changes to Make
 * Add timer class, remove this responsibility from GameManager

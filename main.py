@@ -224,7 +224,7 @@ class GameManager:
     def spawn_powerup(self, pos, color):
         self.powerups.add(PowerUp(pos, color))
 
-    def alien_shoot(self):  
+    def alien_shoot(self):
         if self.aliens.sprites():
             random_alien = random.choice(self.aliens.sprites())
             
@@ -280,8 +280,8 @@ class GameManager:
     def display_hearts(self):
         """displays the heart icons on the top right"""
         for heart in range(self.hearts):
-            x = self.heart_x_start_pos + (heart * (self.heart_surf.get_size()[0] + HEART_SPACING))
-            self.screen.blit(self.heart_surf,(x,HEART_TOP_MARGIN))
+            x = self.heart_x_start_pos + (heart * (self.heart_surf.get_size()[0] + UISettings.HEART_SPACING))
+            self.screen.blit(self.heart_surf,(x,UISettings.HEART_TOP_MARGIN))
 
     def pause(self):
         """Pauses game when ESC or START is pressed"""
@@ -385,13 +385,13 @@ class GameManager:
                         self.audio.master_volume += 0.1
                         self.audio.master_volume = min(self.audio.master_volume, 1.0)
                         self.audio.update()
-                        pygame.time.set_timer(self.volume_display_timer,VOLUME_DISPLAY_TIME)
+                        pygame.time.set_timer(self.volume_display_timer,UISettings.VOLUME_DISPLAY_TIME)
                         self.show_volume = True
                     elif event.key == pygame.K_KP_MINUS or event.key == pygame.K_MINUS:
                         self.audio.master_volume -= 0.1
                         self.audio.master_volume = max(self.audio.master_volume, 0.0)
                         self.audio.update()
-                        pygame.time.set_timer(self.volume_display_timer,VOLUME_DISPLAY_TIME)
+                        pygame.time.set_timer(self.volume_display_timer,UISettings.VOLUME_DISPLAY_TIME)
                         self.show_volume = True
                 if event.type == self.volume_display_timer:
                     self.show_volume = False
@@ -492,7 +492,7 @@ class GameManager:
                     self.player.draw(self.screen)
                 self.exploding_sprites.draw(self.screen)
 
-                self.exploding_sprites.update(EXPLOSION_SPEED)
+                self.exploding_sprites.update(ExplosionSettings.ANIMATION_SPEED)
 
                 self.aliens.draw(self.screen)
                 self.alien_lasers.draw(self.screen)

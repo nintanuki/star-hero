@@ -19,7 +19,7 @@ class Background(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(self.rect.bottomleft)
 
     def update(self,delta_time):
-        self.pos.y += BG_SCROLL_SPEED * delta_time
+        self.pos.y += ScreenSettings.BG_SCROLL_SPEED * delta_time
         if self.rect.top >= 0:
             self.pos.y = -self.image.get_height() / 2
         self.rect.y = round(self.pos.y)
@@ -34,7 +34,7 @@ class Explosion(pygame.sprite.Sprite):
         sprite_sheet = pygame.image.load('graphics/explosion.png').convert_alpha()
 
         # Using list comprehension to build the explosion animation fromt he sprite sheet
-        self.sprites = [self.get_image(sprite_sheet, frame, EXPLOSION_SIZE, EXPLOSION_SIZE, EXPLOSION_SCALE) for frame in range(EXPLOSION_FRAMES)]
+        self.sprites = [self.get_image(sprite_sheet, frame, ExplosionSettings.SIZE, ExplosionSettings.SIZE, ExplosionSettings.SCALE) for frame in range(ExplosionSettings.FRAMES)]
 
         self.current_sprite = 0
         self.image = self.sprites[self.current_sprite]

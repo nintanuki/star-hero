@@ -124,9 +124,9 @@ class Player(pygame.sprite.Sprite):
             joy = pygame.joystick.Joystick(i)
             
             # Left Thumbstick Movement
-            if abs(joy.get_axis(0)) > JOYSTICK_DEADZONE:
+            if abs(joy.get_axis(0)) > PlayerSettings.JOYSTICK_DEADZONE:
                 self.rect.x += joy.get_axis(0) * current_speed
-            if abs(joy.get_axis(1)) > JOYSTICK_DEADZONE:
+            if abs(joy.get_axis(1)) > PlayerSettings.JOYSTICK_DEADZONE:
                 self.rect.y += joy.get_axis(1) * current_speed
 
             # A Button (Button 0) to Shoot
@@ -272,7 +272,7 @@ class Alien(pygame.sprite.Sprite):
 class PowerUp(pygame.sprite.Sprite):
     def __init__(self, pos, color):
         super().__init__()
-        self.speed = POWERUP_SPEED
+        self.speed = PowerupSettings.SPEED
         self.shape = POWERUP_DATA[color].get('shape', 'circle')
 
         self.draw_color = POWERUP_DATA[color]['draw_color']
@@ -284,14 +284,14 @@ class PowerUp(pygame.sprite.Sprite):
 
         if self.shape == 'heart':
             self.image = pygame.image.load('graphics/heart.png').convert_alpha()
-            self.image = pygame.transform.scale(self.image, HEART_SPRITE_SIZE)
+            self.image = pygame.transform.scale(self.image, UISettings.HEART_SPRITE_SIZE)
             self.rect = self.image.get_rect(center=pos)
         else:
-            self.image = pygame.Surface((POWERUP_RADIUS * 2, POWERUP_RADIUS * 2), pygame.SRCALPHA)
+            self.image = pygame.Surface((PowerupSettings.RADIUS * 2, PowerupSettings.RADIUS * 2), pygame.SRCALPHA)
             self.rect = self.image.get_rect(center=pos)
 
         self.flash_timer = 0
-        self.flash_speed = POWERUP_FLASH_SPEED
+        self.flash_speed = PowerupSettings.FLASH_SPEED
 
     def animate(self):
         if self.shape == 'heart':
@@ -313,18 +313,18 @@ class PowerUp(pygame.sprite.Sprite):
 
         if self.shape == 'diamond':
             points = [
-                (POWERUP_RADIUS, 0),                    # top
-                (POWERUP_RADIUS * 2, POWERUP_RADIUS),      # right
-                (POWERUP_RADIUS, POWERUP_RADIUS * 2),      # bottom
-                (0, POWERUP_RADIUS)                     # left
+                (PowerupSettings.RADIUS, 0),                    # top
+                (PowerupSettings.RADIUS * 2, PowerupSettings.RADIUS),      # right
+                (PowerupSettings.RADIUS, PowerupSettings.RADIUS * 2),      # bottom
+                (0, PowerupSettings.RADIUS)                     # left
             ]
             pygame.draw.polygon(self.image, self.current_color, points)
         else:
             pygame.draw.circle(
                 self.image,
                 self.current_color,
-                (POWERUP_RADIUS, POWERUP_RADIUS),
-                POWERUP_RADIUS
+                (PowerupSettings.RADIUS, PowerupSettings.RADIUS),
+                PowerupSettings.RADIUS
             )
 
     def destroy(self):

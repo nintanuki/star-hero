@@ -6,6 +6,7 @@ class ScreenSettings:
     FPS = 120
     BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
     CRT_ALPHA_RANGE = (75, 90)
+    BG_SCROLL_SPEED = 50
 
 class PlayerSettings:
     SPEED = 2
@@ -17,6 +18,7 @@ class PlayerSettings:
     DEATH_DELAY = 500
     FLASH_DURATION = 500 # Total time to flash in milliseconds
     FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
+    JOYSTICK_DEADZONE = 0.2
 
 class AlienSettings:
     SPAWN_RATE = 600 # lower numbers = faster rate of enemy spawn
@@ -35,52 +37,40 @@ class LaserSettings:
     HEIGHT = 20
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4
-    COLORS = {'standard': ('green', 'white'), 'rapid': ('yellow', 'white'), 'alien': ('red', 'white'), 'beam': ('cyan', 'white')}
+    COLORS = {
+        'standard': ('green', 'white'), 
+        'rapid': ('yellow', 'white'), 
+        'alien': ('red', 'white'), 
+        'beam': ('cyan', 'white')
+    }
 
 class ExplosionSettings:
-    pass
+    FRAMES = 7 # there are seven unique images in the explosion sprite sheet
+    ANIMATION_SPEED = 0.15 # smaller numbers = slower explosion animation. Always 0.x
+    SIZE = 192 # size of each frame in the spritesheet, definse both width and height
+    SCALE = 0.5
 
 class FontSettings:
-    pass
+    FONT = 'font/Pixeled.ttf'
+    SMALL = 10
+    MEDIUM = 20
+    LARGE = 30
+    COLOR = 'white'
 
 class UISettings:
-    pass
+    HEART_SPRITE_SIZE = (24, 24)
+    HEART_SPACING = 10
+    HEART_TOP_MARGIN = 8
+    VOLUME_DISPLAY_TIME = 1000
 
 class AudioSettings:
-    pass
+    INTRO_VOL_BOOST = 2.0
+    DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
 
-# Font Settings
-UT_FONT = 'font/Pixeled.ttf'
-FONT_SIZE_SMALL = 10
-FONT_SIZE_MEDIUM = 20
-FONT_SIZE_LARGE = 30
-
-# Background
-BG_SCROLL_SPEED = 50
-
-JOYSTICK_DEADZONE = 0.2
-
-# Visual Effects
-EXPLOSION_FRAMES = 7 # there are seven unique images in the explosion sprite sheet
-EXPLOSION_SPEED = 0.15 # smaller numbers = slower explosion animation. Always 0.x
-EXPLOSION_SIZE = 192 # size of each frame in the spritesheet, definse both width and height
-EXPLOSION_SCALE = 0.5
-
-# UI Settings
-HEART_SPRITE_SIZE = (24, 24)
-HEART_SPACING = 10
-HEART_TOP_MARGIN = 8
-VOLUME_DISPLAY_TIME = 1000
-# CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
-
-# Powerup Visuals
-POWERUP_RADIUS = 12
-POWERUP_SPEED = 2 # how fast the powerup floats down?
-POWERUP_FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
-
-# Audio Mix (Master offsets)
-INTRO_VOL_BOOST = 2.0
-DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
+class PowerupSettings:
+    RADIUS = 12
+    SPEED = 2 # how fast the powerup floats down?
+    FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
 
 # Dictionaries
 

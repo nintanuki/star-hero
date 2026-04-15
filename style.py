@@ -143,7 +143,7 @@ class Style():
             self.display_game_over_score(self.score)
 
             if entering_initials:
-                prompt = self.small_font.render("NEW TOP 10! ENTER INITIALS", False, 'yellow')
+                prompt = self.small_font.render("NEW HIGH SCORE! ENTER YOUR INITIALS", False, 'yellow')
                 prompt_rect = prompt.get_rect(center=(screen_center_x, 125))
                 self.screen.blit(prompt, prompt_rect)
 
@@ -158,10 +158,10 @@ class Style():
                 initials_rect = initials_surf.get_rect(center=(screen_center_x, 165))
                 self.screen.blit(initials_surf, initials_rect)
 
-                leaderboard_title_y = 210
+                leaderboard_title_y = 220
                 leaderboard_start_y = 255
             else:
-                restart_surf = self.medium_font.render("PRESS ENTER TO RESTART", False, 'white')
+                restart_surf = self.medium_font.render("PRESS ENTER TO PLAY AGAIN", False, 'white')
                 restart_rect = restart_surf.get_rect(center=(screen_center_x, ScreenSettings.HEIGHT - 70))
                 self.screen.blit(restart_surf, restart_rect)
 

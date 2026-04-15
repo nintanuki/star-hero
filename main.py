@@ -27,8 +27,16 @@ class CollisionManager:
                 for alien in aliens_hit:
                     self.game.score += alien.value
                     self.game.explode(alien.rect.centerx, alien.rect.centery)
+
+                    # Check if a powerup should drop
                     if random.random() < DROP_CHANCES[alien.color]:
-                        self.game.spawn_powerup(alien.rect.center, alien.color)
+
+                        # If it's a red alien (heart), only spawn if player is hurt
+                        if alien.color == 'red':
+                            if self.game.hearts < 3:
+                                self.game.spawn_powerup(alien.rect.center, alien.color)
+                        else:
+                            self.game.spawn_powerup(alien.rect.center, alien.color)
 
     def _alien_lasers(self):
         for laser in self.game.alien_lasers:

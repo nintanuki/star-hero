@@ -7,7 +7,7 @@ class Laser(pygame.sprite.Sprite):
         super().__init__()
         self.colors = colors
         self.color_index = 0
-        self.image = pygame.Surface((width, LASER_HEIGHT))
+        self.image = pygame.Surface((width, LaserSettings.HEIGHT))
         self.image.fill(self.colors[self.color_index])
         self.rect = self.image.get_rect(center = pos)
         self.speed = speed
@@ -164,23 +164,23 @@ class Player(pygame.sprite.Sprite):
         # 1. Determine the colors and size of the lasers
         if self.beam_active:
             colors = LASER_COLORS['beam']
-            width = BEAM_LASER_WIDTH
+            width = AlienSettings.BEAM_WIDTH
             offset = 20              # Extra space for thick beams
         elif self.rapid_fire_active:
             colors = LASER_COLORS['rapid']
-            width = DEFAULT_LASER_WIDTH
+            width = LaserSettings.DEFAULT_WIDTH
             offset = 12
         else:
             colors = LASER_COLORS['standard']
-            width = DEFAULT_LASER_WIDTH
+            width = LaserSettings.DEFAULT_WIDTH
             offset = 12
 
         # 2. Spawn the lasers
         if self.twin_laser_active:
-            self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), PLAYER_LASER_SPEED, colors, width))
-            self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), PLAYER_LASER_SPEED, colors, width))
+            self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width))
+            self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width))
         else:
-            self.lasers.add(Laser(self.rect.center, PLAYER_LASER_SPEED, colors, width))
+            self.lasers.add(Laser(self.rect.center, LaserSettings.PLAYER_LASER_SPEED, colors, width))
 
     def activate_powerup(self, powerup):
         current_time = pygame.time.get_ticks()
@@ -243,7 +243,7 @@ class Alien(pygame.sprite.Sprite):
         # Give green aliens twin lasers
         self.is_twin = True if color == 'green' else False
 
-        self.value = ALIEN_VALUES.get(color, 0)
+        self.value = AlienSettings.POINTS.get(color, 0)
 
     def destroy(self):
         if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease
@@ -251,10 +251,10 @@ class Alien(pygame.sprite.Sprite):
 
     # numbers round down if decimals are used? .05 doesn't move and 1 is the same as 1.5, etc
     def update(self):
-        if self.color == 'red': self.rect.y += AlienSettings.DESCEND_SPEED['red']
-        elif self.color == 'green': self.rect.y += AlienSettings.DESCEND_SPEED['green']
+        if self.color == 'red': self.rect.y += AlienSettings.SPEED['red']
+        elif self.color == 'green': self.rect.y += AlienSettings.SPEED['green']
         elif self.color == 'yellow':
-            self.rect.y += AlienSettings.DESCEND_SPEED['yellow']
+            self.rect.y += AlienSettings.SPEED['yellow']
             self.yellow_zigzag_counter += 1
             if self.yellow_zigzag_counter >= AlienSettings.ZIGZAG_THRESHOLD:
                 self.yellow_zigzag_counter = 0
@@ -263,7 +263,7 @@ class Alien(pygame.sprite.Sprite):
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.yellow_zigzag_direction *= -1
         else: # color is blue
-            self.rect.y += AlienSettings.DESCEND_SPEED['blue']
+            self.rect.y += AlienSettings.SPEED['blue']
             self.rect.x += self.blue_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1

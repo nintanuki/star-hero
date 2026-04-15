@@ -9,7 +9,7 @@ class ScreenSettings:
 
 class PlayerSettings:
     SPEED = 2
-    ROTATION = 0
+    ROTATION = 0 # Is this ever even used?
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
     RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
@@ -23,12 +23,21 @@ class AlienSettings:
     LASER_RATE = 400 # lower numbers = more lasers
     SPAWN_OFFSET = (-300, -100)
     ZIGZAG_THRESHOLD = 100
-    DESCEND_SPEED = {
-        'red': 1,
-        'green': 2,
-        'yellow': 3,
-        'blue': 5
-    }
+    SPEED = {'red': 1, 'green': 2, 'yellow': 3, 'blue': 5} # How fast each alien descends
+    POINTS = {'red': 100, 'green': 200, 'yellow': 300, 'blue': 500}
+    COLOR = ['red', 'green', 'yellow', 'blue']
+    SPAWN_CHANCE = [50, 30, 15, 5] # probability of each color alien appearing
+    DROP_CHANCE = {'red': 0.20, 'green': 0.20, 'yellow': 0.15, 'blue': 0.25,} # Probability of each alien dropping a powerup
+
+class LaserSettings:
+    DEFAULT_WIDTH = 4
+    BEAM_WIDTH = 12
+    HEIGHT = 20
+    PLAYER_LASER_SPEED = -8
+    ALIEN_LASER_SPEED = 4
+
+class ExplosionSettings:
+    pass
 
 # Font Settings
 UT_FONT = 'font/Pixeled.ttf'
@@ -40,17 +49,6 @@ FONT_SIZE_LARGE = 30
 BG_SCROLL_SPEED = 50
 
 JOYSTICK_DEADZONE = 0.2
-
-
-ALIEN_TYPES = ['red', 'green', 'yellow', 'blue']
-ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing
-
-# Laser Settings
-DEFAULT_LASER_WIDTH = 4
-BEAM_LASER_WIDTH = 12
-LASER_HEIGHT = 20
-PLAYER_LASER_SPEED = -8
-ALIEN_LASER_SPEED = 4
 
 # Visual Effects
 EXPLOSION_FRAMES = 7 # there are seven unique images in the explosion sprite sheet
@@ -88,13 +86,6 @@ POWERUP_DATA = {
     'green':  {'draw_color': (60, 255, 100), 'type': 'twin_laser', 'shape': 'diamond'},
     'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': 150},
     'blue':   {'draw_color': (80, 160, 255), 'type': 'beam',       'shape': 'circle', 'cooldown': 0},
-}
-
-DROP_CHANCES = {
-    'red': 0.20,
-    'green': 0.20,
-    'yellow': 0.15,
-    'blue': 0.25,
 }
 
 # Scoring

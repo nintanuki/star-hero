@@ -29,7 +29,7 @@ class CollisionManager:
                     self.game.explode(alien.rect.centerx, alien.rect.centery)
 
                     # Check if a powerup should drop
-                    if random.random() < DROP_CHANCES[alien.color]:
+                    if random.random() < AlienSettings.DROP_CHANCE[alien.color]:
 
                         # If it's a red alien (heart), only spawn if player is hurt
                         if alien.color == 'red':
@@ -230,10 +230,10 @@ class GameManager:
             
             if random_alien.color == 'green':
                 offset = 10
-                self.alien_lasers.add(Laser((random_alien.rect.centerx - offset, random_alien.rect.centery), ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH))
-                self.alien_lasers.add(Laser((random_alien.rect.centerx + offset, random_alien.rect.centery), ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH))
+                self.alien_lasers.add(Laser((random_alien.rect.centerx - offset, random_alien.rect.centery), LaserSettings.ALIEN_LASER_SPEED, LASER_COLORS['alien'], LaserSettings.DEFAULT_WIDTH))
+                self.alien_lasers.add(Laser((random_alien.rect.centerx + offset, random_alien.rect.centery), LaserSettings.ALIEN_LASER_SPEED, LASER_COLORS['alien'], LaserSettings.DEFAULT_WIDTH))
             else:
-                laser_sprite = Laser(random_alien.rect.center, ALIEN_LASER_SPEED, LASER_COLORS['alien'], DEFAULT_LASER_WIDTH)
+                laser_sprite = Laser(random_alien.rect.center, LaserSettings.ALIEN_LASER_SPEED, LASER_COLORS['alien'], LaserSettings.DEFAULT_WIDTH)
                 self.alien_lasers.add(laser_sprite)
 
     def explode(self,x_pos,y_pos):
@@ -384,7 +384,7 @@ class GameManager:
 
                 if self.game_active:
                     if event.type == self.alien_spawn_timer:
-                        alien_color = random.choices(ALIEN_TYPES, weights=ALIEN_WEIGHTS)[0]
+                        alien_color = random.choices(AlienSettings.COLOR, weights=AlienSettings.SPAWN_CHANCE)[0]
                         self.spawn_aliens(alien_color)
                     if event.type == self.alien_laser_timer:
                         self.alien_shoot()

@@ -109,39 +109,30 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_f] or controller_boost:
             current_speed *= 2 # Doubles the movement speed
 
-        # 2. Keyboard Movement
-        if (keys[pygame.K_w] or keys[pygame.K_UP]):
-            self.rect.y -= current_speed
-        if (keys[pygame.K_s] or keys[pygame.K_DOWN]):
-            self.rect.y += current_speed
-        if (keys[pygame.K_a] or keys[pygame.K_LEFT]):
-            self.rect.x -= current_speed
-        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]):
-            self.rect.x += current_speed
+        # 2. Movement (Keyboard + Controller)
+        if (keys[pygame.K_w] or keys[pygame.K_UP]): self.rect.y -= current_speed
+        if (keys[pygame.K_s] or keys[pygame.K_DOWN]): self.rect.y += current_speed
+        if (keys[pygame.K_a] or keys[pygame.K_LEFT]): self.rect.x -= current_speed
+        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]): self.rect.x += current_speed
 
-        # 3. Controller Input
         for i in range(pygame.joystick.get_count()):
             joy = pygame.joystick.Joystick(i)
-            
-            # Left Thumbstick Movement
             if abs(joy.get_axis(0)) > PlayerSettings.JOYSTICK_DEADZONE:
                 self.rect.x += joy.get_axis(0) * current_speed
             if abs(joy.get_axis(1)) > PlayerSettings.JOYSTICK_DEADZONE:
                 self.rect.y += joy.get_axis(1) * current_speed
 
-            # A Button (Button 0) to Shoot
-            if joy.get_button(0) and self.ready:
-                self.shoot_laser()
-                self.ready = False
-                self.laser_time = pygame.time.get_ticks()
-                self.audio.channel_3.play(self.audio.laser_sound)
-
-        # 4. Keyboard Shooting
-        if keys[pygame.K_SPACE] and self.ready:
-            self.shoot_laser()
-            self.ready = False
-            self.laser_time = pygame.time.get_ticks()
-            self.audio.channel_3.play(self.audio.laser_sound)
+        # 3. MANUAL Shooting (Only for standard weapon)
+        # Only check for manual input if NO auto-powerup is active
+        if not (self.rapid_fire_active or self.beam_active):
+            # Keyboard
+            if keys[pygame.K_SPACE] and self.ready:
+                self.trigger_shot()
+            # Controller (A Button)
+            for i in range(pygame.joystick.get_count()):
+                joy = pygame.joystick.Joystick(i)
+                if joy.get_button(0) and self.ready:
+                    self.trigger_shot()
 
     def recharge(self):
         if not self.ready:
@@ -214,8 +205,19 @@ class Player(pygame.sprite.Sprite):
                 self.beam_active = False
                 self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
+    def trigger_shot(self):
+        """Helper to handle the act of shooting"""
+        self.shoot_laser()
+        self.ready = False
+        self.laser_time = pygame.time.get_ticks()
+        self.audio.channel_3.play(self.audio.laser_sound)
+
     def update(self):
         self.get_input()
+
+        if (self.rapid_fire_active or self.beam_active) and self.ready:
+            self.trigger_shot()
+        
         self.constraint()
         self.recharge()
         self.check_powerup_timeout()

@@ -118,10 +118,10 @@ class GameManager:
 
         # Timers
         self.alien_spawn_timer = pygame.event.custom_type()
-        pygame.time.set_timer(self.alien_spawn_timer,ALIEN_SPAWN_RATE)
+        pygame.time.set_timer(self.alien_spawn_timer,AlienSettings.SPAWN_RATE)
 
         self.alien_laser_timer = pygame.event.custom_type()
-        pygame.time.set_timer(self.alien_laser_timer,ALIEN_LASER_RATE)
+        pygame.time.set_timer(self.alien_laser_timer,AlienSettings.LASER_RATE)
 
         self.player_death_timer = pygame.event.custom_type()
         self.volume_display_timer = pygame.event.custom_type()

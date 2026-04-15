@@ -18,6 +18,18 @@ class PlayerSettings:
     FLASH_DURATION = 500 # Total time to flash in milliseconds
     FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
 
+class AlienSettings:
+    SPAWN_RATE = 600 # lower numbers = faster rate of enemy spawn
+    LASER_RATE = 400 # lower numbers = more lasers
+    SPAWN_OFFSET = (-300, -100)
+    ZIGZAG_THRESHOLD = 100
+    DESCEND_SPEED = {
+        'red': 1,
+        'green': 2,
+        'yellow': 3,
+        'blue': 5
+    }
+
 # Font Settings
 UT_FONT = 'font/Pixeled.ttf'
 FONT_SIZE_SMALL = 10
@@ -29,15 +41,6 @@ BG_SCROLL_SPEED = 50
 
 JOYSTICK_DEADZONE = 0.2
 
-# Alien Settings
-ALIEN_SPAWN_OFFSET = (-300, -100)
-ALIEN_SPAWN_RATE = 600 # lower numbers = faster rate of enemy spawn
-ALIEN_LASER_RATE = 400 # lower numbers = more lasers
-ALIEN_DESCEND_SPEED_RED = 1
-ALIEN_DESCEND_SPEED_GREEN = 2
-ALIEN_DESCEND_SPEED_YELLOW = 3
-ZIGZAG_THRESHOLD = 100
-ALIEN_DESCEND_SPEED_BLUE = 5
 
 ALIEN_TYPES = ['red', 'green', 'yellow', 'blue']
 ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing

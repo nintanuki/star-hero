@@ -231,7 +231,7 @@ class Alien(pygame.sprite.Sprite):
         x_pos  = random.randint(20,self.screen_width - 20)
         file_path = 'graphics/' + self.color + '.png'
         self.image = pygame.image.load(file_path).convert_alpha()
-        self.rect = self.image.get_rect(center = (x_pos,random.randint(*ALIEN_SPAWN_OFFSET)))
+        self.rect = self.image.get_rect(center = (x_pos,random.randint(*AlienSettings.SPAWN_OFFSET)))
 
         # Yellow aliens zigzag
         self.yellow_zigzag_direction = random.choice([-1,1]) # 1 for right, -1 for left
@@ -251,19 +251,19 @@ class Alien(pygame.sprite.Sprite):
 
     # numbers round down if decimals are used? .05 doesn't move and 1 is the same as 1.5, etc
     def update(self):
-        if self.color == 'red': self.rect.y += ALIEN_DESCEND_SPEED_RED
-        elif self.color == 'green': self.rect.y += ALIEN_DESCEND_SPEED_GREEN
+        if self.color == 'red': self.rect.y += AlienSettings.DESCEND_SPEED['red']
+        elif self.color == 'green': self.rect.y += AlienSettings.DESCEND_SPEED['green']
         elif self.color == 'yellow':
-            self.rect.y += ALIEN_DESCEND_SPEED_YELLOW
+            self.rect.y += AlienSettings.DESCEND_SPEED['yellow']
             self.yellow_zigzag_counter += 1
-            if self.yellow_zigzag_counter >= ZIGZAG_THRESHOLD:
+            if self.yellow_zigzag_counter >= AlienSettings.ZIGZAG_THRESHOLD:
                 self.yellow_zigzag_counter = 0
                 self.yellow_zigzag_direction *= -1
             self.rect.x += self.yellow_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.yellow_zigzag_direction *= -1
         else: # color is blue
-            self.rect.y += ALIEN_DESCEND_SPEED_BLUE
+            self.rect.y += AlienSettings.DESCEND_SPEED['blue']
             self.rect.x += self.blue_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1

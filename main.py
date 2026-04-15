@@ -52,7 +52,7 @@ class CollisionManager:
                 self.game.audio.channel_8.play(self.game.audio.powerup_heart)
                 self.game.hearts += 1
             else:
-                if powerup.powerup_type == 'twin_laser':
+                if powerup.powerup_type == 'twin_laser' and not self.game.player.sprite.twin_laser_active:
                     self.game.audio.channel_8.play(self.game.audio.powerup_twin)
                 elif powerup.powerup_type in ['rapid_fire', 'beam']:
                     self.game.audio.channel_8.play(self.game.audio.powerup_weapon)

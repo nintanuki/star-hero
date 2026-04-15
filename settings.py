@@ -35,7 +35,7 @@ ALIEN_WEIGHTS = [50, 30, 15, 5] # probability of each color alien appearing
 
 # Laser Settings
 DEFAULT_LASER_WIDTH = 4
-BEAM_LASER_WIDTH = 64
+BEAM_LASER_WIDTH = 12
 LASER_HEIGHT = 20
 PLAYER_LASER_SPEED = -8
 ALIEN_LASER_SPEED = 4
@@ -77,7 +77,7 @@ DROP_CHANCES = {
     'red': 0.20,
     'green': 0.20,
     'yellow': 0.15,
-    'blue': 0.10,
+    'blue': 0.25,
 }
 
 # Scoring

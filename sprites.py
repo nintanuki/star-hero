@@ -64,6 +64,12 @@ class Player(pygame.sprite.Sprite):
         self.is_flashing = True
         self.flash_timer = pygame.time.get_ticks()
 
+        # Reset all powerups upon taking damage
+        self.twin_laser_active = False
+        self.rapid_fire_active = False
+        self.beam_active = False
+        self.laser_cooldown = DEFAULT_LASER_COOLDOWN
+
     def animate_damage(self):
         """Toggles the ship color between original and red tint"""
         if self.is_flashing:
@@ -183,36 +189,29 @@ class Player(pygame.sprite.Sprite):
 
         if powerup.powerup_type == 'twin_laser':
             self.twin_laser_active = True
-            self.twin_laser_start_time = current_time
 
         elif powerup.powerup_type == 'rapid_fire':
             self.rapid_fire_active = True
             self.rapid_fire_start_time = current_time
             self.laser_cooldown = powerup.cooldown_bonus
-            # Turn off beam if it was active so they don't fight
             self.beam_active = False 
 
         elif powerup.powerup_type == 'beam':
             self.beam_active = True
             self.beam_start_time = current_time
             self.laser_cooldown = powerup.cooldown_bonus
-            # Turn off rapid fire if it was active
             self.rapid_fire_active = False
 
     def check_powerup_timeout(self):
         current_time = pygame.time.get_ticks()
 
-        if self.twin_laser_active:
-            if current_time - self.twin_laser_start_time >= POWERUP_DURATION:
-                self.twin_laser_active = False
-
         if self.rapid_fire_active:
-            if current_time - self.rapid_fire_start_time >= POWERUP_DURATION:
+            if current_time - self.rapid_fire_start_time >= RAPID_FIRE_DURATION:
                 self.rapid_fire_active = False
                 self.laser_cooldown = DEFAULT_LASER_COOLDOWN
 
         if self.beam_active:
-            if current_time - self.beam_start_time >= POWERUP_DURATION:
+            if current_time - self.beam_start_time >= BEAM_DURATION:
                 self.beam_active = False
                 self.laser_cooldown = DEFAULT_LASER_COOLDOWN
 

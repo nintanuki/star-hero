@@ -18,7 +18,8 @@ PLAYER_SPEED = 2
 PLAYER_ROTATION = 0
 PLAYER_SCALE = 0.15
 DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
-POWERUP_DURATION = 10000 # 10000 milliseconds = 10 seconds
+RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
+BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
 PLAYER_DEATH_DELAY = 500
 
 # Alien Settings

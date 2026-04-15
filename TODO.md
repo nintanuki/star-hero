@@ -7,6 +7,7 @@
 
 ### Ideas for Future Changes and Additions
 * Add sound effects for when the player touches a powerup
+* Display indicator when powerup is active (maybe it blinks before going away?)
 * Different rates of fire for different enemies (yellow shoots more, blue shoots the most, but blue's lasers are too slow)
 * Enemy shoots a beam (in the style of the ship stealer from Galaga) that makes play purple and reverses controls.
 * Add shield powerup?

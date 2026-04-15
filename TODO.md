@@ -6,7 +6,6 @@
 * Player can hold button down for laser, disable this for both keyboard and controller, unless they have the beam
 
 ### Ideas for Future Changes and Additions
-* If twin lasers already active, powerup sound should not play when picked up
 * Ship should flash green, gold or blue when picking up powerups
 * Display indicator when powerup is active (maybe it blinks before going away?)
 * Different rates of fire for different enemies (yellow shoots more, blue shoots the most, but blue's lasers are too slow)

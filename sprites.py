@@ -191,10 +191,11 @@ class Player(pygame.sprite.Sprite):
             self.twin_laser_active = True
 
         elif powerup.powerup_type == 'rapid_fire':
-            self.rapid_fire_active = True
-            self.rapid_fire_start_time = current_time
-            self.laser_cooldown = powerup.cooldown_bonus
-            self.beam_active = False 
+            # Only activate rapid fire if the beam isn't already active
+            if not self.beam_active:
+                self.rapid_fire_active = True
+                self.rapid_fire_start_time = current_time
+                self.laser_cooldown = powerup.cooldown_bonus
 
         elif powerup.powerup_type == 'beam':
             self.beam_active = True

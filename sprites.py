@@ -273,11 +273,11 @@ class PowerUp(pygame.sprite.Sprite):
     def __init__(self, pos, color):
         super().__init__()
         self.speed = PowerupSettings.SPEED
-        self.shape = POWERUP_DATA[color].get('shape', 'circle')
+        self.shape = PowerupSettings.DATA[color].get('shape', 'circle')
 
-        self.draw_color = POWERUP_DATA[color]['draw_color']
-        self.powerup_type = POWERUP_DATA[color]['type']
-        self.cooldown_bonus = POWERUP_DATA[color].get('cooldown', None)
+        self.draw_color = PowerupSettings.DATA[color]['draw_color']
+        self.powerup_type = PowerupSettings.DATA[color]['type']
+        self.cooldown_bonus = PowerupSettings.DATA[color].get('cooldown', None)
 
         self.flash_color = (255, 255, 255)
         self.current_color = self.draw_color

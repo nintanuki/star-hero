@@ -44,6 +44,18 @@ class LaserSettings:
         'beam': ('cyan', 'white')
     }
 
+class PowerupSettings:
+    RADIUS = 12
+    SPEED = 2 # how fast the powerup floats down?
+    FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
+
+    DATA = {
+    'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},
+    'green':  {'draw_color': (60, 255, 100), 'type': 'twin_laser', 'shape': 'diamond'},
+    'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': 150},
+    'blue':   {'draw_color': (80, 160, 255), 'type': 'beam',       'shape': 'circle', 'cooldown': 0},
+    }
+
 class ExplosionSettings:
     FRAMES = 7 # there are seven unique images in the explosion sprite sheet
     ANIMATION_SPEED = 0.15 # smaller numbers = slower explosion animation. Always 0.x
@@ -66,25 +78,3 @@ class UISettings:
 class AudioSettings:
     INTRO_VOL_BOOST = 2.0
     DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
-
-class PowerupSettings:
-    RADIUS = 12
-    SPEED = 2 # how fast the powerup floats down?
-    FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
-
-# Dictionaries
-
-POWERUP_DATA = {
-    'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},
-    'green':  {'draw_color': (60, 255, 100), 'type': 'twin_laser', 'shape': 'diamond'},
-    'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': 150},
-    'blue':   {'draw_color': (80, 160, 255), 'type': 'beam',       'shape': 'circle', 'cooldown': 0},
-}
-
-# Scoring
-ALIEN_VALUES = {
-    'red': 100,
-    'green': 200,
-    'yellow': 300,
-    'blue': 500
-}

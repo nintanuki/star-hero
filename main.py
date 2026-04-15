@@ -228,12 +228,27 @@ class GameManager:
         if self.aliens.sprites():
             random_alien = random.choice(self.aliens.sprites())
             
+            # Give green aliens twin lasers
             if random_alien.color == 'green':
                 offset = 10
-                self.alien_lasers.add(Laser((random_alien.rect.centerx - offset, random_alien.rect.centery), LaserSettings.ALIEN_LASER_SPEED, LASER_COLORS['alien'], LaserSettings.DEFAULT_WIDTH))
-                self.alien_lasers.add(Laser((random_alien.rect.centerx + offset, random_alien.rect.centery), LaserSettings.ALIEN_LASER_SPEED, LASER_COLORS['alien'], LaserSettings.DEFAULT_WIDTH))
+                self.alien_lasers.add(
+                    Laser(
+                        pos=(random_alien.rect.centerx - offset, random_alien.rect.centery),
+                        speed=LaserSettings.ALIEN_LASER_SPEED,
+                        colors=LaserSettings.COLORS['alien'],
+                        width=LaserSettings.DEFAULT_WIDTH
+                    )
+                )
+                self.alien_lasers.add(
+                    Laser(
+                        pos=(random_alien.rect.centerx + offset, random_alien.rect.centery),
+                        speed=LaserSettings.ALIEN_LASER_SPEED,
+                        colors=LaserSettings.COLORS['alien'],
+                        width=LaserSettings.DEFAULT_WIDTH
+                    )
+                )
             else:
-                laser_sprite = Laser(random_alien.rect.center, LaserSettings.ALIEN_LASER_SPEED, LASER_COLORS['alien'], LaserSettings.DEFAULT_WIDTH)
+                laser_sprite = Laser(random_alien.rect.center, LaserSettings.ALIEN_LASER_SPEED, LaserSettings.COLORS['alien'], LaserSettings.DEFAULT_WIDTH)
                 self.alien_lasers.add(laser_sprite)
 
     def explode(self,x_pos,y_pos):

@@ -163,15 +163,15 @@ class Player(pygame.sprite.Sprite):
         
         # 1. Determine the colors and size of the lasers
         if self.beam_active:
-            colors = LASER_COLORS['beam']
-            width = AlienSettings.BEAM_WIDTH
+            colors = LaserSettings.COLORS['beam']
+            width = LaserSettings.BEAM_WIDTH
             offset = 20              # Extra space for thick beams
         elif self.rapid_fire_active:
-            colors = LASER_COLORS['rapid']
+            colors = LaserSettings.COLORS['rapid']
             width = LaserSettings.DEFAULT_WIDTH
             offset = 12
         else:
-            colors = LASER_COLORS['standard']
+            colors = LaserSettings.COLORS['standard']
             width = LaserSettings.DEFAULT_WIDTH
             offset = 12
 

@@ -35,8 +35,18 @@ class LaserSettings:
     HEIGHT = 20
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4
+    COLORS = {'standard': ('green', 'white'), 'rapid': ('yellow', 'white'), 'alien': ('red', 'white'), 'beam': ('cyan', 'white')}
 
 class ExplosionSettings:
+    pass
+
+class FontSettings:
+    pass
+
+class UISettings:
+    pass
+
+class AudioSettings:
     pass
 
 # Font Settings
@@ -73,13 +83,6 @@ INTRO_VOL_BOOST = 2.0
 DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
 
 # Dictionaries
-
-LASER_COLORS = {
-    'standard': ('green', 'white'),
-    'rapid':    ('yellow', 'white'),
-    'alien':    ('red', 'white'),
-    'beam':     ('cyan', 'white')
-}
 
 POWERUP_DATA = {
     'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},

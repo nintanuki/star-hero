@@ -28,11 +28,11 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # Store original image to revert back after flashing
         self.original_image = pygame.image.load('graphics/player_ship.png').convert_alpha()
-        self.original_image = pygame.transform.rotozoom(self.original_image, 0, PLAYER_SCALE)
+        self.original_image = pygame.transform.rotozoom(self.original_image, 0, PlayerSettings.SCALE)
         self.image = self.original_image.copy()
 
         self.rect = self.image.get_rect(center = (pos)) # make pos = 400,500?
-        self.speed = PLAYER_SPEED
+        self.speed = PlayerSettings.SPEED
 
         # Damage Flash Logic
         self.is_flashing = False
@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.ready = True
         
         self.laser_time = 0
-        self.laser_cooldown = DEFAULT_LASER_COOLDOWN
+        self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
         self.beam_active = False
         self.beam_start_time = 0
 
@@ -66,7 +66,7 @@ class Player(pygame.sprite.Sprite):
         self.twin_laser_active = False
         self.rapid_fire_active = False
         self.beam_active = False
-        self.laser_cooldown = DEFAULT_LASER_COOLDOWN
+        self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
     def animate_damage(self):
         """Toggles the ship color between original and red tint"""
@@ -74,13 +74,13 @@ class Player(pygame.sprite.Sprite):
             current_time = pygame.time.get_ticks()
             
             # Check if total duration has passed
-            if current_time - self.flash_timer >= PLAYER_FLASH_DURATION:
+            if current_time - self.flash_timer >= PlayerSettings.FLASH_DURATION:
                 self.is_flashing = False
                 self.image = self.original_image.copy() # Reset to normal
                 return
 
             # Toggle flash state based on interval
-            if current_time - self.last_flash_time >= PLAYER_FLASH_INTERVAL:
+            if current_time - self.last_flash_time >= PlayerSettings.FLASH_INTERVAL:
                 self.last_flash_time = current_time
                 self.is_red = not self.is_red
 
@@ -207,12 +207,12 @@ class Player(pygame.sprite.Sprite):
         if self.rapid_fire_active:
             if current_time - self.rapid_fire_start_time >= RAPID_FIRE_DURATION:
                 self.rapid_fire_active = False
-                self.laser_cooldown = DEFAULT_LASER_COOLDOWN
+                self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
         if self.beam_active:
             if current_time - self.beam_start_time >= BEAM_DURATION:
                 self.beam_active = False
-                self.laser_cooldown = DEFAULT_LASER_COOLDOWN
+                self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
     def update(self):
         self.get_input()

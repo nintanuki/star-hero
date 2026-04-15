@@ -1,3 +1,4 @@
+# Window & Display Settings
 class ScreenSettings:
     WIDTH = 600
     HEIGHT = 800
@@ -7,10 +8,13 @@ class ScreenSettings:
     BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
     CRT_ALPHA_RANGE = (75, 90)
 
-# Window & Display Settings
-# SCREEN_WIDTH = 600
-# SCREEN_HEIGHT = 800
-# FRAMERATE = 120
+class PlayerSettings:
+    SPEED = 2
+    SCALE = 0.15
+    DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
+    DEATH_DELAY = 500
+    FLASH_DURATION = 500 # Total time to flash in milliseconds
+    FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
 
 # Font Settings
 UT_FONT = 'font/Pixeled.ttf'
@@ -22,16 +26,15 @@ FONT_SIZE_LARGE = 30
 BG_SCROLL_SPEED = 50
 
 # Player Settings
-# SCREEN_CENTER = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-PLAYER_SPEED = 2
+# PLAYER_SPEED = 2
 PLAYER_ROTATION = 0
-PLAYER_SCALE = 0.15
-DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
+# PLAYER_SCALE = 0.15
+# DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
 RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
 BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
-PLAYER_FLASH_DURATION = 500 # Total time to flash in milliseconds
-PLAYER_FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
-PLAYER_DEATH_DELAY = 500
+# PLAYER_FLASH_DURATION = 500 # Total time to flash in milliseconds
+# PLAYER_FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
+# PLAYER_DEATH_DELAY = 500
 
 JOYSTICK_DEADZONE = 0.2
 
@@ -62,7 +65,6 @@ EXPLOSION_SIZE = 192 # size of each frame in the spritesheet, definse both width
 EXPLOSION_SCALE = 0.5
 
 # UI Settings
-# BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
 HEART_SPRITE_SIZE = (24, 24)
 HEART_SPACING = 10
 HEART_TOP_MARGIN = 8

@@ -183,7 +183,7 @@ class GameManager:
             self.explode(self.player.sprite.rect.centerx, self.player.sprite.rect.centery)
             self.audio.channel_1.pause()
             self.player_alive = False
-            pygame.time.set_timer(self.player_death_timer, PLAYER_DEATH_DELAY)
+            pygame.time.set_timer(self.player_death_timer, PlayerSettings.DEATH_DELAY)
 
     def score_check(self):
         """checks the current score against the high score"""

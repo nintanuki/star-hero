@@ -340,7 +340,7 @@ class GameManager:
                         self.player_alive = True
                         self.game_active = True
 
-            self.screen.fill((30,30,30))
+            self.screen.fill(BG_COLOR)
             self.background.update(delta_time)
             self.background.draw(self.screen)
             if self.show_volume:

@@ -36,9 +36,7 @@ class Player(pygame.sprite.Sprite):
 
         # Damage Flash Logic
         self.is_flashing = False
-        self.flash_duration = 500  # Total time to flash in milliseconds
         self.flash_timer = 0
-        self.flash_interval = 50   # How fast it toggles (smaller = faster flicker)
         self.last_flash_time = 0
         self.is_red = False
 
@@ -76,13 +74,13 @@ class Player(pygame.sprite.Sprite):
             current_time = pygame.time.get_ticks()
             
             # Check if total duration has passed
-            if current_time - self.flash_timer >= self.flash_duration:
+            if current_time - self.flash_timer >= PLAYER_FLASH_DURATION:
                 self.is_flashing = False
                 self.image = self.original_image.copy() # Reset to normal
                 return
 
             # Toggle flash state based on interval
-            if current_time - self.last_flash_time >= self.flash_interval:
+            if current_time - self.last_flash_time >= PLAYER_FLASH_INTERVAL:
                 self.last_flash_time = current_time
                 self.is_red = not self.is_red
 
@@ -126,9 +124,9 @@ class Player(pygame.sprite.Sprite):
             joy = pygame.joystick.Joystick(i)
             
             # Left Thumbstick Movement
-            if abs(joy.get_axis(0)) > 0.2:
+            if abs(joy.get_axis(0)) > JOYSTICK_DEADZONE:
                 self.rect.x += joy.get_axis(0) * current_speed
-            if abs(joy.get_axis(1)) > 0.2:
+            if abs(joy.get_axis(1)) > JOYSTICK_DEADZONE:
                 self.rect.y += joy.get_axis(1) * current_speed
 
             # A Button (Button 0) to Shoot
@@ -233,7 +231,7 @@ class Alien(pygame.sprite.Sprite):
         x_pos  = random.randint(20,self.screen_width - 20)
         file_path = 'graphics/' + self.color + '.png'
         self.image = pygame.image.load(file_path).convert_alpha()
-        self.rect = self.image.get_rect(center = (x_pos,random.randint(-300,-100)))
+        self.rect = self.image.get_rect(center = (x_pos,random.randint(*ALIEN_SPAWN_OFFSET)))
 
         # Yellow aliens zigzag
         self.yellow_zigzag_direction = random.choice([-1,1]) # 1 for right, -1 for left
@@ -258,7 +256,7 @@ class Alien(pygame.sprite.Sprite):
         elif self.color == 'yellow':
             self.rect.y += ALIEN_DESCEND_SPEED_YELLOW
             self.yellow_zigzag_counter += 1
-            if self.yellow_zigzag_counter >= 100: # change direction every 100 updates
+            if self.yellow_zigzag_counter >= ZIGZAG_THRESHOLD:
                 self.yellow_zigzag_counter = 0
                 self.yellow_zigzag_direction *= -1
             self.rect.x += self.yellow_zigzag_direction * 2
@@ -286,7 +284,7 @@ class PowerUp(pygame.sprite.Sprite):
 
         if self.shape == 'heart':
             self.image = pygame.image.load('graphics/heart.png').convert_alpha()
-            self.image = pygame.transform.scale(self.image, (24, 24))
+            self.image = pygame.transform.scale(self.image, HEART_SPRITE_SIZE)
             self.rect = self.image.get_rect(center=pos)
         else:
             self.image = pygame.Surface((POWERUP_RADIUS * 2, POWERUP_RADIUS * 2), pygame.SRCALPHA)

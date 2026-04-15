@@ -7,7 +7,7 @@ class Audio():
         # Increase the number of available channels from 8 to 16
         pygame.mixer.set_num_channels(16)
 
-        self.master_volume = 0.5 # default value is 1.0
+        self.master_volume = DEFAULT_MASTER_VOLUME
 
         """Music"""
         self.intro_music = pygame.mixer.Sound('audio/star_hero_intro.ogg')

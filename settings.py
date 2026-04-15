@@ -1,4 +1,3 @@
-# Window & Display Settings
 class ScreenSettings:
     WIDTH = 600
     HEIGHT = 800
@@ -10,8 +9,11 @@ class ScreenSettings:
 
 class PlayerSettings:
     SPEED = 2
+    ROTATION = 0
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
+    RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
+    BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
     DEATH_DELAY = 500
     FLASH_DURATION = 500 # Total time to flash in milliseconds
     FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
@@ -24,17 +26,6 @@ FONT_SIZE_LARGE = 30
 
 # Background
 BG_SCROLL_SPEED = 50
-
-# Player Settings
-# PLAYER_SPEED = 2
-PLAYER_ROTATION = 0
-# PLAYER_SCALE = 0.15
-# DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
-RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
-BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
-# PLAYER_FLASH_DURATION = 500 # Total time to flash in milliseconds
-# PLAYER_FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
-# PLAYER_DEATH_DELAY = 500
 
 JOYSTICK_DEADZONE = 0.2
 

@@ -205,12 +205,12 @@ class Player(pygame.sprite.Sprite):
         current_time = pygame.time.get_ticks()
 
         if self.rapid_fire_active:
-            if current_time - self.rapid_fire_start_time >= RAPID_FIRE_DURATION:
+            if current_time - self.rapid_fire_start_time >= PlayerSettings.RAPID_FIRE_DURATION:
                 self.rapid_fire_active = False
                 self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
         if self.beam_active:
-            if current_time - self.beam_start_time >= BEAM_DURATION:
+            if current_time - self.beam_start_time >= PlayerSettings.BEAM_DURATION:
                 self.beam_active = False
                 self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 

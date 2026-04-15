@@ -95,6 +95,7 @@ class Player(pygame.sprite.Sprite):
                     self.image = self.original_image.copy()
 
     def get_input(self):
+        """Handles player input for movement and shooting. Called every frame in update()"""
         # 1. Determine current speed (check Keyboard 'F' or Controller 'X')
         keys = pygame.key.get_pressed()
         current_speed = self.speed
@@ -109,12 +110,14 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_f] or controller_boost:
             current_speed *= 2 # Doubles the movement speed
 
-        # 2. Movement (Keyboard + Controller)
+        # Player Movement Input
+        # Keyboard input (WASD or Arrow Keys)
         if (keys[pygame.K_w] or keys[pygame.K_UP]): self.rect.y -= current_speed
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]): self.rect.y += current_speed
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]): self.rect.x -= current_speed
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]): self.rect.x += current_speed
 
+        # Controller input (Left Joystick)
         for i in range(pygame.joystick.get_count()):
             joy = pygame.joystick.Joystick(i)
             if abs(joy.get_axis(0)) > PlayerSettings.JOYSTICK_DEADZONE:
@@ -135,12 +138,14 @@ class Player(pygame.sprite.Sprite):
                     self.trigger_shot()
 
     def recharge(self):
+        """Recharges the player's laser based on cooldown. Called every frame in update()"""
         if not self.ready:
             current_time = pygame.time.get_ticks()
             if current_time - self.laser_time >= self.laser_cooldown:
                 self.ready = True
 
     def constraint(self):
+        """Constrains the player within the screen. Called every frame in update()"""
         if self.rect.left <= 0:
             self.rect.left = 0
         if self.rect.right >= ScreenSettings.WIDTH:

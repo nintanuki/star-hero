@@ -24,18 +24,18 @@ class Style():
         # Load image of ship for intro and game over screens
         self.player_ship = pygame.image.load('graphics/player_ship.png').convert_alpha()
         self.player_ship = pygame.transform.rotozoom(self.player_ship,0,0.2)
-        self.player_ship_rect = self.player_ship.get_rect(center = (SCREEN_CENTER))
+        self.player_ship_rect = self.player_ship.get_rect(center = (ScreenSettings.CENTER))
 
     def display_title(self):
         """# Displays the title on the intro and game over screens"""
         title = self.large_font.render('STAR HERO',False,(self.font_color))
-        title_rect = title.get_rect(center = (SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - 100))
+        title_rect = title.get_rect(center = (ScreenSettings.WIDTH/2,ScreenSettings.HEIGHT/2 - 100))
         self.screen.blit(title,title_rect)
 
     def display_game_over(self):
         """Displays Game Over message"""
         game_over_message = self.large_font.render('GAME OVER',False,(self.font_color))
-        game_over_message_rect = game_over_message.get_rect(center = (SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - 100))
+        game_over_message_rect = game_over_message.get_rect(center = (ScreenSettings.WIDTH/2,ScreenSettings.HEIGHT/2 - 100))
         self.screen.blit(game_over_message,game_over_message_rect)
 
     def display_player_ship(self):
@@ -45,7 +45,7 @@ class Style():
     def display_intro_message(self):
         """Displays instructions on how to begin on the intro screen (show controls in this method?)"""
         intro_message = self.medium_font.render('PRESS ENTER TO BEGIN',False,(self.font_color))
-        intro_message_rect = intro_message.get_rect(center = (SCREEN_WIDTH/2,SCREEN_HEIGHT/2 + 130))
+        intro_message_rect = intro_message.get_rect(center = (ScreenSettings.WIDTH/2,ScreenSettings.HEIGHT/2 + 130))
         self.screen.blit(intro_message,intro_message_rect)
 
     def display_high_score(self,save_data):
@@ -53,7 +53,7 @@ class Style():
         self.save_data = save_data
 
         high_score_message = self.medium_font.render(f'HIGH SCORE: {self.save_data["high_score"]}',False,(self.font_color))
-        high_score_message_rect = high_score_message.get_rect(center = (SCREEN_WIDTH/2,SCREEN_HEIGHT/2 + 100))
+        high_score_message_rect = high_score_message.get_rect(center = (ScreenSettings.WIDTH/2,ScreenSettings.HEIGHT/2 + 100))
         self.screen.blit(high_score_message,high_score_message_rect)
 
     def display_in_game_score(self,save_data,score):
@@ -74,13 +74,13 @@ class Style():
         self.score = score
 
         score_message = self.medium_font.render(f'YOUR SCORE: {self.score}',False,(self.font_color))
-        score_message_rect = score_message.get_rect(center = (SCREEN_WIDTH/2,SCREEN_HEIGHT/2 + 130))
+        score_message_rect = score_message.get_rect(center = (ScreenSettings.WIDTH/2,ScreenSettings.HEIGHT/2 + 130))
         self.screen.blit(score_message,score_message_rect)
 
     def display_pause_text(self):
         """Displays the Pause message on pause"""
         pause_text = self.medium_font.render('PAUSED', False, (self.font_color))
-        pause_text_rect = pause_text.get_rect(center = (SCREEN_CENTER))
+        pause_text_rect = pause_text.get_rect(center = (ScreenSettings.CENTER))
         self.screen.blit(pause_text,pause_text_rect)
 
     def display_volume(self):
@@ -88,11 +88,11 @@ class Style():
 
         # Volume Number
         volume_message = self.small_font.render(f'VOLUME: {round(self.audio.master_volume * 10)}',False,(self.font_color))
-        volume_message_rect = volume_message.get_rect(bottomleft = (10,SCREEN_HEIGHT - 20))
+        volume_message_rect = volume_message.get_rect(bottomleft = (10,ScreenSettings.HEIGHT - 20))
         self.screen.blit(volume_message,volume_message_rect)
         
         # Volume Bar
-        pygame.draw.rect(self.screen,'green',(10,SCREEN_HEIGHT - 20,(self.audio.master_volume*1000)/self.volume_bar_ratio,10))
+        pygame.draw.rect(self.screen,'green',(10,ScreenSettings.HEIGHT - 20,(self.audio.master_volume*1000)/self.volume_bar_ratio,10))
 
     def update(self,game_state,save_data,score):
         self.game_state = game_state

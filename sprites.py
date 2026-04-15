@@ -20,7 +20,7 @@ class Laser(pygame.sprite.Sprite):
         self.image.fill(self.colors[self.color_index])
         
         # Kill if off screen (using settings)
-        if self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT:
+        if self.rect.bottom < 0 or self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
 
 class Player(pygame.sprite.Sprite):
@@ -152,12 +152,12 @@ class Player(pygame.sprite.Sprite):
     def constraint(self):
         if self.rect.left <= 0:
             self.rect.left = 0
-        if self.rect.right >= SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
+        if self.rect.right >= ScreenSettings.WIDTH:
+            self.rect.right = ScreenSettings.WIDTH
         if self.rect.top <= 0:
             self.rect.top = 0
-        if self.rect.bottom >= SCREEN_HEIGHT:
-            self.rect.bottom = SCREEN_HEIGHT
+        if self.rect.bottom >= ScreenSettings.HEIGHT:
+            self.rect.bottom = ScreenSettings.HEIGHT
 
     def shoot_laser(self):
         
@@ -328,7 +328,7 @@ class PowerUp(pygame.sprite.Sprite):
             )
 
     def destroy(self):
-        if self.rect.top > SCREEN_HEIGHT:
+        if self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
 
     def update(self):

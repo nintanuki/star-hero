@@ -15,7 +15,7 @@ class Background(pygame.sprite.Sprite):
         self.image.blit(bg_image,(0,0))
         self.image.blit(bg_image,(0,full_height))
 
-        self.rect = self.image.get_rect(bottomleft = (0,SCREEN_HEIGHT))
+        self.rect = self.image.get_rect(bottomleft = (0,ScreenSettings.HEIGHT))
         self.pos = pygame.math.Vector2(self.rect.bottomleft)
 
     def update(self,delta_time):
@@ -68,16 +68,16 @@ class CRT:
         super().__init__()
         self.screen = screen
         self.tv = pygame.image.load('graphics/tv.png').convert_alpha()
-        self.tv = pygame.transform.scale(self.tv,(SCREEN_WIDTH,SCREEN_HEIGHT))
+        self.tv = pygame.transform.scale(self.tv,(ScreenSettings.RESOLUTION))
 
     def create_crt_lines(self):
         line_height = 3
-        line_amount = int(SCREEN_HEIGHT / line_height)
+        line_amount = int(ScreenSettings.HEIGHT / line_height)
         for line in range(line_amount):
             y_pos = line * line_height
-            pygame.draw.line(self.tv,'black',(0,y_pos),(SCREEN_WIDTH,y_pos),1)
+            pygame.draw.line(self.tv,'black',(0,y_pos),(ScreenSettings.WIDTH,y_pos),1)
 
     def draw(self):
-        self.tv.set_alpha(random.randint(*CRT_ALPHA_RANGE))
+        self.tv.set_alpha(random.randint(*ScreenSettings.CRT_ALPHA_RANGE))
         self.create_crt_lines()
         self.screen.blit(self.tv,(0,0))

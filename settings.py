@@ -1,7 +1,16 @@
+class ScreenSettings:
+    WIDTH = 600
+    HEIGHT = 800
+    RESOLUTION = (WIDTH,HEIGHT)
+    CENTER = (WIDTH / 2, HEIGHT / 2)
+    FPS = 120
+    BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
+    CRT_ALPHA_RANGE = (75, 90)
+
 # Window & Display Settings
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 800
-FRAMERATE = 120
+# SCREEN_WIDTH = 600
+# SCREEN_HEIGHT = 800
+# FRAMERATE = 120
 
 # Font Settings
 UT_FONT = 'font/Pixeled.ttf'
@@ -13,7 +22,7 @@ FONT_SIZE_LARGE = 30
 BG_SCROLL_SPEED = 50
 
 # Player Settings
-SCREEN_CENTER = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+# SCREEN_CENTER = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 PLAYER_SPEED = 2
 PLAYER_ROTATION = 0
 PLAYER_SCALE = 0.15
@@ -53,12 +62,12 @@ EXPLOSION_SIZE = 192 # size of each frame in the spritesheet, definse both width
 EXPLOSION_SCALE = 0.5
 
 # UI Settings
-BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
+# BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
 HEART_SPRITE_SIZE = (24, 24)
 HEART_SPACING = 10
 HEART_TOP_MARGIN = 8
 VOLUME_DISPLAY_TIME = 1000
-CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
+# CRT_ALPHA_RANGE = (75, 90) # can't pass this into animations, not used
 
 # Powerup Visuals
 POWERUP_RADIUS = 12

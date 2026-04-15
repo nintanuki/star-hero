@@ -77,7 +77,7 @@ class GameManager:
         pygame.joystick.init()
         self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT), pygame.SCALED)
+        self.screen = pygame.display.set_mode((ScreenSettings.RESOLUTION), pygame.SCALED)
         pygame.display.set_caption('Star Hero')
         self.clock = pygame.time.Clock()
         self.game_active = False
@@ -93,14 +93,14 @@ class GameManager:
         # Player Health
         self.hearts = 3
         self.heart_surf = pygame.image.load('graphics/heart.png').convert_alpha()
-        self.heart_x_start_pos = SCREEN_WIDTH - (self.heart_surf.get_size()[0] * 3 + 30)
+        self.heart_x_start_pos = ScreenSettings.WIDTH - (self.heart_surf.get_size()[0] * 3 + 30)
 
         # Background Setup
         self.background = pygame.sprite.Group()
         Background(self.background)
 
         # Player setup
-        player_sprite = Player((SCREEN_CENTER),self.audio)
+        player_sprite = Player((ScreenSettings.CENTER),self.audio)
         self.player = pygame.sprite.GroupSingle(player_sprite)
         self.player_alive = True
 
@@ -140,7 +140,7 @@ class GameManager:
         self.play_intro_music = True # Set to False after user begins, only place once
 
     def spawn_aliens(self,alien_color):
-        self.aliens.add(Alien(alien_color,SCREEN_WIDTH,SCREEN_HEIGHT))
+        self.aliens.add(Alien(alien_color,*ScreenSettings.RESOLUTION))
         if alien_color == 'blue':
             self.audio.channel_5.play(self.audio.ufo_sound)
 
@@ -268,7 +268,7 @@ class GameManager:
                         else:
                             # Start/Restart the game
                             self.score = 0
-                            self.player.sprite.rect.center = SCREEN_CENTER
+                            self.player.sprite.rect.center = ScreenSettings.CENTER
                             self.hearts = 3
                             self.alien_lasers.empty()
                             self.powerups.empty()
@@ -333,14 +333,14 @@ class GameManager:
                 else:
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                         self.score = 0
-                        self.player.sprite.rect.center = SCREEN_CENTER
+                        self.player.sprite.rect.center = ScreenSettings.CENTER
                         self.hearts = 3
                         self.alien_lasers.empty()
                         self.powerups.empty()
                         self.player_alive = True
                         self.game_active = True
 
-            self.screen.fill(BG_COLOR)
+            self.screen.fill(ScreenSettings.BG_COLOR)
             self.background.update(delta_time)
             self.background.draw(self.screen)
             if self.show_volume:
@@ -384,7 +384,7 @@ class GameManager:
 
             self.crt.draw()
             pygame.display.flip()
-            self.clock.tick(FRAMERATE)
+            self.clock.tick(ScreenSettings.FPS)
 
 if __name__ == '__main__':
     game_manager = GameManager()

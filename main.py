@@ -29,6 +29,7 @@ class CollisionManager:
                 laser.kill()
                 for alien in aliens_hit:
                     self.game.score += alien.value # Add points for each alien hit
+                    self.game.adjust_difficulty() # Adjust difficulty based on new score
                     self.game.explode(alien.rect.centerx, alien.rect.centery) # Trigger explosion animation at alien's position
 
                     # Check if a powerup should drop
@@ -291,6 +292,25 @@ class GameManager:
                     LaserSettings.DEFAULT_WIDTH
                     )
                 self.alien_lasers.add(laser_sprite)
+
+    def adjust_difficulty(self):
+        """Gradually decreases timers as score increases"""
+        # Calculate how many 'difficulty steps' the player has achieved
+        steps = self.score // AlienSettings.DIFFICULTY_STEP
+        
+        # 1. Increase Spawn Rate (Decrease the timer interval)
+        new_spawn_rate = max(
+            AlienSettings.MIN_SPAWN_RATE, 
+            AlienSettings.SPAWN_RATE - (steps * 25) # Decrease by 25ms per step
+        )
+        pygame.time.set_timer(self.alien_spawn_timer, new_spawn_rate)
+
+        # 2. Increase Shooting Frequency
+        new_laser_rate = max(
+            AlienSettings.MIN_LASER_RATE, 
+            AlienSettings.LASER_RATE - (steps * 15)
+        )
+        pygame.time.set_timer(self.alien_laser_timer, new_laser_rate)
 
     def explode(self,x_pos,y_pos):
         """Triggers an explosion animation at the given position and plays the sound effect"""

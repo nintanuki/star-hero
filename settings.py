@@ -29,7 +29,13 @@ class AlienSettings:
     and probabilities for spawning and dropping powerups.
     """
     SPAWN_RATE = 600 # lower numbers = faster rate of enemy spawn
+    MIN_SPAWN_RATE = 150  # Hard limit on how fast they spawn
+
     LASER_RATE = 400 # lower numbers = more lasers
+    MIN_LASER_RATE = 100  # Hard limit on how fast they shoot
+
+    DIFFICULTY_STEP = 10000 # Increase difficulty every 10000 points
+
     SPAWN_OFFSET = (-300, -100)
     ZIGZAG_THRESHOLD = 100
     SPEED = {'red': 1, 'green': 2, 'yellow': 3, 'blue': 5} # How fast each alien descends

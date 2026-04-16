@@ -3,7 +3,18 @@ import random
 from settings import *
 
 class Laser(pygame.sprite.Sprite):
+    """Represents a laser shot by either the player or an alien. Handles movement, animation, and self-destruction when off-screen."""
     def __init__(self, pos, speed, colors, width, should_grow=False):
+        """
+        Initializes the laser with position, speed, colors for flickering, width, and growth behavior (for beams).
+
+        Args:
+            pos (tuple): The initial (x, y) position of the laser.
+            speed (int): The vertical speed of the laser (negative for player lasers, positive for alien lasers).
+            colors (tuple): A pair of colors to alternate between for flickering effect.
+            width (int): The width of the laser beam.
+            should_grow (bool): If True, the laser will start thin and grow to the target width (used for beams).
+        """
         super().__init__()
         self.colors = colors
         self.color_index = 0
@@ -20,6 +31,7 @@ class Laser(pygame.sprite.Sprite):
         self.should_grow = should_grow
 
     def update(self):
+        """Handles laser movement, growth (for beams), color flickering, and self-destruction when off-screen. Called every frame."""
         self.rect.y += self.speed
 
         # Rapidly grow width of beam until target is reached
@@ -40,7 +52,18 @@ class Laser(pygame.sprite.Sprite):
             self.kill()
 
 class Player(pygame.sprite.Sprite):
+    """Represents the player's ship. Handles movement, shooting, powerup effects, damage flashing, and constraints within the screen."""
     def __init__(self,pos,audio):
+        """
+        Initializes the player with position,
+        audio for sound effects,
+        and sets up all necessary attributes
+        for movement, shooting, powerups, and damage effects.
+
+        Args:
+            pos (tuple): The initial (x, y) position of the player ship.
+            audio (AudioManager): An instance of the AudioManager class to handle sound effects.
+        """
         super().__init__()
         # Store original image to revert back after flashing
         self.original_image = pygame.image.load('graphics/player_ship.png').convert_alpha()
@@ -172,7 +195,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = ScreenSettings.HEIGHT
 
     def shoot_laser(self):
-        
+        """Spawns lasers based on current powerup state. Handles twin lasers, rapid fire, and beam logic."""
         # 1. Determine the colors and size of the lasers
         if self.beam_active:
             colors = LaserSettings.COLORS['beam']
@@ -199,6 +222,12 @@ class Player(pygame.sprite.Sprite):
             self.lasers.add(Laser(self.rect.center, LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
 
     def activate_powerup(self, powerup):
+        """
+        Activates the given powerup's effect on the player. Called when player collects a powerup.
+
+        Args:
+            powerup (PowerUp): The powerup object that was collected, which contains information about the type and any cooldown bonuses.
+        """
         current_time = pygame.time.get_ticks()
 
         if powerup.powerup_type == 'twin_laser':
@@ -218,6 +247,7 @@ class Player(pygame.sprite.Sprite):
             self.rapid_fire_active = False
 
     def check_powerup_timeout(self):
+        """Checks if any time-limited powerups have expired and deactivates them. Called every frame in update()"""
         current_time = pygame.time.get_ticks()
 
         if self.rapid_fire_active:
@@ -250,7 +280,18 @@ class Player(pygame.sprite.Sprite):
         self.lasers.update()
 
 class Alien(pygame.sprite.Sprite):
+    """Represents an alien enemy. Handles movement patterns, zigzag behavior for certain types, and self-destruction when off-screen."""
     def __init__(self,color,screen_width,screen_height):
+        """Initializes the alien with a color
+        (which determines its behavior and points),
+        screen dimensions for spawning and movement constraints,
+        and sets up its sprite and movement attributes.
+        
+        Args:
+            color (str): The color/type of the alien, which affects its speed, points, and behavior.
+            screen_width (int): The width of the game screen, used for spawning and movement constraints
+            screen_height (int): The height of the game screen, used for spawning and movement constraints
+        """
         super().__init__()
         self.color = color
         self.screen_width = screen_width
@@ -297,7 +338,15 @@ class Alien(pygame.sprite.Sprite):
         self.destroy()
 
 class PowerUp(pygame.sprite.Sprite):
+    """Represents a powerup that the player can collect. Handles movement, animation (flashing), and self-destruction when off-screen."""
     def __init__(self, pos, color):
+        """Initializes the powerup with a position and color (which determines its type and appearance),
+        and sets up attributes for movement, flashing animation, and self-destruction.
+        
+        Args:
+            pos (tuple): The initial (x, y) position of the powerup when it spawns.
+            color (str): The color/type of the powerup, which determines its effect on the player and its appearance.
+        """
         super().__init__()
         self.speed = PowerupSettings.SPEED
         self.shape = PowerupSettings.DATA[color].get('shape', 'circle')
@@ -321,6 +370,10 @@ class PowerUp(pygame.sprite.Sprite):
         self.flash_speed = PowerupSettings.FLASH_SPEED
 
     def animate(self):
+        """
+        Handles the flashing animation of the powerup by toggling its color between the base color and white at a set interval.
+        Called every frame in update().
+        """
         if self.shape == 'heart':
             return  # skip animation, keep sprite static
 
@@ -338,6 +391,7 @@ class PowerUp(pygame.sprite.Sprite):
         # redraw circle every frame
         self.image.fill((0, 0, 0, 0))
 
+        # For diamonds, we have to redraw the polygon every frame to update the color. For circles, we can just fill the surface with the new color.
         if self.shape == 'diamond':
             points = [
                 (PowerupSettings.RADIUS, 0),                    # top
@@ -355,10 +409,16 @@ class PowerUp(pygame.sprite.Sprite):
             )
 
     def destroy(self):
+        """Destroys the powerup if it moves off the bottom of the screen. Called every frame in update()."""
         if self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
 
     def update(self):
+        """
+        Handles the downward movement of the powerup,
+        its flashing animation, and checks for self-destruction when off-screen.
+        Called every frame in the game loop.
+        """
         self.rect.y += self.speed
         self.animate()
         self.destroy()

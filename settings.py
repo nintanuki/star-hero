@@ -1,4 +1,5 @@
 class ScreenSettings:
+    """Holds all the settings related to the game screen, such as dimensions, frame rate, background color, and other visual parameters."""
     WIDTH = 600
     HEIGHT = 800
     RESOLUTION = (WIDTH,HEIGHT)
@@ -9,6 +10,7 @@ class ScreenSettings:
     BG_SCROLL_SPEED = 50
 
 class PlayerSettings:
+    """Contains all the settings related to the player, including movement speed, rotation, scale, laser cooldowns, and other gameplay parameters."""
     SPEED = 2
     ROTATION = 0 # Is this ever even used?
     SCALE = 0.15
@@ -21,6 +23,11 @@ class PlayerSettings:
     JOYSTICK_DEADZONE = 0.2
 
 class AlienSettings:
+    """
+    Defines all the settings related to the alien enemies,
+    including spawn rates, movement speeds, point values, colors,
+    and probabilities for spawning and dropping powerups.
+    """
     SPAWN_RATE = 600 # lower numbers = faster rate of enemy spawn
     LASER_RATE = 400 # lower numbers = more lasers
     SPAWN_OFFSET = (-300, -100)
@@ -32,6 +39,7 @@ class AlienSettings:
     DROP_CHANCE = {'red': 0.20, 'green': 0.20, 'yellow': 0.15, 'blue': 0.25,} # Probability of each alien dropping a powerup
 
 class LaserSettings:
+    """Contains all the settings related to lasers fired by both the player and aliens, including dimensions, speeds, and colors for different laser types."""
     DEFAULT_WIDTH = 4
     BEAM_WIDTH = ScreenSettings.WIDTH
     HEIGHT = 20
@@ -45,6 +53,11 @@ class LaserSettings:
     }
 
 class PowerupSettings:
+    """
+    Defines all the settings related to powerups that the player can collect,
+    including their size, movement speed, flashing animation speed,
+    and the different types of powerups with their associated colors, effects, and shapes.
+    """
     RADIUS = 12
     SPEED = 2 # how fast the powerup floats down?
     FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
@@ -57,12 +70,22 @@ class PowerupSettings:
     }
 
 class ExplosionSettings:
+    """
+    ontains all the settings related to explosion animations,
+    including the number of frames in the sprite sheet, animation speed,
+    size of each frame, and scale for rendering.
+    """
     FRAMES = 7 # there are seven unique images in the explosion sprite sheet
     ANIMATION_SPEED = 0.15 # smaller numbers = slower explosion animation. Always 0.x
     SIZE = 192 # size of each frame in the spritesheet, definse both width and height
     SCALE = 0.5
 
 class FontSettings:
+    """
+    Defines the settings related to fonts used in the game,
+    including the path to the font file, sizes for different text elements,
+    and the color of the text.
+    """
     FONT = 'font/Pixeled.ttf'
     SMALL = 10
     MEDIUM = 20
@@ -70,11 +93,21 @@ class FontSettings:
     COLOR = 'white'
 
 class UISettings:
+    """
+    Contains settings related to the user interface elements,
+    such as the size and spacing of heart sprites for health display,
+    and the duration for which volume changes are displayed on the screen.
+    """
     HEART_SPRITE_SIZE = (24, 24)
     HEART_SPACING = 10
     HEART_TOP_MARGIN = 8
     VOLUME_DISPLAY_TIME = 1000
 
 class AudioSettings:
+    """
+    Defines settings related to audio in the game,
+    including the volume boost applied during the intro sequence
+    and the default master volume level for all sounds.
+    """
     INTRO_VOL_BOOST = 2.0
     DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0

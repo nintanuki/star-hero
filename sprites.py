@@ -18,6 +18,7 @@ class Laser(pygame.sprite.Sprite):
         super().__init__()
         self.colors = colors
         self.color_index = 0
+        self.hue = 0  # Start at red in the HSV spectrum
 
         # Beam Growth Logic
         self.target_width = width
@@ -25,7 +26,13 @@ class Laser(pygame.sprite.Sprite):
         self.growth_speed = 5   # Pixels added per frame
 
         self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
-        self.image.fill(self.colors[self.color_index])
+        
+        if self.colors == "rainbow":
+            # Start with white as a default color so it doesn't crash before update() runs
+            self.image.fill((255, 255, 255)) 
+        else:
+            self.image.fill(self.colors[self.color_index])
+
         self.rect = self.image.get_rect(center = pos)
         self.speed = speed
         self.should_grow = should_grow
@@ -43,9 +50,29 @@ class Laser(pygame.sprite.Sprite):
             self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
             self.rect = self.image.get_rect(center = old_center)
         
-        # Color Flickering Logic
-        self.color_index = 1 - self.color_index # Toggles between 0 and 1 every frame
-        self.image.fill(self.colors[self.color_index])
+        # Color  Logic fo Beam
+        if self.colors == "rainbow":
+            self.hue = (self.hue + 4) % 360
+            
+            # Divide the laser into 5 vertical segments for a "flow" effect
+            segments = 5
+            segment_height = LaserSettings.HEIGHT // segments
+            
+            for i in range(segments):
+                # Offset the hue for each segment based on its position
+                # Adding 'i * 20' creates the color shift along the beam
+                seg_hue = (self.hue + (i * 20)) % 360
+                
+                color = pygame.Color(0)
+                color.hsva = (seg_hue, 100, 100, 100)
+                
+                # Draw the segment onto the image
+                segment_rect = pygame.Rect(0, i * segment_height, self.current_width, segment_height)
+                self.image.fill(color, segment_rect)
+        else:
+            # Standard flickering for non-beam lasers
+            self.color_index = 1 - self.color_index # Toggles between 0 and 1 every frame
+            self.image.fill(self.colors[self.color_index])
         
         # Kill laser if off screen (using settings)
         if self.rect.bottom < 0 or self.rect.top > ScreenSettings.HEIGHT:
@@ -194,25 +221,22 @@ class Player(pygame.sprite.Sprite):
 
     def shoot_laser(self):
         """Spawns lasers based on current powerup state. Handles twin lasers, rapid fire, and beam logic."""
-        # 1. Determine the colors and size of the lasers
-        if self.beam_active:
-            colors = LaserSettings.COLORS['beam']
-            width = LaserSettings.BEAM_WIDTH
-            offset = 20              # Extra space for thick beams
-            is_beam = True # Used for the growth flag
-        else:
-            # Standard and Rapid Fire settings
-            is_beam = False
-            if self.rapid_fire_active:
-                colors = LaserSettings.COLORS['rapid']
-                width = LaserSettings.DEFAULT_WIDTH
-                offset = 12
-            else:
-                colors = LaserSettings.COLORS['standard']
-                width = LaserSettings.DEFAULT_WIDTH
-                offset = 12
+        # 1. Determine the behavior and growth
+        is_beam = self.beam_active
+        width = LaserSettings.BEAM_WIDTH if is_beam else LaserSettings.DEFAULT_WIDTH
+        offset = 20 if is_beam else 12
 
-        # 2. Spawn the lasers with the growth flag
+        # 2. Assign colors based on priority
+        if self.beam_active:
+            colors = "rainbow"
+        elif self.rapid_fire_active:
+            colors = LaserSettings.COLORS['rapid']
+        elif self.twin_laser_active:
+            colors = LaserSettings.COLORS['twin']
+        else:
+            colors = LaserSettings.COLORS['standard']
+
+        # 3. Spawn the lasers
         if self.twin_laser_active:
             self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
             self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))

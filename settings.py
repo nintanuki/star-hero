@@ -75,10 +75,11 @@ class LaserSettings:
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4
     COLORS = {
-        'standard': ('green', 'white'), 
+        'standard': ('cyan', 'white'), 
+        'twin':     ('green', 'white'), 
         'rapid':    ('yellow', 'white'), 
         'alien':    ('red', 'white'), 
-        'beam':     ('cyan', 'white')
+        'beam':     None
     }
 
 class PowerupSettings:

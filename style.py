@@ -2,15 +2,14 @@ import pygame
 from settings import *
 
 class Style():
-    """Class for displaying text"""
+    """"Handles UI rendering for menus, scores, volume, and game-over screens."""
     def __init__(self,screen,audio):
         self.screen = screen
         self.small_font = pygame.font.Font(FontSettings.FONT,FontSettings.SMALL)
         self.medium_font = pygame.font.Font(FontSettings.FONT,FontSettings.MEDIUM)
         self.large_font = pygame.font.Font(FontSettings.FONT,FontSettings.LARGE)
 
-        # Needed to display the volume
-        self.audio = audio
+        self.audio = audio # Audio reference used to read and display the current volume
 
         # Volume Bar
         self.maximum_volume = 1000

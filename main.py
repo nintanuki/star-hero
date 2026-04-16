@@ -9,31 +9,34 @@ from audio import Audio
 import debug
 
 class CollisionManager:
+    """Handles all collision logic in one place"""
     def __init__(self, game):
         self.game = game
 
     def check_all(self):
+        """Checks all collisions"""
         self._player_lasers()
         self._alien_lasers()
         self._ship_collisions()
         self._powerups()
 
     def _player_lasers(self):
+        """Checks for collisions between player lasers and aliens"""
         if not self.game.player.sprite.lasers: return
         for laser in self.game.player.sprite.lasers:
             aliens_hit = pygame.sprite.spritecollide(laser, self.game.aliens, True)
             if aliens_hit:
                 laser.kill()
                 for alien in aliens_hit:
-                    self.game.score += alien.value
-                    self.game.explode(alien.rect.centerx, alien.rect.centery)
+                    self.game.score += alien.value # Add points for each alien hit
+                    self.game.explode(alien.rect.centerx, alien.rect.centery) # Trigger explosion animation at alien's position
 
                     # Check if a powerup should drop
                     if random.random() < AlienSettings.DROP_CHANCE[alien.color]:
 
                         # If it's a red alien (heart), only spawn if player is hurt
                         if alien.color == 'red':
-                            if self.game.hearts < 3:
+                            if self.game.hearts < 3: # Only drop if player isn't at full health
                                 self.game.spawn_powerup(alien.rect.center, alien.color)
                         else:
                             self.game.spawn_powerup(alien.rect.center, alien.color)

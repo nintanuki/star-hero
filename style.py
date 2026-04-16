@@ -155,26 +155,18 @@ class Style():
                 self.screen.blit(initials_surf, initials_rect)
 
                 leaderboard_title_y = 220
-                leaderboard_start_y = 255
             else:
                 restart_surf = self.medium_font.render("PRESS ENTER TO PLAY AGAIN", False, FontSettings.COLOR)
                 restart_rect = restart_surf.get_rect(center=(screen_center_x, ScreenSettings.HEIGHT - 70))
                 self.screen.blit(restart_surf, restart_rect)
 
                 leaderboard_title_y = 130
-                leaderboard_start_y = 160
 
-            leaderboard_title = self.small_font.render("TOP 10", False, FontSettings.COLOR)
-            leaderboard_title_rect = leaderboard_title.get_rect(center=(screen_center_x, leaderboard_title_y))
-            self.screen.blit(leaderboard_title, leaderboard_title_rect)
-
-            y = leaderboard_start_y
-            for i, entry in enumerate(leaderboard, start=1):
-                text = f"{i:>2}. {entry['name']}  {entry['score']}"
-                surf = self.small_font.render(text, False, FontSettings.COLOR)
-                rect = surf.get_rect(center=(screen_center_x, y))
-                self.screen.blit(surf, rect)
-                y += 22
+            self.display_leaderboard(
+            leaderboard,
+            title="TOP 10",
+            start_y=leaderboard_title_y
+            )
 
         elif game_state == 'pause':
             self.display_pause_text()

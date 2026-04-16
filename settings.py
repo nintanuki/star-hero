@@ -40,6 +40,7 @@ class AlienSettings:
     SPAWN_OFFSET = (-300, -100)
     COLOR = ['red', 'green', 'yellow', 'blue']
     SPAWN_CHANCE = [50, 30, 15, 5] # probability of each color alien appearing
+    ANIMATION_SPEED = 0.015  # higher is faster, lower is slower
 
     # Movement speeds for each alien color (how fast each alien moves down the screen)
     SPEED = {

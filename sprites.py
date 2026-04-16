@@ -318,19 +318,47 @@ class Alien(pygame.sprite.Sprite):
         self.color = color
         self.screen_width = screen_width
         self.screen_height = screen_height
+
+        # 1. Load the frames
+        self.frames = []
+        path1 = f'graphics/{self.color}1.png'
+        path2 = f'graphics/{self.color}2.png'
+
+        # Load frame 1
+        self.frames.append(pygame.image.load(path1).convert_alpha())
+
+        # Load frame 2 (if not blue)
+        if color in ['red', 'green', 'yellow']:
+            try:
+                self.frames.append(pygame.image.load(path2).convert_alpha())
+            except pygame.error:
+                # Fallback if the file is missing
+                self.frames.append(self.frames[0])
+
+        self.frame_index = 0
+        self.image = self.frames[self.frame_index]
+
+        # Position setup
         x_pos  = random.randint(20,self.screen_width - 20)
-        file_path = 'graphics/' + self.color + '.png'
-        self.image = pygame.image.load(file_path).convert_alpha()
         self.rect = self.image.get_rect(center = (x_pos,random.randint(*AlienSettings.SPAWN_OFFSET)))
 
+        # Movement logic
         # Yellow aliens zigzag
         self.yellow_zigzag_direction = random.choice([-1,1]) # 1 for right, -1 for left
         self.yellow_zigzag_counter = 0 
-
         # Blue aliens zigzag
         self.blue_zigzag_direction = random.choice([-1,1]) # 1 for right, -1 for left
 
+        # Point value based on color
         self.value = AlienSettings.POINTS.get(color, 0)
+
+    def animate(self):
+        """Cycles through the frames"""
+        if len(self.frames) > 1:
+            self.frame_index += AlienSettings.ANIMATION_SPEED
+            if self.frame_index >= len(self.frames):
+                self.frame_index = 0
+            self.image = self.frames[int(self.frame_index)]
 
     def destroy(self):
         if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease
@@ -354,6 +382,7 @@ class Alien(pygame.sprite.Sprite):
             self.rect.x += self.blue_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1
+        self.animate()
         self.destroy()
 
 class PowerUp(pygame.sprite.Sprite):

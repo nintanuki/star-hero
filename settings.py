@@ -33,7 +33,7 @@ class AlienSettings:
 
 class LaserSettings:
     DEFAULT_WIDTH = 4
-    BEAM_WIDTH = 64
+    BEAM_WIDTH = 20
     HEIGHT = 20
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4

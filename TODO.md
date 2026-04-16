@@ -7,7 +7,7 @@
 
 ### Ideas for Future Changes and Additions
 * Player should not be able to hold down the shoot button
-* Change Beam powerup into "nuke?"
+* Beam is not as good as rapidfire, change to "nuke?"
 * Ship should flash green, gold or blue when picking up powerups
 * Display indicator when powerup is active (maybe it blinks before going away?)
 * Different rates of fire for different enemies (yellow shoots more, blue shoots the most, but blue's lasers are too slow)

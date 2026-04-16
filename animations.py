@@ -23,13 +23,15 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(bottomleft = (0,ScreenSettings.HEIGHT))
         self.pos = pygame.math.Vector2(self.rect.bottomleft)
 
+        self.scroll_speed = ScreenSettings.DEFAULT_BG_SCROLL_SPEED
+
     def update(self,delta_time):
         """
         Updates the position of the background to create a scrolling effect
         by moving it downwards based on the defined scroll speed and the time elapsed
         since the last update, and resets its position when it has scrolled completely.
         """
-        self.pos.y += ScreenSettings.BG_SCROLL_SPEED * delta_time
+        self.pos.y += self.scroll_speed * delta_time
         if self.rect.top >= 0:
             self.pos.y = -self.image.get_height() / 2
         self.rect.y = round(self.pos.y)

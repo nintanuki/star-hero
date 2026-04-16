@@ -251,6 +251,9 @@ class GameManager:
         self.pending_score = None
         self.score_processed = False
 
+        for bg in self.background.sprites():
+            bg.scroll_speed = ScreenSettings.DEFAULT_BG_SCROLL_SPEED
+
     def spawn_aliens(self,alien_color):
         """Spawns a new alien of the given color"""
         self.aliens.add(Alien(alien_color,*ScreenSettings.RESOLUTION))
@@ -312,6 +315,14 @@ class GameManager:
             AlienSettings.LASER_RATE - (steps * 15)
         )
         pygame.time.set_timer(self.alien_laser_timer, new_laser_rate)
+
+        # 3. Increase background scroll speed
+        new_bg_speed = min(
+            ScreenSettings.BG_SCROLL_MAX,  # cap so it doesn't get ridiculous
+            ScreenSettings.DEFAULT_BG_SCROLL_SPEED + (steps * ScreenSettings.BG_SCROLL_STEP)
+        )
+        for bg in self.background.sprites():
+            bg.scroll_speed = new_bg_speed
 
     def explode(self,x_pos,y_pos):
         """Triggers an explosion animation at the given position and plays the sound effect"""
@@ -478,6 +489,10 @@ class GameManager:
                         self.audio.player_down.play()
                         self.aliens.empty()
                         self.powerups.empty()
+
+                        for bg in self.background.sprites():
+                            bg.scroll_speed = ScreenSettings.DEFAULT_BG_SCROLL_SPEED
+
                         self.game_active = False
                         pygame.time.set_timer(self.player_death_timer,0)
                         self.finalize_game_over_score()

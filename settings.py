@@ -7,7 +7,9 @@ class ScreenSettings:
     FPS = 120
     BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
     CRT_ALPHA_RANGE = (75, 90)
-    BG_SCROLL_SPEED = 50
+    DEFAULT_BG_SCROLL_SPEED = 50
+    BG_SCROLL_STEP = 25
+    BG_SCROLL_MAX = 500
 
 class PlayerSettings:
     """Contains all the settings related to the player, including movement speed, rotation, scale, laser cooldowns, and other gameplay parameters."""
@@ -33,7 +35,7 @@ class AlienSettings:
     LASER_RATE = 400 # lower numbers = more lasers
     MIN_LASER_RATE = 100  # Hard limit on how fast they shoot
 
-    DIFFICULTY_STEP = 5000 # Increase difficulty every 5000 points
+    DIFFICULTY_STEP = 2500 # Increase difficulty every 2500 points
 
     SPAWN_OFFSET = (-300, -100)
     COLOR = ['red', 'green', 'yellow', 'blue']

@@ -92,6 +92,7 @@ class GameManager:
 
         # Controller setup
         pygame.joystick.init()
+        # Start button doesn't work without this
         self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 
         # Display setup

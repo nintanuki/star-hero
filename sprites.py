@@ -69,9 +69,7 @@ class Player(pygame.sprite.Sprite):
         self.original_image = pygame.image.load('graphics/player_ship.png').convert_alpha()
         self.original_image = pygame.transform.rotozoom(self.original_image, 0, PlayerSettings.SCALE)
         self.image = self.original_image.copy()
-
         self.rect = self.image.get_rect(center = (pos)) # make pos = 400,500?
-        self.speed = PlayerSettings.SPEED
 
         # Damage Flash Logic
         self.is_flashing = False
@@ -137,7 +135,7 @@ class Player(pygame.sprite.Sprite):
         """Handles player input for movement and shooting. Called every frame in update()"""
         # 1. Determine current speed (check Keyboard 'F' or Controller 'X')
         keys = pygame.key.get_pressed()
-        current_speed = self.speed
+        current_speed = PlayerSettings.SPEED
         
         # Check all connected joysticks for the X button (Button 2)
         controller_boost = False

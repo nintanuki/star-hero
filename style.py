@@ -13,9 +13,6 @@ class Style():
         self.audio = audio
 
         # Volume Bar
-        self.volume_bar = pygame.Surface((40,40))
-        self.volume_bar.fill((240,240,240))
-        self.volume_bar_rect = self.volume_bar.get_rect(center = (400,400))
         self.maximum_volume = 1000
         self.volume_bar_length = 150
         self.volume_bar_ratio = self.maximum_volume / self.volume_bar_length

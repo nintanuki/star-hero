@@ -3,23 +3,39 @@ import random
 from settings import *
 
 class Laser(pygame.sprite.Sprite):
-    def __init__(self, pos, speed, colors, width):
+    def __init__(self, pos, speed, colors, width, should_grow=False):
         super().__init__()
         self.colors = colors
         self.color_index = 0
-        self.image = pygame.Surface((width, LaserSettings.HEIGHT))
+
+        # Beam Growth Logic
+        self.target_width = width
+        self.current_width = 1 if should_grow else width# Start as a thin line
+        self.growth_speed = 5   # Pixels added per frame
+
+        self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
         self.image.fill(self.colors[self.color_index])
         self.rect = self.image.get_rect(center = pos)
         self.speed = speed
+        self.should_grow = should_grow
 
     def update(self):
         self.rect.y += self.speed
+
+        # Rapidly grow width of beam until target is reached
+        # Only grow if the flag is set and we haven't hit the target yet
+        if self.should_grow and self.current_width < self.target_width:
+            self.current_width = min(self.target_width, self.current_width + self.growth_speed)
+            # Re-create the surface and re-center the rect
+            old_center = self.rect.center
+            self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
+            self.rect = self.image.get_rect(center = old_center)
         
         # Color Flickering Logic
         self.color_index = 1 - self.color_index # Toggles between 0 and 1 every frame
         self.image.fill(self.colors[self.color_index])
         
-        # Kill if off screen (using settings)
+        # Kill laser if off screen (using settings)
         if self.rect.bottom < 0 or self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
 
@@ -162,21 +178,25 @@ class Player(pygame.sprite.Sprite):
             colors = LaserSettings.COLORS['beam']
             width = LaserSettings.BEAM_WIDTH
             offset = 20              # Extra space for thick beams
-        elif self.rapid_fire_active:
-            colors = LaserSettings.COLORS['rapid']
-            width = LaserSettings.DEFAULT_WIDTH
-            offset = 12
+            is_beam = True # Used for the growth flag
         else:
-            colors = LaserSettings.COLORS['standard']
-            width = LaserSettings.DEFAULT_WIDTH
-            offset = 12
+            # Standard and Rapid Fire settings
+            is_beam = False
+            if self.rapid_fire_active:
+                colors = LaserSettings.COLORS['rapid']
+                width = LaserSettings.DEFAULT_WIDTH
+                offset = 12
+            else:
+                colors = LaserSettings.COLORS['standard']
+                width = LaserSettings.DEFAULT_WIDTH
+                offset = 12
 
-        # 2. Spawn the lasers
+        # 2. Spawn the lasers with the growth flag
         if self.twin_laser_active:
-            self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width))
-            self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width))
+            self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
+            self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
         else:
-            self.lasers.add(Laser(self.rect.center, LaserSettings.PLAYER_LASER_SPEED, colors, width))
+            self.lasers.add(Laser(self.rect.center, LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
 
     def activate_powerup(self, powerup):
         current_time = pygame.time.get_ticks()

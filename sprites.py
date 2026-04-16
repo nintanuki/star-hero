@@ -306,9 +306,6 @@ class Alien(pygame.sprite.Sprite):
         # Blue aliens zigzag
         self.blue_zigzag_direction = random.choice([-1,1]) # 1 for right, -1 for left
 
-        # Give green aliens twin lasers
-        self.is_twin = True if color == 'green' else False
-
         self.value = AlienSettings.POINTS.get(color, 0)
 
     def destroy(self):

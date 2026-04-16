@@ -6,7 +6,7 @@
 * Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
 
 ### Ideas for Future Changes and Additions
-* Background scrolls faster with higher score / difficulty
+* Add drop shadow to sprites?
 * Player should not be able to hold down the shoot button
 * Add "bombs" that can be shot with a different button and have AOE damage
 * Ship should flash green, gold or blue when picking up powerups

@@ -1,9 +1,9 @@
 ### Issues That Need to be Fixed
-* Player ship sprite can still move and shoot lasers briefly after death
+* Player can hold button down for laser, disable this so they have to press the buttone very time
+* Logic for leaderboard scores and initials uses a lot of code and functions. Put into it's own class?
+* Player ship sprite can still move and shoot lasers briefly after death?
 * Windows flags exe made with Pyinstaller as a virus... [try this.](https://plainenglish.io/blog/pyinstaller-exe-false-positive-trojan-virus-resolved-b33842bd3184)
-* Using joystick module program crashes if controller not plugged in?
 * Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
-* Player can hold button down for laser, disable this for both keyboard and controller, unless they have the beam
 
 ### Ideas for Future Changes and Additions
 * Player should not be able to hold down the shoot button

@@ -68,12 +68,14 @@ class CollisionManager:
             self.game.player_damage()
 
     def _powerups(self):
+        # Check for collisions between player and powerups
         powerups_collected = pygame.sprite.spritecollide(self.game.player.sprite, self.game.powerups, True)
         for powerup in powerups_collected:
-            if powerup.powerup_type == 'heal' and self.game.hearts < 3:
+            if powerup.powerup_type == 'heal' and self.game.hearts < 3: # Only heal if player isn't at full health
                 self.game.audio.channel_8.play(self.game.audio.powerup_heart)
                 self.game.hearts += 1
             else:
+                # Only play sound if it's a new powerup activation, not if player already has it active
                 if powerup.powerup_type == 'twin_laser' and not self.game.player.sprite.twin_laser_active:
                     self.game.audio.channel_8.play(self.game.audio.powerup_twin)
                 elif powerup.powerup_type in ['rapid_fire', 'beam']:
@@ -91,6 +93,7 @@ class GameManager:
         pygame.joystick.init()
         self.joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 
+        # Display setup
         self.screen = pygame.display.set_mode((ScreenSettings.RESOLUTION), pygame.SCALED)
         pygame.display.set_caption('Star Hero')
         self.clock = pygame.time.Clock()
@@ -132,6 +135,7 @@ class GameManager:
         self.pending_score = None
         self.score_processed = False
 
+        # Load saved high score and leaderboard data if available
         try:
             with open('high_score.txt') as high_score_file:
                 self.save_data = json.load(high_score_file)
@@ -141,10 +145,10 @@ class GameManager:
         # Timers
         self.alien_spawn_timer = pygame.event.custom_type()
         pygame.time.set_timer(self.alien_spawn_timer,AlienSettings.SPAWN_RATE)
-
+        # Custom timer for alien shooting
         self.alien_laser_timer = pygame.event.custom_type()
         pygame.time.set_timer(self.alien_laser_timer,AlienSettings.LASER_RATE)
-
+        # Custom timer for player death delay before showing game over screen and allowing restart
         self.player_death_timer = pygame.event.custom_type()
         self.volume_display_timer = pygame.event.custom_type()
 
@@ -162,35 +166,43 @@ class GameManager:
         self.play_intro_music = True # Set to False after user begins, only place once
 
     def _sort_and_trim_leaderboard(self):
+        """Sorts the leaderboard and keeps only the top 10 scores, also updates high score"""
+
+        # Sort the leaderboard by score in descending order and keep only the top 10 entries
         self.save_data['leaderboard'] = sorted(
             self.save_data.get('leaderboard', []),
             key=lambda entry: entry['score'],
             reverse=True
         )[:10]
 
+        # Update high score based on the top entry in the leaderboard
         if self.save_data['leaderboard']:
             self.save_data['high_score'] = self.save_data['leaderboard'][0]['score']
         else:
             self.save_data['high_score'] = 0
 
     def save_scores(self):
+        """Saves the current leaderboard and high score to a file"""
         self._sort_and_trim_leaderboard()
         with open('high_score.txt', 'w') as high_score_file:
             json.dump(self.save_data, high_score_file)
 
     def qualifies_for_leaderboard(self, score):
+        """Checks if the given score qualifies for the leaderboard"""
         leaderboard = self.save_data.get('leaderboard', [])
         if len(leaderboard) < 10:
             return score > 0
         return score > leaderboard[-1]['score']
 
     def start_initial_entry(self):
+        """Initiates the process of entering initials for a new high score"""
         self.entering_initials = True
         self.initials = "AAA"
         self.initials_index = 0
         self.pending_score = self.score
 
     def submit_initials(self):
+        """Submits the entered initials and score to the leaderboard"""
         entry = {
             'name': self.initials,
             'score': self.pending_score
@@ -204,6 +216,12 @@ class GameManager:
         self.score_processed = True
 
     def finalize_game_over_score(self):
+        """
+        Finalizes the score at game over,
+        checking if it qualifies for the leaderboard
+        and either starting initials entry
+        or just saving the score
+        """
         if self.score_processed:
             return
 
@@ -215,6 +233,7 @@ class GameManager:
             self.score_processed = True
 
     def reset_for_new_game(self):
+        """Resets all necessary game state to start a new game"""
         self.score = 0
         self.player.sprite.rect.center = ScreenSettings.CENTER
         self.hearts = 3
@@ -231,14 +250,17 @@ class GameManager:
         self.score_processed = False
 
     def spawn_aliens(self,alien_color):
+        """Spawns a new alien of the given color"""
         self.aliens.add(Alien(alien_color,*ScreenSettings.RESOLUTION))
         if alien_color == 'blue':
             self.audio.channel_5.play(self.audio.ufo_sound)
 
     def spawn_powerup(self, pos, color):
+        """Spawns a new powerup of the given color at the given position"""
         self.powerups.add(PowerUp(pos, color))
 
     def alien_shoot(self):
+        """Spawns a new alien laser from a random alien"""
         if self.aliens.sprites():
             random_alien = random.choice(self.aliens.sprites())
             
@@ -262,16 +284,26 @@ class GameManager:
                     )
                 )
             else:
-                laser_sprite = Laser(random_alien.rect.center, LaserSettings.ALIEN_LASER_SPEED, LaserSettings.COLORS['alien'], LaserSettings.DEFAULT_WIDTH)
+                laser_sprite = Laser(
+                    random_alien.rect.center,
+                    LaserSettings.ALIEN_LASER_SPEED,
+                    LaserSettings.COLORS['alien'],
+                    LaserSettings.DEFAULT_WIDTH
+                    )
                 self.alien_lasers.add(laser_sprite)
 
     def explode(self,x_pos,y_pos):
+        """Triggers an explosion animation at the given position and plays the sound effect"""
         self.audio.channel_2.play(self.audio.explosion_sound)
         self.explosion = Explosion(x_pos,y_pos)
         self.exploding_sprites.add(self.explosion)
         self.explosion.explode()
 
     def player_damage(self):
+        """
+        Handles logic for when the player takes damage,
+        including reducing hearts, triggering flash effect, playing alarms, and handling death
+        """
         self.hearts -= 1
         
         # Trigger the visual flash effect
@@ -345,6 +377,7 @@ class GameManager:
         self.paused = False
 
     def run(self):
+        """Main game loop"""
         last_time = time.time()
         while True:
             delta_time = time.time() - last_time
@@ -411,6 +444,7 @@ class GameManager:
                     self.show_volume = False
                     pygame.time.set_timer(self.volume_display_timer,0)
 
+                # Game timers (alien spawn, alien shoot, player death delay)
                 if self.game_active:
                     if event.type == self.alien_spawn_timer:
                         alien_color = random.choices(AlienSettings.COLOR, weights=AlienSettings.SPAWN_CHANCE)[0]
@@ -489,6 +523,7 @@ class GameManager:
             if self.show_volume:
                 self.style.display_volume()
 
+            # Game logic and drawing only happens if game is active, otherwise show intro or game over screen
             if self.game_active:
                 self.audio.channel_0.stop()
                 self.play_intro_music = False
@@ -531,10 +566,12 @@ class GameManager:
                         initials_index=self.initials_index
                     )
 
+            # Apply CRT filter and update display
             self.crt.draw()
             pygame.display.flip()
             self.clock.tick(ScreenSettings.FPS)
 
+# Main execution
 if __name__ == '__main__':
     game_manager = GameManager()
     game_manager.run()

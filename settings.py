@@ -37,12 +37,34 @@ class AlienSettings:
     DIFFICULTY_STEP = 10000 # Increase difficulty every 10000 points
 
     SPAWN_OFFSET = (-300, -100)
-    ZIGZAG_THRESHOLD = 100
-    SPEED = {'red': 1, 'green': 2, 'yellow': 3, 'blue': 5} # How fast each alien descends
-    POINTS = {'red': 100, 'green': 200, 'yellow': 300, 'blue': 500}
     COLOR = ['red', 'green', 'yellow', 'blue']
     SPAWN_CHANCE = [50, 30, 15, 5] # probability of each color alien appearing
-    DROP_CHANCE = {'red': 0.20, 'green': 0.20, 'yellow': 0.15, 'blue': 0.25,} # Probability of each alien dropping a powerup
+
+    # Movement speeds for each alien color (how fast each alien moves down the screen)
+    SPEED = {
+        'red':    1,
+        'green':  2,
+        'yellow': 3,
+        'blue':   5
+        }
+    
+    ZIGZAG_THRESHOLD = 100 # how wide the zigzag pattern is for yellow aliens (in pixels)
+
+    # Point values for each alien color
+    POINTS = {
+        'red':    100,
+        'green':  200,
+        'yellow': 300,
+        'blue':   500
+        }
+
+    # Probability of each alien dropping a powerup upon destruction, by color
+    DROP_CHANCE = {
+        'red':    0.20,
+        'green':  0.20,
+        'yellow': 0.15,
+        'blue':   0.25,
+        }
 
 class LaserSettings:
     """Contains all the settings related to lasers fired by both the player and aliens, including dimensions, speeds, and colors for different laser types."""
@@ -53,9 +75,9 @@ class LaserSettings:
     ALIEN_LASER_SPEED = 4
     COLORS = {
         'standard': ('green', 'white'), 
-        'rapid': ('yellow', 'white'), 
-        'alien': ('red', 'white'), 
-        'beam': ('cyan', 'white')
+        'rapid':    ('yellow', 'white'), 
+        'alien':    ('red', 'white'), 
+        'beam':     ('cyan', 'white')
     }
 
 class PowerupSettings:

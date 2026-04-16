@@ -164,7 +164,7 @@ class GameManager:
         self.exploding_sprites = pygame.sprite.Group()
 
         # Audio setup
-        self.play_intro_music = True # Set to False after user begins, only place once
+        self.play_intro_music = True # Set to False after user begins, only plays once
 
     def _sort_and_trim_leaderboard(self):
         """Sorts the leaderboard and keeps only the top 10 scores, also updates high score"""

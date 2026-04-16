@@ -371,24 +371,26 @@ class GameManager:
 
     def unpause_game(self):
         """Helper to handle unpausing logic"""
-        self.audio.channel_0.unpause()
-        self.audio.channel_1.unpause()
-        self.audio.channel_7.play(self.audio.unpause_sound)
+        self.audio.channel_0.unpause() # Unpause intro music if it was playing
+        self.audio.channel_1.unpause() # Unpause bg music if it was playing
+        self.audio.channel_7.play(self.audio.unpause_sound) # Play unpause sound effect
         self.paused = False
 
     def run(self):
         """Main game loop"""
-        last_time = time.time()
+        last_time = time.time() # Track time for delta_time calculations for smooth movement and animations regardless of frame rate
         while True:
             delta_time = time.time() - last_time
             last_time = time.time()
 
+            # Event handling
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.save_scores()
                     pygame.quit()
                     sys.exit()
 
+                # Controller input
                 if event.type == pygame.JOYBUTTONDOWN:
                     if event.button == 7:  # Button 7 is usually 'Start'
                         if self.game_active:
@@ -517,6 +519,7 @@ class GameManager:
                             if event.button == 0 or event.button == 7:
                                 self.reset_for_new_game()
 
+            # Drawing
             self.screen.fill(ScreenSettings.BG_COLOR)
             self.background.update(delta_time)
             self.background.draw(self.screen)
@@ -554,6 +557,7 @@ class GameManager:
                     if not self.audio.channel_0.get_busy():
                         self.audio.channel_0.play(self.audio.intro_music)
 
+                # Show intro screen if score is 0, otherwise show game over screen
                 if self.score == 0:
                     self.style.update('intro',self.save_data,self.score)
                 else:

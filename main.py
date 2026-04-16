@@ -38,6 +38,9 @@ class CollisionManager:
                         if alien.color == 'red':
                             if self.game.hearts < 3: # Only drop if player isn't at full health
                                 self.game.spawn_powerup(alien.rect.center, alien.color)
+                        elif alien.color == 'green':
+                            if not self.game.player.sprite.twin_laser_active: # Only drop if twin laser isn't active
+                                self.game.spawn_powerup(alien.rect.center, alien.color)
                         else:
                             self.game.spawn_powerup(alien.rect.center, alien.color)
 

@@ -59,10 +59,10 @@ class AlienSettings:
 
     # Probability of each alien dropping a powerup upon destruction, by color
     DROP_CHANCE = {
-        'red':    0.20,
+        'red':    0.25,
         'green':  0.20,
         'yellow': 0.15,
-        'blue':   0.25,
+        'blue':   0.10,
         }
 
 class LaserSettings:

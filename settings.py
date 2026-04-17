@@ -122,6 +122,7 @@ class FontSettings:
     MEDIUM = 20
     LARGE = 30
     COLOR = 'white'
+    DEFAULT_INITIALS = "AAA"
 
 class UISettings:
     """

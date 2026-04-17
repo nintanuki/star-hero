@@ -132,7 +132,7 @@ class GameManager:
 
         # Leaderboard / initials entry state
         self.entering_initials = False
-        self.initials = "AAA"
+        self.initials = FontSettings.DEFAULT_INITIALS
         self.initials_index = 0
         self.pending_score = None
         self.score_processed = False
@@ -203,7 +203,7 @@ class GameManager:
     def start_initial_entry(self):
         """Initiates the process of entering initials for a new high score"""
         self.entering_initials = True
-        self.initials = "AAA"
+        self.initials = FontSettings.DEFAULT_INITIALS
         self.initials_index = 0
         self.pending_score = self.score
 
@@ -264,7 +264,7 @@ class GameManager:
         self.game_active = True
 
         self.entering_initials = False
-        self.initials = "AAA"
+        self.initials = FontSettings.DEFAULT_INITIALS
         self.initials_index = 0
         self.pending_score = None
         self.score_processed = False

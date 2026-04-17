@@ -403,18 +403,6 @@ class Alien(pygame.sprite.Sprite):
         # Point value based on color
         self.value = AlienSettings.POINTS.get(color, 0)
 
-    def animate(self):
-        """Cycles through the frames"""
-        if len(self.frames) > 1:
-            self.frame_index += AlienSettings.ANIMATION_SPEED
-            if self.frame_index >= len(self.frames):
-                self.frame_index = 0
-            self.image = self.frames[int(self.frame_index)]
-
-    def destroy(self):
-        if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease
-            self.kill()
-
     def calculate_movement(self):
         """
         Calculates the movement of the alien based on its color and behavior patterns.
@@ -437,6 +425,18 @@ class Alien(pygame.sprite.Sprite):
             self.rect.x += self.blue_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1
+
+    def animate(self):
+        """Cycles through the frames"""
+        if len(self.frames) > 1:
+            self.frame_index += AlienSettings.ANIMATION_SPEED
+            if self.frame_index >= len(self.frames):
+                self.frame_index = 0
+            self.image = self.frames[int(self.frame_index)]
+
+    def destroy(self):
+        if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease
+            self.kill()
 
     def update(self):
         self.calculate_movement()
@@ -473,6 +473,10 @@ class PowerUp(pygame.sprite.Sprite):
 
         self.flash_timer = 0
         self.flash_speed = PowerupSettings.FLASH_SPEED
+
+    def move(self):
+        """Moves the powerup downward based on its speed. Called every frame in update()."""
+        self.rect.y += PowerupSettings.SPEED
 
     def animate(self):
         """
@@ -518,10 +522,6 @@ class PowerUp(pygame.sprite.Sprite):
         """Destroys the powerup if it moves off the bottom of the screen. Called every frame in update()."""
         if self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
-
-    def move(self):
-        """Moves the powerup downward based on its speed. Called every frame in update()."""
-        self.rect.y += PowerupSettings.SPEED
 
     def update(self):
         """

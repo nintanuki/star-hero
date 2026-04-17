@@ -13,13 +13,6 @@ class CollisionManager:
     def __init__(self, game):
         self.game = game
 
-    def check_all(self):
-        """Checks all collisions"""
-        self._player_lasers()
-        self._alien_lasers()
-        self._ship_collisions()
-        self._powerups()
-
     def _player_lasers(self):
         """Checks for collisions between player lasers and aliens"""
         if not self.game.player.sprite.lasers: return
@@ -82,6 +75,13 @@ class CollisionManager:
                 elif powerup.powerup_type in ['rapid_fire', 'beam']:
                     self.game.audio.channel_8.play(self.game.audio.powerup_weapon)
                 self.game.player.sprite.activate_powerup(powerup)
+
+    def update(self):
+        """Checks all collisions"""
+        self._player_lasers()
+        self._alien_lasers()
+        self._ship_collisions()
+        self._powerups()
 
 class GameManager:
     """Main game manager class"""
@@ -590,7 +590,7 @@ class GameManager:
                 self.alien_lasers.update()
                 self.aliens.update()
                 self.powerups.update()
-                self.collisions.check_all()
+                self.collisions.update()
                 self.display_hearts()
 
                 self.player.sprite.lasers.draw(self.screen)

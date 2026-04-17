@@ -102,7 +102,7 @@ class PowerupSettings:
 
 class ExplosionSettings:
     """
-    ontains all the settings related to explosion animations,
+    Contains all the settings related to explosion animations,
     including the number of frames in the sprite sheet, animation speed,
     size of each frame, and scale for rendering.
     """

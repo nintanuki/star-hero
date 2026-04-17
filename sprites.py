@@ -138,6 +138,7 @@ class Player(pygame.sprite.Sprite):
         self.original_image = pygame.image.load(AssetPaths.PLAYER).convert_alpha()
         self.original_image = pygame.transform.rotozoom(self.original_image, 0, PlayerSettings.SCALE)
         self.image = self.original_image.copy()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center = (pos)) # make pos = 400,500?
 
         # Damage Flash Logic
@@ -162,6 +163,10 @@ class Player(pygame.sprite.Sprite):
         self.lasers = pygame.sprite.Group()
 
         self.audio = audio
+
+        # Confusion state for when hit by blue alien attack
+        self.confused = False
+        self.confusion_timer = 0
 
     def trigger_damage_effect(self):
         """Called when the player takes damage"""
@@ -205,6 +210,9 @@ class Player(pygame.sprite.Sprite):
         # 1. Determine current speed (check Keyboard 'F' or Controller 'X')
         keys = pygame.key.get_pressed()
         current_speed = PlayerSettings.SPEED
+
+        # Determine direction: if confused, multiply by -1 to invert
+        direction_mod = -1 if self.confused else 1
         
         # Check all connected joysticks for the X button (Button 2)
         controller_boost = False
@@ -218,18 +226,18 @@ class Player(pygame.sprite.Sprite):
 
         # Player Movement Input
         # Keyboard input (WASD or Arrow Keys)
-        if (keys[pygame.K_w] or keys[pygame.K_UP]): self.rect.y -= current_speed
-        if (keys[pygame.K_s] or keys[pygame.K_DOWN]): self.rect.y += current_speed
-        if (keys[pygame.K_a] or keys[pygame.K_LEFT]): self.rect.x -= current_speed
-        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]): self.rect.x += current_speed
+        if (keys[pygame.K_w] or keys[pygame.K_UP]): self.rect.y -= (current_speed * direction_mod)
+        if (keys[pygame.K_s] or keys[pygame.K_DOWN]): self.rect.y += (current_speed * direction_mod)
+        if (keys[pygame.K_a] or keys[pygame.K_LEFT]): self.rect.x -= (current_speed * direction_mod)
+        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]): self.rect.x += (current_speed * direction_mod)
 
         # Controller input (Left Joystick)
         for i in range(pygame.joystick.get_count()):
             joy = pygame.joystick.Joystick(i)
             if abs(joy.get_axis(0)) > PlayerSettings.JOYSTICK_DEADZONE:
-                self.rect.x += joy.get_axis(0) * current_speed
+                self.rect.x += (joy.get_axis(0) * current_speed * direction_mod)
             if abs(joy.get_axis(1)) > PlayerSettings.JOYSTICK_DEADZONE:
-                self.rect.y += joy.get_axis(1) * current_speed
+                self.rect.y += (joy.get_axis(1) * current_speed * direction_mod)
 
         # 3. MANUAL Shooting (Only for standard weapon)
         # Only check for manual input if NO auto-powerup is active
@@ -352,6 +360,18 @@ class Player(pygame.sprite.Sprite):
         self.animate_damage()
         self.update_lasers()
 
+        if self.confused:
+            if pygame.time.get_ticks() - self.confusion_timer >= PlayerSettings.CONFUSION_TIMEOUT:
+                self.confused = False
+                self.image = self.original_image # Reset to original colors
+            else:
+                # Create a purple-tinted version of the ship
+                # This creates a copy and "multiplies" the colors with purple
+                tinted_surf = self.original_image.copy()
+                # (200, 0, 255) is a bright purple/magenta
+                tinted_surf.fill((200, 0, 255, 255), special_flags=pygame.BLEND_RGBA_MULT)
+                self.image = tinted_surf
+
 class Alien(pygame.sprite.Sprite):
     """Represents an alien enemy. Handles movement patterns, zigzag behavior for certain types, and self-destruction when off-screen."""
     def __init__(self,color,screen_width,screen_height):
@@ -403,11 +423,33 @@ class Alien(pygame.sprite.Sprite):
         # Point value based on color
         self.value = AlienSettings.POINTS.get(color, 0)
 
+        # Confusion attack attributes (for blue aliens)
+        self.is_confusing = False
+        self.confusion_start_time = 0
+        self.has_projected = False 
+        # Only blue aliens have a chance to cause confusion
+        self.can_confuse = (color == 'blue' and random.random() < AlienSettings.CONFUSION_CHANCE)
+
+        self.confusion_growth = 0  # Starts at 0, will increase to ScreenSettings.HEIGHT
+
     def calculate_movement(self):
         """
         Calculates the movement of the alien based on its color and behavior patterns.
         Called every frame in update()
         """
+        # Check for confusion attack trigger (only for blue aliens with the ability)
+        if self.can_confuse and not self.has_projected:
+            if self.rect.centery >= AlienSettings.CONFUSION_STOP_Y:
+                self.is_confusing = True
+                self.has_projected = True
+                self.confusion_start_time = pygame.time.get_ticks()
+
+        if self.is_confusing:
+            # Check if the projection time is over
+            if pygame.time.get_ticks() - self.confusion_start_time >= AlienSettings.CONFUSION_DURATION:
+                self.is_confusing = False
+            return # Stop moving while confusing the player
+        
         # numbers round down if decimals are used? .05 doesn't move and 1 is the same as 1.5, etc
         if self.color == 'red': self.rect.y += AlienSettings.SPEED['red']
         elif self.color == 'green': self.rect.y += AlienSettings.SPEED['green']

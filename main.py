@@ -285,35 +285,39 @@ class GameManager:
     def alien_shoot(self):
         """Spawns a new alien laser from a random alien"""
         if self.aliens.sprites():
-            random_alien = random.choice(self.aliens.sprites())
-            
-            # Give green aliens twin lasers
-            if random_alien.color == 'green':
-                offset = 10
-                self.alien_lasers.add(
-                    Laser(
-                        pos=(random_alien.rect.centerx - offset, random_alien.rect.centery),
-                        speed=LaserSettings.ALIEN_LASER_SPEED,
-                        colors=LaserSettings.COLORS['alien'],
-                        width=LaserSettings.DEFAULT_WIDTH
+            # Only select from aliens that aren't blue since they don't shoot lasers, and also prevents them from shooting while they're doing their confusion attack
+            attacking_aliens = [alien for alien in self.aliens.sprites() if alien.color != 'blue']
+
+            if attacking_aliens:
+                random_alien = random.choice(attacking_aliens)
+                
+                # Give green aliens twin lasers
+                if random_alien.color == 'green':
+                    offset = 10
+                    self.alien_lasers.add(
+                        Laser(
+                            pos=(random_alien.rect.centerx - offset, random_alien.rect.centery),
+                            speed=LaserSettings.ALIEN_LASER_SPEED,
+                            colors=LaserSettings.COLORS['alien'],
+                            width=LaserSettings.DEFAULT_WIDTH
+                        )
                     )
-                )
-                self.alien_lasers.add(
-                    Laser(
-                        pos=(random_alien.rect.centerx + offset, random_alien.rect.centery),
-                        speed=LaserSettings.ALIEN_LASER_SPEED,
-                        colors=LaserSettings.COLORS['alien'],
-                        width=LaserSettings.DEFAULT_WIDTH
+                    self.alien_lasers.add(
+                        Laser(
+                            pos=(random_alien.rect.centerx + offset, random_alien.rect.centery),
+                            speed=LaserSettings.ALIEN_LASER_SPEED,
+                            colors=LaserSettings.COLORS['alien'],
+                            width=LaserSettings.DEFAULT_WIDTH
+                        )
                     )
-                )
-            else:
-                laser_sprite = Laser(
-                    random_alien.rect.center,
-                    LaserSettings.ALIEN_LASER_SPEED,
-                    LaserSettings.COLORS['alien'],
-                    LaserSettings.DEFAULT_WIDTH
-                    )
-                self.alien_lasers.add(laser_sprite)
+                else:
+                    laser_sprite = Laser(
+                        random_alien.rect.center,
+                        LaserSettings.ALIEN_LASER_SPEED,
+                        LaserSettings.COLORS['alien'],
+                        LaserSettings.DEFAULT_WIDTH
+                        )
+                    self.alien_lasers.add(laser_sprite)
 
     def adjust_difficulty(self):
         """Gradually decreases timers as score increases"""
@@ -599,6 +603,40 @@ class GameManager:
                 self.exploding_sprites.draw(self.screen)
 
                 self.exploding_sprites.update(ExplosionSettings.ANIMATION_SPEED)
+
+                # Draw blue alien confusion attack
+                for alien in self.aliens:
+                    if getattr(alien, 'is_confusing', False):
+                        if alien.confusion_growth < ScreenSettings.HEIGHT:
+                            alien.confusion_growth += 15 
+
+                        top_width = 10
+                        bottom_width = top_width + (alien.confusion_growth * 0.2) 
+
+                        # Define points
+                        top_left  = (alien.rect.centerx - top_width // 2, alien.rect.bottom)
+                        top_right = (alien.rect.centerx + top_width // 2, alien.rect.bottom)
+                        bottom_right = (alien.rect.centerx + bottom_width // 2, alien.rect.bottom + alien.confusion_growth)
+                        bottom_left  = (alien.rect.centerx - bottom_width // 2, alien.rect.bottom + alien.confusion_growth)
+                        shape_points = [top_left, top_right, bottom_right, bottom_left]
+
+                        # Draw the polygon on a transparent surface
+                        field_surf = pygame.Surface((ScreenSettings.WIDTH, ScreenSettings.HEIGHT), pygame.SRCALPHA)
+                        pygame.draw.polygon(field_surf, (200, 0, 255, 80), shape_points)
+                        self.screen.blit(field_surf, (0, 0))
+
+                        # --- NEW PIXEL-PERFECT COLLISION ---
+                        # 1. Create a mask from the beam surface (detects where pixels are not transparent)
+                        beam_mask = pygame.mask.from_surface(field_surf, threshold=1)
+                        
+                        # 2. Check collision against player mask
+                        # We need the offset (the distance between the top-left of the screen and the player)
+                        offset = (self.player.sprite.rect.x, self.player.sprite.rect.y)
+                        
+                        if beam_mask.overlap(self.player.sprite.mask, offset):
+                            if not self.player.sprite.confused:
+                                self.player.sprite.confused = True
+                                self.player.sprite.confusion_timer = pygame.time.get_ticks()
 
                 self.aliens.draw(self.screen)
                 self.alien_lasers.draw(self.screen)

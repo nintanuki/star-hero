@@ -85,6 +85,10 @@ class Laser(pygame.sprite.Sprite):
         self.image.fill(self.colors[self.color_index])
 
     def update_color(self):
+        """Updates the laser's color based on whether it's a beam (rainbow animation)
+        or a standard laser (flicker animation).
+        Called every frame in update()."""
+        
         # Color  Logic for Beam
         if self.colors == "rainbow":
             self.animate_rainbow()
@@ -112,7 +116,8 @@ class Laser(pygame.sprite.Sprite):
 
     def update(self):
         """
-        Handles laser movement, growth (for beams), color flickering, and self-destruction when off-screen.
+        Handles laser movement, growth (for beams),
+        color flickering, and self-destruction when off-screen.
         Called every frame.
         """
         self.move()
@@ -121,7 +126,10 @@ class Laser(pygame.sprite.Sprite):
         self.destroy_if_offscreen()
 
 class Player(pygame.sprite.Sprite):
-    """Represents the player's ship. Handles movement, shooting, powerup effects, damage flashing, and constraints within the screen."""
+    """
+    Represents the player's ship. Handles movement, shooting, powerup effects,
+    damage flashing, and constraints within the screen.
+    """
     def __init__(self,pos,audio):
         """
         Initializes the player with position,
@@ -352,6 +360,10 @@ class Player(pygame.sprite.Sprite):
         self.lasers.update()
     
     def update(self):
+        """Handles player input for movement and shooting,
+        applies constraints, manages powerup effects and durations,
+        animates damage flashing, and updates lasers.
+        Called every frame."""
         self.get_input()
         self.handle_auto_shooting()
         self.constraint()
@@ -477,10 +489,12 @@ class Alien(pygame.sprite.Sprite):
             self.image = self.frames[int(self.frame_index)]
 
     def destroy(self):
+        """Destroys the alien if it moves off the bottom of the screen. Called every frame in update()."""
         if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease
             self.kill()
 
     def update(self):
+        """Handles movement, animation, and self-destruction when off-screen. Called every frame."""
         self.calculate_movement()
         self.animate()
         self.destroy()

@@ -11,6 +11,12 @@ import debug
 class CollisionManager:
     """Handles all collision logic in one place"""
     def __init__(self, game):
+        """Initializes the CollisionManager with a reference to the main game object
+        to access necessary attributes and methods for handling collisions.
+        
+        Args:
+            game (GameManager): The main game manager instance that contains game state and methods.
+        """
         self.game = game
 
     def _player_lasers(self):
@@ -39,6 +45,7 @@ class CollisionManager:
                             self.game.spawn_powerup(alien.rect.center, alien.color)
 
     def _alien_lasers(self):
+        """Checks for collisions between alien lasers and the player"""
         # Prevent damage if the player is currently flashing or has the beam powerup (invincible)
         if self.game.player.sprite.is_flashing or self.game.player.sprite.beam_active: return
 
@@ -49,6 +56,7 @@ class CollisionManager:
                 self.game.player_damage()
 
     def _ship_collisions(self):
+        """Checks for collisions between the player's ship and aliens"""
         # Prevent damage if the player is currently flashing or has the beam powerup (invincible)
         if self.game.player.sprite.is_flashing or self.game.player.sprite.beam_active: return
 
@@ -62,7 +70,7 @@ class CollisionManager:
             self.game.player_damage()
 
     def _powerups(self):
-        # Check for collisions between player and powerups
+        """Checks for collisions between player and powerups, applying effects and playing sounds as necessary"""
         powerups_collected = pygame.sprite.spritecollide(self.game.player.sprite, self.game.powerups, True)
         for powerup in powerups_collected:
             if powerup.powerup_type == 'heal' and self.game.hearts < 3: # Only heal if player isn't at full health
@@ -86,7 +94,7 @@ class CollisionManager:
 class GameManager:
     """Main game manager class"""
     def __init__(self):
-
+        """Initializes the game, setting up display, audio, sprites, timers, and game state variables."""
         # Game setup
         pygame.init()
 
@@ -190,7 +198,12 @@ class GameManager:
             json.dump(self.save_data, high_score_file)
 
     def qualifies_for_leaderboard(self, score):
-        """Checks if the given score qualifies for the leaderboard or is a personal best"""
+        """
+        Checks if the given score qualifies for the leaderboard or is a personal best
+
+        Args:
+            score (int): The player's final score to check against the leaderboard
+        """
         leaderboard = self.save_data.get('leaderboard', [])
         
         # If leaderboard isn't full, any score > 0 qualifies
@@ -273,13 +286,24 @@ class GameManager:
             bg.scroll_speed = ScreenSettings.DEFAULT_BG_SCROLL_SPEED
 
     def spawn_aliens(self,alien_color):
-        """Spawns a new alien of the given color"""
+        """
+        Spawns a new alien of the given color
+
+        Args:
+            alien_color (str): The color of the alien to spawn, which determines its behavior and point value
+        """
         self.aliens.add(Alien(alien_color,*ScreenSettings.RESOLUTION))
         if alien_color == 'blue':
             self.audio.channel_5.play(self.audio.ufo_sound)
 
     def spawn_powerup(self, pos, color):
-        """Spawns a new powerup of the given color at the given position"""
+        """
+        Spawns a new powerup of the given color at the given position
+
+        Args:
+            pos (tuple): The position where the powerup should be spawned
+            color (str): The color of the powerup to spawn, which determines its type and effect
+        """
         self.powerups.add(PowerUp(pos, color))
 
     def alien_shoot(self):
@@ -347,7 +371,13 @@ class GameManager:
             bg.scroll_speed = new_bg_speed
 
     def explode(self,x_pos,y_pos):
-        """Triggers an explosion animation at the given position and plays the sound effect"""
+        """
+        Triggers an explosion animation at the given position and plays the sound effect
+
+        Args:
+            x_pos (int): The x-coordinate of the explosion's center
+            y_pos (int): The y-coordinate of the explosion's center
+        """
         self.audio.channel_2.play(self.audio.explosion_sound)
         self.explosion = Explosion(x_pos,y_pos)
         self.exploding_sprites.add(self.explosion)

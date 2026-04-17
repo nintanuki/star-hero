@@ -11,16 +11,20 @@ class Audio():
 
         """Music"""
         self.intro_music = pygame.mixer.Sound('audio/star_hero_intro.ogg')
-        self.intro_music.set_volume(self.master_volume * 2) # Low volume for some reason
+        # self.intro_music.set_volume(self.master_volume * 2) # Low volume for some reason
+        self.intro_music = pygame.mixer.Sound('audio/star_fox_snes_controls_and_map_select.mp3')
+        self.intro_music.set_volume(self.master_volume / 2)
         self.channel_0 = pygame.mixer.Channel(0)
         self.play_intro_music = True # Set to False after user begins, only plays once
 
-        self.bg_music = pygame.mixer.Sound('audio/star_hero.mp3')
-        self.bg_music.set_volume(self.master_volume)
+        # self.bg_music = pygame.mixer.Sound('audio/star_hero.mp3')
+        self.bg_music = pygame.mixer.Sound('audio/star_fox_snes_space_armada.mp3')
+        self.bg_music.set_volume(self.master_volume / 2)
         self.channel_1 = pygame.mixer.Channel(1)
 
         # Not tied to a channel?
-        self.player_down = pygame.mixer.Sound('audio/game_over.ogg')
+        # self.player_down = pygame.mixer.Sound('audio/game_over.ogg')
+        self.player_down = pygame.mixer.Sound('audio/star_fox_snes_player_down.mp3')
         self.player_down.set_volume(self.master_volume)
 
         """
@@ -66,9 +70,11 @@ class Audio():
 
     def update(self):
         """Updates volume of all sounds and music"""
-        self.intro_music.set_volume(self.master_volume * 2)
-        self.bg_music.set_volume(self.master_volume)
-        self.player_down.set_volume(self.master_volume)
+        # self.intro_music.set_volume(self.master_volume * 2)
+        self.intro_music.set_volume(self.master_volume / 2)
+        # self.bg_music.set_volume(self.master_volume)
+        self.bg_music.set_volume(self.master_volume / 2)
+        self.player_down.set_volume(self.master_volume / 2)
         self.laser_sound.set_volume(self.master_volume / 2)
         self.explosion_sound.set_volume(self.master_volume / 2)
         self.low_health_alarm1.set_volume(self.master_volume / 2)

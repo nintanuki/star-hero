@@ -17,7 +17,7 @@
 * Ship should flash green, gold or blue when picking up powerups
 * Display indicator when powerup is active (maybe it blinks before going away?)
 * Different rates of fire for different enemies (yellow shoots more, blue shoots the most, but blue's lasers are too slow)
-* Enemy shoots a beam (in the style of the ship stealer from Galaga) that makes play purple and reverses controls.
+* Enemy shoots a beam (in the style of the ship stealer from Galaga) that makes player purple and reverses controls.
 * Add shield powerup?
 * Display sprites of aliens on screen with how many points they are worth
 * Allow player to enter initials if they get the high score
@@ -25,7 +25,6 @@
 * Show controls in game (create images with WASD, Spacebar and arrow keys, etc)
 * Menu and options
 * Quit game option
-* Enemy animations
 * Bosses?
 * Multiple levels/stages?
 * Speed boost that uses energy?

@@ -496,7 +496,8 @@ class PowerUp(pygame.sprite.Sprite):
         # redraw circle every frame
         self.image.fill((0, 0, 0, 0))
 
-        # For diamonds, we have to redraw the polygon every frame to update the color. For circles, we can just fill the surface with the new color.
+        # For diamonds, we have to redraw the polygon every frame to update the color.
+        # For circles, we can just fill the surface with the new color.
         if self.shape == 'diamond':
             points = [
                 (PowerupSettings.RADIUS, 0),                    # top

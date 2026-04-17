@@ -36,9 +36,13 @@ class Laser(pygame.sprite.Sprite):
         self.speed = speed
         self.should_grow = should_grow
 
+    def move(self):
+        """Moves the laser vertically based on its speed. Called every frame in update()."""
+        self.rect.y += self.speed
+
     def update(self):
         """Handles laser movement, growth (for beams), color flickering, and self-destruction when off-screen. Called every frame."""
-        self.rect.y += self.speed
+        self.move()
 
         # Rapidly grow width of beam until target is reached
         # Only grow if the flag is set and we haven't hit the target yet
@@ -394,7 +398,6 @@ class PowerUp(pygame.sprite.Sprite):
             color (str): The color/type of the powerup, which determines its effect on the player and its appearance.
         """
         super().__init__()
-        self.speed = PowerupSettings.SPEED
         self.shape = PowerupSettings.DATA[color].get('shape', 'circle')
 
         self.draw_color = PowerupSettings.DATA[color]['draw_color']
@@ -459,12 +462,16 @@ class PowerUp(pygame.sprite.Sprite):
         if self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
 
+    def move(self):
+        """Moves the powerup downward based on its speed. Called every frame in update()."""
+        self.rect.y += PowerupSettings.SPEED
+
     def update(self):
         """
         Handles the downward movement of the powerup,
         its flashing animation, and checks for self-destruction when off-screen.
         Called every frame in the game loop.
         """
-        self.rect.y += self.speed
+        self.move()
         self.animate()
         self.destroy()

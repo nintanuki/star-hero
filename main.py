@@ -39,8 +39,8 @@ class CollisionManager:
                             self.game.spawn_powerup(alien.rect.center, alien.color)
 
     def _alien_lasers(self):
-        # Prevent damage if the player is currently flashing (invincible)
-        if self.game.player.sprite.is_flashing: return
+        # Prevent damage if the player is currently flashing or has the beam powerup (invincible)
+        if self.game.player.sprite.is_flashing or self.game.player.sprite.beam_active: return
 
         # Cause damage when alien laser hits player
         for laser in self.game.alien_lasers:
@@ -49,8 +49,8 @@ class CollisionManager:
                 self.game.player_damage()
 
     def _ship_collisions(self):
-        # Prevent damage if the player is currently flashing (invincible)
-        if self.game.player.sprite.is_flashing: return
+        # Prevent damage if the player is currently flashing or has the beam powerup (invincible)
+        if self.game.player.sprite.is_flashing or self.game.player.sprite.beam_active: return
 
         # Damage player if their ship collides with an alien
         aliens_crash = pygame.sprite.spritecollide(self.game.player.sprite, self.game.aliens, True)

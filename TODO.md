@@ -8,7 +8,6 @@
 * Volume bar overlaps with level display
 
 ### Ideas for Future Changes and Additions
-* Make player invulnerable while beam is shooting
 * Add "barrel roll" to repel lasers? AND/OR fast movement left and right?
 * Randomize different music tracks
 * Add drop shadow to sprites?

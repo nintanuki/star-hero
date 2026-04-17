@@ -35,7 +35,7 @@
 
 ### Asset Changes to Make
 * Replace player and enemy sprites with original art
-* Replace placeholder music with original music
+* Replace all placeholder music with better original music
 
 ### Misc Notes
 * Use `channel_#.play(music, -1)` to loop instead?

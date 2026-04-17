@@ -635,38 +635,46 @@ class GameManager:
                 self.exploding_sprites.update(ExplosionSettings.ANIMATION_SPEED)
 
                 # Draw blue alien confusion attack
+                # 1. Track if ANY alien is currently confusing
+                any_alien_confusing = False
+
+                # 2. Draw blue alien confusion attack
                 for alien in self.aliens:
                     if getattr(alien, 'is_confusing', False):
+                        any_alien_confusing = True # Mark that at least one is attacking
+                        
                         if alien.confusion_growth < ScreenSettings.HEIGHT:
                             alien.confusion_growth += 15 
 
                         top_width = 10
                         bottom_width = top_width + (alien.confusion_growth * 0.2) 
 
-                        # Define points
                         top_left  = (alien.rect.centerx - top_width // 2, alien.rect.bottom)
                         top_right = (alien.rect.centerx + top_width // 2, alien.rect.bottom)
                         bottom_right = (alien.rect.centerx + bottom_width // 2, alien.rect.bottom + alien.confusion_growth)
                         bottom_left  = (alien.rect.centerx - bottom_width // 2, alien.rect.bottom + alien.confusion_growth)
                         shape_points = [top_left, top_right, bottom_right, bottom_left]
 
-                        # Draw the polygon on a transparent surface
                         field_surf = pygame.Surface((ScreenSettings.WIDTH, ScreenSettings.HEIGHT), pygame.SRCALPHA)
                         pygame.draw.polygon(field_surf, (200, 0, 255, 80), shape_points)
                         self.screen.blit(field_surf, (0, 0))
 
-                        # --- NEW PIXEL-PERFECT COLLISION ---
-                        # 1. Create a mask from the beam surface (detects where pixels are not transparent)
                         beam_mask = pygame.mask.from_surface(field_surf, threshold=1)
-                        
-                        # 2. Check collision against player mask
-                        # We need the offset (the distance between the top-left of the screen and the player)
                         offset = (self.player.sprite.rect.x, self.player.sprite.rect.y)
                         
                         if beam_mask.overlap(self.player.sprite.mask, offset):
                             if not self.player.sprite.confused:
                                 self.player.sprite.confused = True
                                 self.player.sprite.confusion_timer = pygame.time.get_ticks()
+
+                # 3. Handle Audio outside the loop based on the collective state
+                if any_alien_confusing:
+                    if not self.audio.channel_9.get_busy():
+                        self.audio.channel_9.play(self.audio.tractor_beam, loops=-1)
+                else:
+                    # Only stop if the channel is actually busy and NO aliens are attacking
+                    if self.audio.channel_9.get_busy():
+                        self.audio.channel_9.stop()
 
                 self.aliens.draw(self.screen)
                 self.alien_lasers.draw(self.screen)

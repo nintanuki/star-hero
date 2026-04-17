@@ -68,6 +68,10 @@ class Audio():
         self.powerup_weapon.set_volume(self.master_volume / 2)
         self.powerup_heart.set_volume(self.master_volume / 2)
 
+        self.tractor_beam = pygame.mixer.Sound('audio/galaga_tractor_beam.mp3')
+        self.tractor_beam.set_volume(self.master_volume / 2)
+        self.channel_9 = pygame.mixer.Channel(9)
+
     def update(self):
         """Updates volume of all sounds and music"""
         # self.intro_music.set_volume(self.master_volume * 2)
@@ -80,6 +84,7 @@ class Audio():
         self.low_health_alarm1.set_volume(self.master_volume / 2)
         self.low_health_alarm2.set_volume(self.master_volume / 2)
         self.ufo_sound.set_volume(self.master_volume / 2)
+        self.tractor_beam.set_volume(self.master_volume / 2)
         self.pause_sound.set_volume(self.master_volume / 2)
         self.unpause_sound.set_volume(self.master_volume / 2)
         self.powerup_twin.set_volume(self.master_volume / 2)

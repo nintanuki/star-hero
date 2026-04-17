@@ -111,6 +111,14 @@ class Style():
             self.screen.blit(surf, rect)
             y += 22
 
+    def display_level(self, score):
+        """Displays the current level in the bottom left corner"""
+        # Level starts at 1 and increases every DIFFICULTY_STEP points (max 20)
+        level = min(20, (score // AlienSettings.DIFFICULTY_STEP) + 1)
+        level_surf = self.small_font.render(f'LEVEL: {level}', False, FontSettings.COLOR)
+        level_rect = level_surf.get_rect(bottomleft=(10, ScreenSettings.HEIGHT - 10))
+        self.screen.blit(level_surf, level_rect)
+
     def update(self, game_state, save_data, score,
            entering_initials=False,
            initials="AAA",
@@ -131,6 +139,7 @@ class Style():
 
         elif game_state == 'game_active':
             self.display_in_game_score(self.save_data, self.score)
+            self.display_level(self.score)
 
         elif game_state == 'game_over':
             self.display_game_over()

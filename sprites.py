@@ -230,7 +230,7 @@ class Player(pygame.sprite.Sprite):
                 controller_boost = True
 
         if keys[pygame.K_f] or controller_boost:
-            current_speed *= 2 # Doubles the movement speed
+            current_speed *= PlayerSettings.SPEED_BOOST
 
         # Player Movement Input
         # Keyboard input (WASD or Arrow Keys)

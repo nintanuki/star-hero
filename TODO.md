@@ -6,6 +6,7 @@
 * Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
 
 ### Ideas for Future Changes and Additions
+* Add level # to UI with each difficulty increase (or speed?)
 * Randomize different music tracks
 * Add drop shadow to sprites?
 * Player should not be able to hold down the shoot button

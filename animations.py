@@ -77,7 +77,7 @@ class Explosion(pygame.sprite.Sprite):
         Updates the explosion animation by advancing the current sprite index based on the animation speed,
         and kills the sprite when the animation is complete.
         """
-        if self.is_animating == True:
+        if self.is_animating:
             self.current_sprite += speed
             if int(self.current_sprite) >= len(self.sprites):
                 self.kill()

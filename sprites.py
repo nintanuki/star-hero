@@ -23,7 +23,6 @@ class Laser(pygame.sprite.Sprite):
         # Beam Growth Logic
         self.target_width = width
         self.current_width = 1 if should_grow else width# Start as a thin line
-        self.growth_speed = 5   # Pixels added per frame
 
         self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
         
@@ -44,7 +43,7 @@ class Laser(pygame.sprite.Sprite):
         # Rapidly grow width of beam until target is reached
         # Only grow if the flag is set and we haven't hit the target yet
         if self.should_grow and self.current_width < self.target_width:
-            self.current_width = min(self.target_width, self.current_width + self.growth_speed)
+            self.current_width = min(self.target_width, self.current_width + LaserSettings.BEAM_GROWTH_SPEED)
             # Re-create the surface and re-center the rect
             old_center = self.rect.center
             self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
@@ -54,11 +53,7 @@ class Laser(pygame.sprite.Sprite):
         if self.colors == "rainbow":
             self.hue = (self.hue + 4) % 360
             
-            # Divide the laser into 5 vertical segments for a "flow" effect
-            segments = 5
-            segment_height = LaserSettings.HEIGHT // segments
-            
-            for i in range(segments):
+            for i in range(LaserSettings.RAINBOW_SEGMENTS):
                 # Offset the hue for each segment based on its position
                 # Adding 'i * 20' creates the color shift along the beam
                 seg_hue = (self.hue + (i * 20)) % 360
@@ -67,7 +62,7 @@ class Laser(pygame.sprite.Sprite):
                 color.hsva = (seg_hue, 100, 100, 100)
                 
                 # Draw the segment onto the image
-                segment_rect = pygame.Rect(0, i * segment_height, self.current_width, segment_height)
+                segment_rect = pygame.Rect(0, i * LaserSettings.SEGMENT_HEIGHT, self.current_width, LaserSettings.SEGMENT_HEIGHT)
                 self.image.fill(color, segment_rect)
         else:
             # Standard flickering for non-beam lasers

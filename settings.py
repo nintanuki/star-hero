@@ -71,7 +71,6 @@ class AlienSettings:
 class LaserSettings:
     """Contains all the settings related to lasers fired by both the player and aliens, including dimensions, speeds, and colors for different laser types."""
     DEFAULT_WIDTH = 4
-    BEAM_WIDTH = ScreenSettings.WIDTH
     HEIGHT = 20
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4
@@ -82,6 +81,15 @@ class LaserSettings:
         'alien':    ('red', 'white'), 
         'beam':     None
     }
+
+    # Beam Settings
+    BEAM_WIDTH = ScreenSettings.WIDTH
+    BEAM_GROWTH_SPEED = 5 # Pixels added per frame
+    RAINBOW_HUE_STEP = 4
+    RAINBOW_SEGMENTS = 5
+    # Divide the laser into 5 vertical segments for a "flow" effect
+    SEGMENT_HEIGHT = HEIGHT // RAINBOW_SEGMENTS
+    RAINBOW_SEGMENT_SHIFT = 20
 
 class PowerupSettings:
     """

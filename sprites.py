@@ -331,17 +331,26 @@ class Player(pygame.sprite.Sprite):
         self.laser_time = pygame.time.get_ticks()
         self.audio.channel_3.play(self.audio.laser_sound)
 
-    def update(self):
-        self.get_input()
-
+    def handle_auto_shooting(self):
+        """
+        Handles automatic shooting for powerups that require it (like rapid fire and beam).
+        Called every frame in update().
+        """
         if (self.rapid_fire_active or self.beam_active) and self.ready:
             self.trigger_shot()
-        
+
+    def update_lasers(self):
+        """Updates all lasers fired by the player. Called every frame in update()"""
+        self.lasers.update()
+    
+    def update(self):
+        self.get_input()
+        self.handle_auto_shooting()
         self.constraint()
         self.recharge()
         self.check_powerup_timeout()
         self.animate_damage()
-        self.lasers.update()
+        self.update_lasers()
 
 class Alien(pygame.sprite.Sprite):
     """Represents an alien enemy. Handles movement patterns, zigzag behavior for certain types, and self-destruction when off-screen."""
@@ -406,8 +415,12 @@ class Alien(pygame.sprite.Sprite):
         if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease
             self.kill()
 
-    # numbers round down if decimals are used? .05 doesn't move and 1 is the same as 1.5, etc
-    def update(self):
+    def calculate_movement(self):
+        """
+        Calculates the movement of the alien based on its color and behavior patterns.
+        Called every frame in update()
+        """
+        # numbers round down if decimals are used? .05 doesn't move and 1 is the same as 1.5, etc
         if self.color == 'red': self.rect.y += AlienSettings.SPEED['red']
         elif self.color == 'green': self.rect.y += AlienSettings.SPEED['green']
         elif self.color == 'yellow':
@@ -424,6 +437,9 @@ class Alien(pygame.sprite.Sprite):
             self.rect.x += self.blue_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1
+
+    def update(self):
+        self.calculate_movement()
         self.animate()
         self.destroy()
 

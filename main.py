@@ -36,7 +36,7 @@ class CollisionManager:
 
                         # If it's a red alien (heart), only spawn if player is hurt
                         if alien.color == 'red':
-                            if self.game.hearts < 3: # Only drop if player isn't at full health
+                            if self.game.hearts < PlayerSettings.MAX_HEALTH: # Only drop if player isn't at full health
                                 self.game.spawn_powerup(alien.rect.center, alien.color)
                         elif alien.color == 'green':
                             if not self.game.player.sprite.twin_laser_active: # Only drop if twin laser isn't active
@@ -73,7 +73,7 @@ class CollisionManager:
         """Checks for collisions between player and powerups, applying effects and playing sounds as necessary"""
         powerups_collected = pygame.sprite.spritecollide(self.game.player.sprite, self.game.powerups, True)
         for powerup in powerups_collected:
-            if powerup.powerup_type == 'heal' and self.game.hearts < 3: # Only heal if player isn't at full health
+            if powerup.powerup_type == 'heal' and self.game.hearts < PlayerSettings.MAX_HEALTH: # Only heal if player isn't at full health
                 self.game.audio.channel_8.play(self.game.audio.powerup_heart)
                 self.game.hearts += 1
             else:
@@ -118,9 +118,9 @@ class GameManager:
         self.collisions = CollisionManager(self)
 
         # Player Health
-        self.hearts = 3
+        self.hearts = PlayerSettings.MAX_HEALTH
         self.heart_surf = pygame.image.load('graphics/heart.png').convert_alpha()
-        self.heart_x_start_pos = ScreenSettings.WIDTH - (self.heart_surf.get_size()[0] * 3 + 30)
+        self.heart_x_start_pos = ScreenSettings.WIDTH - (self.heart_surf.get_size()[0] * PlayerSettings.MAX_HEALTH + 30)
 
         # Background Setup
         self.background = pygame.sprite.Group()
@@ -269,7 +269,7 @@ class GameManager:
         """Resets all necessary game state to start a new game"""
         self.score = 0
         self.player.sprite.rect.center = ScreenSettings.CENTER
-        self.hearts = 3
+        self.hearts = PlayerSettings.MAX_HEALTH
         self.alien_lasers.empty()
         self.powerups.empty()
         self.aliens.empty()

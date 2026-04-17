@@ -13,6 +13,7 @@ class ScreenSettings:
 
 class PlayerSettings:
     """Contains all the settings related to the player, including movement speed, rotation, scale, laser cooldowns, and other gameplay parameters."""
+    MAX_HEALTH = 3
     SPEED = 2
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire

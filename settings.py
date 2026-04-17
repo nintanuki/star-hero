@@ -143,3 +143,11 @@ class AudioSettings:
     """
     INTRO_VOL_BOOST = 2.0
     DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
+
+class AssetPaths:
+    GRAPHICS_DIR = 'graphics/'
+    BACKGROUND = 'graphics/background.png'
+    EXPLOSION = 'graphics/explosion.png'
+    PLAYER = 'graphics/player_ship.png'
+    HEART = 'graphics/heart.png'
+    TV = 'graphics/tv.png'

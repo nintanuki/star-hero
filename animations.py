@@ -12,7 +12,7 @@ class Background(pygame.sprite.Sprite):
         and setting the initial position of the background.
         """
         super().__init__(groups)
-        bg_image = pygame.image.load('graphics/background.png').convert()
+        bg_image = pygame.image.load(AssetPaths.BACKGROUND).convert()
         full_height = bg_image.get_height()
         full_width = bg_image.get_width()
         self.image = pygame.Surface((full_width,full_height * 2))
@@ -47,7 +47,7 @@ class Explosion(pygame.sprite.Sprite):
         self.is_animating = False
         
         # sprite sheet from https://www.pngwing.com/en/free-png-xiyem/
-        sprite_sheet = pygame.image.load('graphics/explosion.png').convert_alpha()
+        sprite_sheet = pygame.image.load(AssetPaths.EXPLOSION).convert_alpha()
 
         # Using list comprehension to build the explosion animation fromt he sprite sheet
         self.sprites = [self.get_image(sprite_sheet, frame, ExplosionSettings.SIZE, ExplosionSettings.SIZE, ExplosionSettings.SCALE) for frame in range(ExplosionSettings.FRAMES)]
@@ -94,7 +94,7 @@ class CRT:
         """
         super().__init__()
         self.screen = screen
-        self.tv = pygame.image.load('graphics/tv.png').convert_alpha()
+        self.tv = pygame.image.load(AssetPaths.TV).convert_alpha()
         self.tv = pygame.transform.scale(self.tv,(ScreenSettings.RESOLUTION))
 
     def create_crt_lines(self):

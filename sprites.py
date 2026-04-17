@@ -93,7 +93,7 @@ class Player(pygame.sprite.Sprite):
         """
         super().__init__()
         # Store original image to revert back after flashing
-        self.original_image = pygame.image.load('graphics/player_ship.png').convert_alpha()
+        self.original_image = pygame.image.load(AssetPaths.PLAYER).convert_alpha()
         self.original_image = pygame.transform.rotozoom(self.original_image, 0, PlayerSettings.SCALE)
         self.image = self.original_image.copy()
         self.rect = self.image.get_rect(center = (pos)) # make pos = 400,500?
@@ -407,7 +407,7 @@ class PowerUp(pygame.sprite.Sprite):
         self.current_color = self.draw_color
 
         if self.shape == 'heart':
-            self.image = pygame.image.load('graphics/heart.png').convert_alpha()
+            self.image = pygame.image.load(AssetPaths.HEART).convert_alpha()
             self.image = pygame.transform.scale(self.image, UISettings.HEART_SPRITE_SIZE)
             self.rect = self.image.get_rect(center=pos)
         else:

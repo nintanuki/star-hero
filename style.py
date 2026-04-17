@@ -11,11 +11,6 @@ class Style():
 
         self.audio = audio # Audio reference used to read and display the current volume
 
-        # Volume Bar
-        self.maximum_volume = 1000
-        self.volume_bar_length = 150
-        self.volume_bar_ratio = self.maximum_volume / self.volume_bar_length
-
         # Load image of ship for intro and game over screens
         self.player_ship = pygame.image.load('graphics/player_ship.png').convert_alpha()
         self.player_ship = pygame.transform.rotozoom(self.player_ship,0,0.2)
@@ -94,7 +89,7 @@ class Style():
         self.screen.blit(volume_message,volume_message_rect)
         
         # Volume Bar
-        pygame.draw.rect(self.screen,'green',(10,ScreenSettings.HEIGHT - 20,(self.audio.master_volume*1000)/self.volume_bar_ratio,10))
+        pygame.draw.rect(self.screen,'green',(10,ScreenSettings.HEIGHT - 20,(self.audio.master_volume*1000)/UISettings.VOLUME_BAR_RATIO,10))
 
     def display_leaderboard(self, leaderboard, title="TOP 10", start_y=300):
         screen_center_x = ScreenSettings.WIDTH // 2

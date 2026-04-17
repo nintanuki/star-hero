@@ -149,6 +149,11 @@ class UISettings:
     HEART_TOP_MARGIN = 8
     VOLUME_DISPLAY_TIME = 1000
 
+    # Volume Bar Settings
+    MAX_VOLUME = 1000
+    VOLUME_BAR__LENGTH = 150
+    VOLUME_BAR_RATIO = MAX_VOLUME / VOLUME_BAR__LENGTH
+
 class AudioSettings:
     """
     Defines settings related to audio in the game,

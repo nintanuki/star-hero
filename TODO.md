@@ -4,9 +4,11 @@
 * Player ship sprite can still move and shoot lasers briefly after death?
 * Windows flags exe made with Pyinstaller as a virus... [try this.](https://plainenglish.io/blog/pyinstaller-exe-false-positive-trojan-virus-resolved-b33842bd3184)
 * Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
+* Volume bar only shows up for keyboard, not controller
+* Volume bar overlaps with level display
 
 ### Ideas for Future Changes and Additions
-* Add level # to UI with each difficulty increase (or speed?)
+* Add "barrel roll" to repel lasers? AND/OR fast movement left and right?
 * Randomize different music tracks
 * Add drop shadow to sprites?
 * Player should not be able to hold down the shoot button

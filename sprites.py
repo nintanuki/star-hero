@@ -321,8 +321,8 @@ class Alien(pygame.sprite.Sprite):
 
         # 1. Load the frames
         self.frames = []
-        path1 = f'graphics/{self.color}1.png'
-        path2 = f'graphics/{self.color}2.png'
+        path1 = f'{AssetPaths.GRAPHICS_DIR}{self.color}1.png'
+        path2 = f'{AssetPaths.GRAPHICS_DIR}{self.color}2.png'
 
         # Load frame 1
         self.frames.append(pygame.image.load(path1).convert_alpha())

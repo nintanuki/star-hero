@@ -8,8 +8,8 @@ class ScreenSettings:
     BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
     CRT_ALPHA_RANGE = (75, 90)
     DEFAULT_BG_SCROLL_SPEED = 50
-    BG_SCROLL_STEP = 25
-    BG_SCROLL_MAX = 500
+    BG_SCROLL_STEP = 25 # how many pixels the background moves each difficulty step (lower = smoother, higher = more noticeable)
+    BG_SCROLL_MAX = 500 # maximum scroll speed for the background, to prevent it from becoming too fast at high scores
 
 class PlayerSettings:
     """Contains all the settings related to the player, including movement speed, rotation, scale, laser cooldowns, and other gameplay parameters."""

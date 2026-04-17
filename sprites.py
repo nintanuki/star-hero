@@ -40,45 +40,85 @@ class Laser(pygame.sprite.Sprite):
         """Moves the laser vertically based on its speed. Called every frame in update()."""
         self.rect.y += self.speed
 
-    def update(self):
-        """Handles laser movement, growth (for beams), color flickering, and self-destruction when off-screen. Called every frame."""
-        self.move()
+    def rebuild_surface(self):
+        """
+        Rebuilds the laser's surface when its width changes (used for beams).
+        Called during update() when should_grow is True.
+        """
+        old_center = self.rect.center
+        self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
+        self.rect = self.image.get_rect(center = old_center)
+
+    def animate_rainbow(self):
+        """
+        Handles the rainbow animation for beam lasers by updating the hue and filling the laser surface with segmented colors.
+        Called every frame in update() when the laser is a beam.
+        """
+        self.hue = (self.hue + LaserSettings.RAINBOW_HUE_STEP) % 360
+        
+        # To create a flowing rainbow effect, we divide the beam into segments and assign
+        # a slightly different hue to each segment based on its position and the current hue value.
+        # This creates the illusion of colors moving along the beam as it grows.
+        for segment_index in range(LaserSettings.RAINBOW_SEGMENTS):
+            # Offset the hue for each segment based on its position
+            # Adding 'i * 20' creates the color shift along the beam
+            seg_hue = (self.hue + (segment_index * LaserSettings.RAINBOW_SEGMENT_SHIFT)) % 360
+            
+            color = pygame.Color(0)
+            color.hsva = (seg_hue, 100, 100, 100)
+            
+            # Draw the segment onto the image
+            segment_rect = pygame.Rect(
+                0,
+                segment_index * LaserSettings.SEGMENT_HEIGHT,
+                self.current_width,
+                LaserSettings.SEGMENT_HEIGHT
+                )
+            self.image.fill(color, segment_rect)
+
+    def animate_flicker(self):
+        """
+        Handles the flickering animation by alternating between two colors.
+        Called every frame in update() for non-beam lasers.
+        """
+        self.color_index = 1 - self.color_index # Toggles between 0 and 1 every frame
+        self.image.fill(self.colors[self.color_index])
+
+    def update_color(self):
+        # Color  Logic for Beam
+        if self.colors == "rainbow":
+            self.animate_rainbow()
+        else:
+            # Standard flickering for non-beam lasers
+            self.animate_flicker()
+
+    def update_size(self):
+        """
+        Handles the growth of beam lasers by increasing their width until they reach the target width.
+        Called every frame in update() when should_grow is True.
+        """
 
         # Rapidly grow width of beam until target is reached
         # Only grow if the flag is set and we haven't hit the target yet
         if self.should_grow and self.current_width < self.target_width:
             self.current_width = min(self.target_width, self.current_width + LaserSettings.BEAM_GROWTH_SPEED)
             # Re-create the surface and re-center the rect
-            old_center = self.rect.center
-            self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
-            self.rect = self.image.get_rect(center = old_center)
-        
-        # Color  Logic for Beam
-        if self.colors == "rainbow":
-            self.hue = (self.hue + 4) % 360
-            
-            # To create a flowing rainbow effect, we divide the beam into segments and assign
-            # a slightly different hue to each segment based on its position and the current hue value.
-            # This creates the illusion of colors moving along the beam as it grows.
-            for segment_index in range(LaserSettings.RAINBOW_SEGMENTS):
-                # Offset the hue for each segment based on its position
-                # Adding 'i * 20' creates the color shift along the beam
-                seg_hue = (self.hue + (segment_index * LaserSettings.RAINBOW_SEGMENT_SHIFT)) % 360
-                
-                color = pygame.Color(0)
-                color.hsva = (seg_hue, 100, 100, 100)
-                
-                # Draw the segment onto the image
-                segment_rect = pygame.Rect(0, segment_index * LaserSettings.SEGMENT_HEIGHT, self.current_width, LaserSettings.SEGMENT_HEIGHT)
-                self.image.fill(color, segment_rect)
-        else:
-            # Standard flickering for non-beam lasers
-            self.color_index = 1 - self.color_index # Toggles between 0 and 1 every frame
-            self.image.fill(self.colors[self.color_index])
-        
-        # Kill laser if off screen (using settings)
+            self.rebuild_surface()
+
+    def destroy_if_offscreen(self):
+        """Destroys the laser if it goes off the top or bottom of the screen. Called every frame in update()."""
         if self.rect.bottom < 0 or self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
+
+    def update(self):
+        """
+        Handles laser movement, growth (for beams), color flickering, and self-destruction when off-screen.
+        Called every frame.
+        """
+        self.move()
+        self.update_size()
+        self.update_color()
+        self.destroy_if_offscreen()
 
 class Player(pygame.sprite.Sprite):
     """Represents the player's ship. Handles movement, shooting, powerup effects, damage flashing, and constraints within the screen."""

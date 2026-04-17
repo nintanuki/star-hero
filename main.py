@@ -190,10 +190,14 @@ class GameManager:
             json.dump(self.save_data, high_score_file)
 
     def qualifies_for_leaderboard(self, score):
-        """Checks if the given score qualifies for the leaderboard"""
+        """Checks if the given score qualifies for the leaderboard or is a personal best"""
         leaderboard = self.save_data.get('leaderboard', [])
+        
+        # If leaderboard isn't full, any score > 0 qualifies
         if len(leaderboard) < 10:
             return score > 0
+            
+        # If leaderboard is full, check if it beats the 10th place
         return score > leaderboard[-1]['score']
 
     def start_initial_entry(self):
@@ -204,12 +208,26 @@ class GameManager:
         self.pending_score = self.score
 
     def submit_initials(self):
-        """Submits the entered initials and score to the leaderboard"""
-        entry = {
-            'name': self.initials,
-            'score': self.pending_score
-        }
-        self.save_data['leaderboard'].append(entry)
+        """Submits the entered initials and score to the leaderboard, updating existing names"""
+        leaderboard = self.save_data.get('leaderboard', [])
+        
+        # Check if this name already exists in the leaderboard
+        existing_entry = next((item for item in leaderboard if item["name"] == self.initials), None)
+
+        if existing_entry:
+            # Only update if the new score is actually higher
+            if self.pending_score > existing_entry['score']:
+                existing_entry['score'] = self.pending_score
+        else:
+            # If it's a new player, create a new entry
+            entry = {
+                'name': self.initials,
+                'score': self.pending_score
+            }
+            leaderboard.append(entry)
+
+        # Re-assign (in case it was missing) and save
+        self.save_data['leaderboard'] = leaderboard
         self._sort_and_trim_leaderboard()
         self.save_scores()
 

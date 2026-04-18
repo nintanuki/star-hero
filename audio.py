@@ -19,12 +19,17 @@ class Audio():
         self.play_intro_music = True # Set to False after user begins, only plays once
 
 
-        self.bg_music = None 
         self.channel_1 = pygame.mixer.Channel(1)
-        # # self.bg_music = pygame.mixer.Sound('audio/star_hero.mp3')
-        # self.bg_music = pygame.mixer.Sound('audio/star_fox_snes_space_armada.mp3')
-        # self.bg_music.set_volume(self.master_volume / 2)
-        # self.channel_1 = pygame.mixer.Channel(1)
+
+        # --- PRELOAD ALL BGM TRACKS ---
+        self.bgm_tracks = []
+        for filename in AudioSettings.BGM_PLAYLIST:
+            sound = pygame.mixer.Sound(f"{AudioSettings.AUDIO_DIR}{filename}")
+            sound.set_volume(self.master_volume / 2)
+            self.bgm_tracks.append(sound)
+
+        self.bg_music = None
+        self.last_bgm = None
 
         # Not tied to a channel?
         # self.player_down = pygame.mixer.Sound('audio/game_over.ogg')
@@ -78,9 +83,16 @@ class Audio():
 
     def load_random_bgm(self):
         """Selects and loads a random track from the playlist"""
-        random_track = f"{AudioSettings.AUDIO_DIR}{random.choice(AudioSettings.BGM_PLAYLIST)}"
-        self.bg_music = pygame.mixer.Sound(random_track)
-        self.bg_music.set_volume(self.master_volume / 2)
+        if not self.bgm_tracks:
+            return
+
+        choices = self.bgm_tracks
+
+        if self.last_bgm and len(self.bgm_tracks) > 1:
+            choices = [track for track in self.bgm_tracks if track is not self.last_bgm]
+
+        self.bg_music = random.choice(choices)
+        self.last_bgm = self.bg_music
 
     def update(self):
         """Updates volume of all sounds and music"""
@@ -89,8 +101,8 @@ class Audio():
         # self.bg_music.set_volume(self.master_volume)
         
         # To prevent crashing since self.bg_music is initialized as None and only set to a Sound object after the intro music finishes
-        if self.bg_music:
-            self.bg_music.set_volume(self.master_volume / 2)
+        for track in self.bgm_tracks:
+            track.set_volume(self.master_volume / 2)
         
         self.player_down.set_volume(self.master_volume / 2)
         self.laser_sound.set_volume(self.master_volume / 2)

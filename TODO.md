@@ -1,5 +1,5 @@
 ### Issues That Need to be Fixed
-* ^ Do not add any more features until code is refactored and these issues are resolved
+* Confusion beam sound still plays when game is paused
 * Player can hold button down for laser, disable this so they have to press the buttone very time
 * Logic for leaderboard scores and initials uses a lot of code and functions. Put into it's own class?
 * Player ship sprite can still move and shoot lasers briefly after death?
@@ -7,7 +7,6 @@
 * Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
 * Volume bar only shows up for keyboard, not controller
 * Volume bar overlaps with level display
-* Game briefly lags when music changes
 
 ### Ideas for Future Changes and Additions
 * Score bonus + message for destroying multiple enemies at once?

@@ -164,6 +164,19 @@ class AudioSettings:
     """
     INTRO_VOL_BOOST = 2.0
     DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
+    AUDIO_DIR = 'audio/'
+    BGM_PLAYLIST = [
+        'star_fox_64_katina.mp3',
+        'star_fox_64_meteo.mp3',
+        'star_fox_64_sector_x.mp3',
+        'star_fox_64_solar_and_sector_y.mp3',
+        'star_fox_64_titania_and_macbeth.mp3',
+        'star_fox_snes_corneria.mp3',
+        'star_fox_snes_meteor.mp3',
+        'star_fox_snes_space_armada.mp3',
+        'star_fox_snes_venom_asteroid_venom_orbital.mp3',
+        'star_hero.mp3'
+    ]
 
 class AssetPaths:
     GRAPHICS_DIR = 'graphics/'

@@ -1,4 +1,5 @@
 import pygame
+import random
 from settings import *
 
 class Audio():
@@ -17,10 +18,13 @@ class Audio():
         self.channel_0 = pygame.mixer.Channel(0)
         self.play_intro_music = True # Set to False after user begins, only plays once
 
-        # self.bg_music = pygame.mixer.Sound('audio/star_hero.mp3')
-        self.bg_music = pygame.mixer.Sound('audio/star_fox_snes_space_armada.mp3')
-        self.bg_music.set_volume(self.master_volume / 2)
+
+        self.bg_music = None 
         self.channel_1 = pygame.mixer.Channel(1)
+        # # self.bg_music = pygame.mixer.Sound('audio/star_hero.mp3')
+        # self.bg_music = pygame.mixer.Sound('audio/star_fox_snes_space_armada.mp3')
+        # self.bg_music.set_volume(self.master_volume / 2)
+        # self.channel_1 = pygame.mixer.Channel(1)
 
         # Not tied to a channel?
         # self.player_down = pygame.mixer.Sound('audio/game_over.ogg')
@@ -72,12 +76,22 @@ class Audio():
         self.tractor_beam.set_volume(self.master_volume / 2)
         self.channel_9 = pygame.mixer.Channel(9)
 
+    def load_random_bgm(self):
+        """Selects and loads a random track from the playlist"""
+        random_track = f"{AudioSettings.AUDIO_DIR}{random.choice(AudioSettings.BGM_PLAYLIST)}"
+        self.bg_music = pygame.mixer.Sound(random_track)
+        self.bg_music.set_volume(self.master_volume / 2)
+
     def update(self):
         """Updates volume of all sounds and music"""
         # self.intro_music.set_volume(self.master_volume * 2)
         self.intro_music.set_volume(self.master_volume / 2)
         # self.bg_music.set_volume(self.master_volume)
-        self.bg_music.set_volume(self.master_volume / 2)
+        
+        # To prevent crashing since self.bg_music is initialized as None and only set to a Sound object after the intro music finishes
+        if self.bg_music:
+            self.bg_music.set_volume(self.master_volume / 2)
+        
         self.player_down.set_volume(self.master_volume / 2)
         self.laser_sound.set_volume(self.master_volume / 2)
         self.explosion_sound.set_volume(self.master_volume / 2)

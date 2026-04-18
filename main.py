@@ -619,6 +619,7 @@ class GameManager:
                 self.audio.channel_0.stop()
                 self.play_intro_music = False
                 if not self.audio.channel_1.get_busy():
+                    self.audio.load_random_bgm()
                     self.audio.channel_1.play(self.audio.bg_music)
                 self.player.update()
                 self.alien_lasers.update()

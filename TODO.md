@@ -6,8 +6,11 @@
 * Add resize window option that works, see: https://stackoverflow.com/questions/64543449/update-during-resize-in-pygame
 * Volume bar only shows up for keyboard, not controller
 * Volume bar overlaps with level display
+* Game briefly lags when music changes
 
 ### Ideas for Future Changes and Additions
+* Make enemy sprites occasionaly do a spin or divebomb
+* Add random scrolling backgrounds (planet zone, nebula, etc)
 * Add "barrel roll" to repel lasers? AND/OR fast movement left and right?
 * Randomize different music tracks
 * Add drop shadow to sprites?

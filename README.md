@@ -27,7 +27,7 @@ On a logitech controller you can move with the left analog stick, press "A" to s
 
 ### Enemy Aliens
 Each alien sprite behaves differently and is worth a different score value based on color:
-* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/red1.png" width="20" height="16"> Slow - **100 Points**
-* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/green1.png" width="20" height="16"> Moderate Speed - **200 Points**
-* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/yellow1.png" width="20" height="16"> Fast - Moves in a Zigzag Pattern - **300 Points**
-* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/blue1.png" width="20" height="10"> Very Fast and Rare - **500 Points**
+* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/red1.png" width="20" height="16"> Slow. Drops hearts. - **100 Points**
+* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/green1.png" width="20" height="16"> Moderate Speed. Drops laser upgrades. - **200 Points**
+* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/yellow1.png" width="20" height="16"> Fast - Moves in a Zigzag Pattern. Drops rapid fire powerup. - **300 Points**
+* <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/blue1.png" width="20" height="10"> Very Fast and Rare. Sometimes attacks with confusion beam. Drops rainbow beam powerup. - **500 Points**

@@ -108,9 +108,19 @@ class GameManager:
         pygame.display.set_caption('Star Hero')
         self.clock = pygame.time.Clock()
         self.game_active = False
+
+        # Show a temporary loading screen before audio preload
+        self.screen.fill((0, 0, 0))
+        loading_font = pygame.font.Font(FontSettings.FONT, FontSettings.MEDIUM)
+        loading_text = loading_font.render("LOADING...", False, FontSettings.COLOR)
+        loading_rect = loading_text.get_rect(center=(ScreenSettings.WIDTH // 2, ScreenSettings.HEIGHT // 2))
+        self.screen.blit(loading_text, loading_rect)
+        pygame.display.flip()
+
         self.crt = CRT(self.screen)
         self.audio = Audio()
-        self.style = Style(self.screen,self.audio)
+        self.style = Style(self.screen, self.audio)
+        
         self.paused = False
         self.show_volume = False
 

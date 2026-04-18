@@ -109,7 +109,8 @@ class GameManager:
         self.clock = pygame.time.Clock()
         self.game_active = False
 
-        # Show a temporary loading screen before audio preload
+        # Show a temporary loading screen while audio files are being loaded in to prevent lag during gameplay
+        # This part can't be handled in the style class since we need to load audio before we can use that
         self.screen.fill((0, 0, 0))
         loading_font = pygame.font.Font(FontSettings.FONT, FontSettings.MEDIUM)
         loading_text = loading_font.render("LOADING...", False, FontSettings.COLOR)

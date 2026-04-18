@@ -19,7 +19,7 @@ class PlayerSettings:
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
     RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
-    BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
+    RAINBOW_BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
     DEATH_DELAY = 500
     FLASH_DURATION = 1000 # Total time to flash in milliseconds
     FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
@@ -83,16 +83,16 @@ class LaserSettings:
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4
     COLORS = {
-        'standard': ('cyan', 'white'), 
-        'twin':     ('green', 'white'), 
-        'rapid':    ('yellow', 'white'), 
-        'alien':    ('red', 'white'), 
-        'beam':     None
+        'standard': ('green', 'white'), # Tier 1 & 2
+        'hyper': ('cyan', 'white'),    # Tier 3
+        'rapid': ('yellow', 'white'),
+        'alien': ('red', 'white'),
+        'rainbow': None 
     }
 
-    # Beam Settings
-    BEAM_WIDTH = ScreenSettings.WIDTH
-    BEAM_GROWTH_SPEED = 5 # Pixels added per frame
+    # Rainbow Beam Settings
+    RAINBOW_BEAM_WIDTH = ScreenSettings.WIDTH
+    RAINBOW_BEAM_GROWTH_SPEED = 5 # Pixels added per frame
     RAINBOW_HUE_STEP = 4
     RAINBOW_SEGMENTS = 5
     # Divide the laser into 5 vertical segments for a "flow" effect
@@ -111,9 +111,9 @@ class PowerupSettings:
 
     DATA = {
     'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},
-    'green':  {'draw_color': (60, 255, 100), 'type': 'twin_laser', 'shape': 'diamond'},
+    'green':  {'draw_color': (60, 255, 100), 'type': 'laser_upgrade', 'shape': 'diamond'},
     'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': 150},
-    'blue':   {'draw_color': (80, 160, 255), 'type': 'beam',       'shape': 'circle', 'cooldown': 0},
+    'blue':   {'draw_color': (80, 160, 255), 'type': 'rainbow_beam',       'shape': 'circle', 'cooldown': 0},
     }
 
 class ExplosionSettings:

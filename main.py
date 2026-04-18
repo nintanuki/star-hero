@@ -25,7 +25,10 @@ class CollisionManager:
         for laser in self.game.player.sprite.lasers:
             aliens_hit = pygame.sprite.spritecollide(laser, self.game.aliens, True)
             if aliens_hit:
-                laser.kill()
+                # Laser only dies if it is NOT piercing
+                if not laser.is_piercing:
+                    laser.kill()
+
                 for alien in aliens_hit:
                     self.game.score += alien.value # Add points for each alien hit
                     self.game.adjust_difficulty() # Adjust difficulty based on new score
@@ -39,7 +42,8 @@ class CollisionManager:
                             if self.game.hearts < PlayerSettings.MAX_HEALTH: # Only drop if player isn't at full health
                                 self.game.spawn_powerup(alien.rect.center, alien.color)
                         elif alien.color == 'green':
-                            if not self.game.player.sprite.twin_laser_active: # Only drop if twin laser isn't active
+                            # Stop dropping if player is already at Hyper (Level 3)
+                            if self.game.player.sprite.laser_level < 3:
                                 self.game.spawn_powerup(alien.rect.center, alien.color)
                         else:
                             self.game.spawn_powerup(alien.rect.center, alien.color)
@@ -78,10 +82,12 @@ class CollisionManager:
                 self.game.hearts += 1
             else:
                 # Only play sound if it's a new powerup activation, not if player already has it active
-                if powerup.powerup_type == 'twin_laser' and not self.game.player.sprite.twin_laser_active:
-                    self.game.audio.channel_8.play(self.game.audio.powerup_twin)
-                elif powerup.powerup_type in ['rapid_fire', 'beam']:
+                if powerup.powerup_type == 'laser_upgrade':
+                    if self.game.player.sprite.laser_level < 3:
+                        self.game.audio.channel_8.play(self.game.audio.powerup_twin)
+                elif powerup.powerup_type in ['rapid_fire', 'rainbow_beam']:
                     self.game.audio.channel_8.play(self.game.audio.powerup_weapon)
+                
                 self.game.player.sprite.activate_powerup(powerup)
 
     def update(self):

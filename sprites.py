@@ -4,7 +4,7 @@ from settings import *
 
 class Laser(pygame.sprite.Sprite):
     """Represents a laser shot by either the player or an alien. Handles movement, animation, and self-destruction when off-screen."""
-    def __init__(self, pos, speed, colors, width, should_grow=False):
+    def __init__(self, pos, speed, colors, width, should_grow=False, is_piercing=False):
         """
         Initializes the laser with position, speed, colors for flickering, width, and growth behavior (for beams).
 
@@ -14,11 +14,14 @@ class Laser(pygame.sprite.Sprite):
             colors (tuple): A pair of colors to alternate between for flickering effect.
             width (int): The width of the laser beam.
             should_grow (bool): If True, the laser will start thin and grow to the target width (used for beams).
+            is_piercing (bool): If True, the laser will pierce through enemies.
         """
         super().__init__()
         self.colors = colors
         self.color_index = 0
         self.hue = 0  # Start at red in the HSV spectrum
+
+        self.is_piercing = is_piercing
 
         # Beam Growth Logic
         self.target_width = width
@@ -105,7 +108,7 @@ class Laser(pygame.sprite.Sprite):
         # Rapidly grow width of beam until target is reached
         # Only grow if the flag is set and we haven't hit the target yet
         if self.should_grow and self.current_width < self.target_width:
-            self.current_width = min(self.target_width, self.current_width + LaserSettings.BEAM_GROWTH_SPEED)
+            self.current_width = min(self.target_width, self.current_width + LaserSettings.RAINBOW_BEAM_GROWTH_SPEED)
             # Re-create the surface and re-center the rect
             self.rebuild_surface()
 
@@ -159,14 +162,13 @@ class Player(pygame.sprite.Sprite):
         
         self.laser_time = 0
         self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
-        self.beam_active = False
-        self.beam_start_time = 0
 
-        self.twin_laser_active = False
-        self.twin_laser_start_time = 0
-
+        # Powerup States
+        self.laser_level = 1 # Tier 1 start
         self.rapid_fire_active = False
         self.rapid_fire_start_time = 0
+        self.rainbow_beam_active = False
+        self.rainbow_beam_start_time = 0
 
         self.lasers = pygame.sprite.Group()
 
@@ -182,9 +184,9 @@ class Player(pygame.sprite.Sprite):
         self.flash_timer = pygame.time.get_ticks()
 
         # Reset all powerups upon taking damage
-        self.twin_laser_active = False
+        self.laser_level = 1 # Reset to Tier 1
         self.rapid_fire_active = False
-        self.beam_active = False
+        self.rainbow_beam_active = False
         self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
     def animate_damage(self):
@@ -249,7 +251,7 @@ class Player(pygame.sprite.Sprite):
 
         # 3. MANUAL Shooting (Only for standard weapon)
         # Only check for manual input if NO auto-powerup is active
-        if not (self.rapid_fire_active or self.beam_active):
+        if not (self.rapid_fire_active or self.rainbow_beam_active):
             # Keyboard
             if keys[pygame.K_SPACE] and self.ready:
                 self.trigger_shot()
@@ -279,27 +281,43 @@ class Player(pygame.sprite.Sprite):
 
     def shoot_laser(self):
         """Spawns lasers based on current powerup state. Handles twin lasers, rapid fire, and beam logic."""
-        # 1. Determine the behavior and growth
-        is_beam = self.beam_active
-        width = LaserSettings.BEAM_WIDTH if is_beam else LaserSettings.DEFAULT_WIDTH
-        offset = 20 if is_beam else 12
+        is_rainbow_beam = self.rainbow_beam_active
+        is_hyper = (self.laser_level == 3) # Tier 3 check
+        
+        # 1. Determine the behavior and growth of the rainbow beam
+        width = LaserSettings.RAINBOW_BEAM_WIDTH if is_rainbow_beam else LaserSettings.DEFAULT_WIDTH
+        offset = 20 if is_rainbow_beam else 12
 
         # 2. Assign colors based on priority
-        if self.beam_active:
+        if self.rainbow_beam_active:
             colors = "rainbow"
         elif self.rapid_fire_active:
             colors = LaserSettings.COLORS['rapid']
-        elif self.twin_laser_active:
-            colors = LaserSettings.COLORS['twin']
+        elif is_hyper:
+            colors = LaserSettings.COLORS['hyper']
         else:
             colors = LaserSettings.COLORS['standard']
 
         # 3. Spawn the lasers
-        if self.twin_laser_active:
-            self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
-            self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
+        if self.laser_level >= 2:
+            # Left laser
+            self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), 
+                                LaserSettings.PLAYER_LASER_SPEED, colors, width, 
+                                should_grow=is_rainbow_beam, is_piercing=is_hyper))
+            # Right laser
+            self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), 
+                                LaserSettings.PLAYER_LASER_SPEED, colors, width, 
+                                should_grow=is_rainbow_beam, is_piercing=is_hyper))
         else:
-            self.lasers.add(Laser(self.rect.center, LaserSettings.PLAYER_LASER_SPEED, colors, width, should_grow=is_beam))
+            # Level 1: Single laser
+            self.lasers.add(Laser(self.rect.center, LaserSettings.PLAYER_LASER_SPEED, 
+                                colors, width, should_grow=is_rainbow_beam, is_piercing=is_hyper))
+            
+        
+        if self.laser_level == 3 or self.rainbow_beam_active:
+            self.audio.channel_10.play(self.audio.hyper_sound)
+        else:
+            self.audio.channel_3.play(self.audio.laser_sound)
 
     def activate_powerup(self, powerup):
         """
@@ -309,22 +327,23 @@ class Player(pygame.sprite.Sprite):
             powerup (PowerUp): The powerup object that was collected, which contains information about the type and any cooldown bonuses.
         """
         current_time = pygame.time.get_ticks()
-
-        if powerup.powerup_type == 'twin_laser':
-            self.twin_laser_active = True
-
+        
+        if powerup.powerup_type == 'laser_upgrade':
+            if self.laser_level < 3:
+                self.laser_level += 1
+                
         elif powerup.powerup_type == 'rapid_fire':
-            # Only activate rapid fire if the beam isn't already active
-            if not self.beam_active:
+            # Only activate rapid fire if the rainbow beam isn't already active
+            if not self.rainbow_beam_active:
                 self.rapid_fire_active = True
                 self.rapid_fire_start_time = current_time
                 self.laser_cooldown = powerup.cooldown_bonus
-
-        elif powerup.powerup_type == 'beam':
-            self.beam_active = True
-            self.beam_start_time = current_time
+            
+        elif powerup.powerup_type == 'rainbow_beam':
+            self.rainbow_beam_active = True
+            self.rainbow_beam_start_time = current_time
+            self.rapid_fire_active = False # Deactivate rapid fire if it was active, since beam takes priority
             self.laser_cooldown = powerup.cooldown_bonus
-            self.rapid_fire_active = False
 
     def check_powerup_timeout(self):
         """Checks if any time-limited powerups have expired and deactivates them. Called every frame in update()"""
@@ -335,9 +354,9 @@ class Player(pygame.sprite.Sprite):
                 self.rapid_fire_active = False
                 self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
-        if self.beam_active:
-            if current_time - self.beam_start_time >= PlayerSettings.BEAM_DURATION:
-                self.beam_active = False
+        if self.rainbow_beam_active:
+            if current_time - self.rainbow_beam_start_time >= PlayerSettings.RAINBOW_BEAM_DURATION:
+                self.rainbow_beam_active = False
                 self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
     def trigger_shot(self):
@@ -345,14 +364,13 @@ class Player(pygame.sprite.Sprite):
         self.shoot_laser()
         self.ready = False
         self.laser_time = pygame.time.get_ticks()
-        self.audio.channel_3.play(self.audio.laser_sound)
 
     def handle_auto_shooting(self):
         """
         Handles automatic shooting for powerups that require it (like rapid fire and beam).
         Called every frame in update().
         """
-        if (self.rapid_fire_active or self.beam_active) and self.ready:
+        if (self.rapid_fire_active or self.rainbow_beam_active) and self.ready:
             self.trigger_shot()
 
     def update_lasers(self):

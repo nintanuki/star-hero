@@ -123,14 +123,21 @@ class Style():
         status_color = 'magenta' if player.confused else 'white' # Red for danger, White for OKAY
         
         # Weapon
-        weapon_val = "TWIN" if player.twin_laser_active else "SINGLE"
-        weapon_color = 'green' if player.twin_laser_active else 'cyan'
+        if player.laser_level == 3:
+            weapon_val = "HYPER"
+            weapon_color = 'cyan'
+        elif player.laser_level == 2:
+            weapon_val = "TWIN"
+            weapon_color = 'green'
+        else:
+            weapon_val = "NORMAL"
+            weapon_color = 'white'
         
         # Upgrade
         upgrade_val = "NONE"
         upgrade_color = 'white'
-        if player.beam_active:
-            upgrade_val = "HYPERBEAM"
+        if player.rainbow_beam_active:
+            upgrade_val = "RAINBOW BEAM"
             # Create rainbow effect using HSV conversion
             hue = (pygame.time.get_ticks() // 4) % 360
             upgrade_color = pygame.Color(0)

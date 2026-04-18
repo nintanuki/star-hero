@@ -43,6 +43,10 @@ class Audio():
         self.laser_sound = pygame.mixer.Sound('audio/laser.wav')
         self.laser_sound.set_volume(self.master_volume / 2)
         self.channel_3 = pygame.mixer.Channel(3)
+
+        self.hyper_sound = pygame.mixer.Sound('audio/hyper.wav')
+        self.hyper_sound.set_volume(self.master_volume / 2)
+        self.channel_10 = pygame.mixer.Channel(10)
         
         self.explosion_sound = pygame.mixer.Sound('audio/explosion.wav')
         self.explosion_sound.set_volume(self.master_volume / 2)
@@ -106,6 +110,7 @@ class Audio():
         
         self.player_down.set_volume(self.master_volume / 2)
         self.laser_sound.set_volume(self.master_volume / 2)
+        self.hyper_sound.set_volume(self.master_volume / 2)
         self.explosion_sound.set_volume(self.master_volume / 2)
         self.low_health_alarm1.set_volume(self.master_volume / 2)
         self.low_health_alarm2.set_volume(self.master_volume / 2)

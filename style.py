@@ -114,6 +114,57 @@ class Style():
         level_rect = level_surf.get_rect(bottomleft=(10, ScreenSettings.HEIGHT - 10))
         self.screen.blit(level_surf, level_rect)
 
+    def display_player_status(self, player):
+        """Displays a status table with split colors and rainbow effects"""
+        
+        # --- 1. Determine Values and Colors ---
+        # Status
+        status_val = "CONFUSED" if player.confused else "OKAY"
+        status_color = 'magenta' if player.confused else 'white' # Red for danger, White for OKAY
+        
+        # Weapon
+        weapon_val = "TWIN" if player.twin_laser_active else "SINGLE"
+        weapon_color = 'green' if player.twin_laser_active else 'cyan'
+        
+        # Upgrade
+        upgrade_val = "NONE"
+        upgrade_color = 'white'
+        if player.beam_active:
+            upgrade_val = "HYPERBEAM"
+            # Create rainbow effect using HSV conversion
+            hue = (pygame.time.get_ticks() // 4) % 360
+            upgrade_color = pygame.Color(0)
+            upgrade_color.hsva = (hue, 100, 100, 100)
+        elif player.rapid_fire_active:
+            upgrade_val = "RAPID FIRE"
+            upgrade_color = 'yellow'
+
+        # --- 2. Define Rows ---
+        # Format: (Label, Value, Value Color)
+        rows = [
+            ("STATUS: ", status_val, status_color),
+            ("LASER: ", weapon_val, weapon_color),
+            ("POWER: ", upgrade_val, upgrade_color)
+        ]
+
+        # --- 3. Rendering ---
+        start_y = 40 
+        right_margin = 10
+
+        for i, (label, value, val_color) in enumerate(rows):
+            # Render the white label
+            label_surf = self.small_font.render(label, False, 'white')
+            # Render the colored value
+            val_surf = self.small_font.render(value, False, val_color)
+            
+            # Calculate positions to align the entire line to the right
+            total_width = label_surf.get_width() + val_surf.get_width()
+            x_pos = ScreenSettings.WIDTH - right_margin - total_width
+            y_pos = start_y + (i * 15) # 15 pixel vertical spacing
+            
+            self.screen.blit(label_surf, (x_pos, y_pos))
+            self.screen.blit(val_surf, (x_pos + label_surf.get_width(), y_pos))
+
     def update(self, game_state, save_data, score,
            entering_initials=False,
            initials="AAA",

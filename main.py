@@ -681,7 +681,8 @@ class GameManager:
                 self.alien_lasers.draw(self.screen)
                 self.powerups.draw(self.screen)
 
-                self.style.update('game_active',self.save_data,self.score)
+                self.style.update('game_active',self.save_data,self.score) # Display score and high score
+                self.style.display_player_status(self.player.sprite) # Display player status info under hearts
             else:
                 self.audio.channel_1.stop()
                 if self.play_intro_music:

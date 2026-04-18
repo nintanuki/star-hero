@@ -268,22 +268,58 @@ class GameManager:
     def reset_for_new_game(self):
         """Resets all necessary game state to start a new game"""
         self.score = 0
-        self.player.sprite.rect.center = ScreenSettings.CENTER
         self.hearts = PlayerSettings.MAX_HEALTH
-        self.alien_lasers.empty()
-        self.powerups.empty()
-        self.aliens.empty()
         self.player_alive = True
         self.game_active = True
 
+        # Reset player position
+        self.player.sprite.rect.center = ScreenSettings.CENTER
+        
+        # Clear all sprite groups from previous run
+        self.aliens.empty()
+        self.alien_lasers.empty()
+        self.powerups.empty()
+        self.exploding_sprites.empty()
+        self.player.sprite.lasers.empty()
+
+        # Reset player state
+        self.player.sprite.ready = True
+        self.player.sprite.laser_time = 0
+        self.player.sprite.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
+
+        self.player.sprite.beam_active = False
+        self.player.sprite.beam_start_time = 0
+        self.player.sprite.twin_laser_active = False
+        self.player.sprite.twin_laser_start_time = 0
+        self.player.sprite.rapid_fire_active = False
+        self.player.sprite.rapid_fire_start_time = 0
+
+        self.player.sprite.confused = False
+        self.player.sprite.confusion_timer = 0
+
+        self.player.sprite.is_flashing = False
+        self.player.sprite.flash_timer = 0
+        self.player.sprite.last_flash_time = 0
+        self.player.sprite.is_red = False
+        self.player.sprite.image = self.player.sprite.original_image.copy()
+
+        # Reset menu / score-entry state
         self.entering_initials = False
         self.initials = FontSettings.DEFAULT_INITIALS
         self.initials_index = 0
         self.pending_score = None
         self.score_processed = False
 
+        # Reset background speed
         for bg in self.background.sprites():
             bg.scroll_speed = ScreenSettings.DEFAULT_BG_SCROLL_SPEED
+
+        # Stop any lingering audio/effects from previous game
+        self.audio.channel_4.stop()  # low health alarms
+        self.audio.channel_9.stop()  # tractor beam if active
+
+        # Make sure death timer isn't still hanging around
+        pygame.time.set_timer(self.player_death_timer, 0)
 
     def spawn_aliens(self,alien_color):
         """

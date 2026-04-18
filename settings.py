@@ -24,7 +24,7 @@ class PlayerSettings:
     FLASH_DURATION = 1000 # Total time to flash in milliseconds
     FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
     JOYSTICK_DEADZONE = 0.2
-    CONFUSION_TIMEOUT = 5000 # how long the confusion effect lasts after being hit by a blue alien attack (in milliseconds)
+    CONFUSION_TIMEOUT = 4000 # how long the confusion effect lasts after being hit by a blue alien attack (in milliseconds)
 
 class AlienSettings:
     """
@@ -74,7 +74,7 @@ class AlienSettings:
     # Blue alien confusion attack settings
     CONFUSION_CHANCE = 0.1 # chance that a blue alien will trigger the confusion attack
     CONFUSION_STOP_Y = ScreenSettings.HEIGHT // 2 # Halfway down screen
-    CONFUSION_DURATION = 5000 # How long the alien stays to project it's confusion attack (in milliseconds)
+    CONFUSION_DURATION = 4000 # How long the alien stays to project it's confusion attack (in milliseconds)
 
 class LaserSettings:
     """Contains all the settings related to lasers fired by both the player and aliens, including dimensions, speeds, and colors for different laser types."""

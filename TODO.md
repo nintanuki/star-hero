@@ -10,6 +10,8 @@
 * Game briefly lags when music changes
 
 ### Ideas for Future Changes and Additions
+* Score bonus + message for destroying multiple enemies at once?
+* Add border to the left and right sides of the screen
 * Add special message for each level?
 * Make enemy sprites occasionaly do a spin or divebomb
 * Add random scrolling backgrounds (planet zone, nebula, etc)

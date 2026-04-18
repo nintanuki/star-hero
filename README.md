@@ -1,6 +1,6 @@
 # Star Hero <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/player_ship.png" height="32">
 
-This is a vertically scrolling space themed shmup (or Shoot'em up) that I am creating using the Pygame module in Python. This is the first game I ever made and the first program I've written of this size and scope. I am continuously changing and adding to this game as I learn more.
+This is a vertically scrolling space themed shmup (or Shoot'em up) that I am creating using the Pygame module in Python, to practice computer programming and game design. This is the first game I ever made and the first program I've written of this size and scope. I am continuously changing and adding to this game as I learn more.
 
 To play Star Hero you must have [Python](https://www.python.org/) and [Pygame](https://www.pygame.org/) installed.
 

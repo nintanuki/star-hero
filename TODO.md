@@ -1,4 +1,7 @@
 ### Issues That Need to be Fixed
+* Added a feature where BGM is randomize, and noticed lag when the music changes
+* Added a feature where player status appears on top right, now game freezes or lags on restart
+* ^ Do not add any more features until code is refactored and these issues are resolved
 * Player can hold button down for laser, disable this so they have to press the buttone very time
 * Logic for leaderboard scores and initials uses a lot of code and functions. Put into it's own class?
 * Player ship sprite can still move and shoot lasers briefly after death?

@@ -15,7 +15,6 @@
 * Make enemy sprites occasionaly do a spin or divebomb
 * Add random scrolling backgrounds (planet zone, nebula, etc)
 * Add "barrel roll" to repel lasers? AND/OR fast movement left and right?
-* Randomize different music tracks
 * Add drop shadow to sprites?
 * Player should not be able to hold down the shoot button
 * Add "bombs" that can be shot with a different button and have AOE damage

@@ -1,6 +1,4 @@
 ### Issues That Need to be Fixed
-* Added a feature where BGM is randomize, and noticed lag when the music changes
-* Added a feature where player status appears on top right, now game freezes or lags on restart
 * ^ Do not add any more features until code is refactored and these issues are resolved
 * Player can hold button down for laser, disable this so they have to press the buttone very time
 * Logic for leaderboard scores and initials uses a lot of code and functions. Put into it's own class?
@@ -12,7 +10,7 @@
 * Game briefly lags when music changes
 
 ### Ideas for Future Changes and Additions
-* Add special text for each level
+* Add special message for each level?
 * Make enemy sprites occasionaly do a spin or divebomb
 * Add random scrolling backgrounds (planet zone, nebula, etc)
 * Add "barrel roll" to repel lasers? AND/OR fast movement left and right?

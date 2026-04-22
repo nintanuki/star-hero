@@ -314,7 +314,9 @@ class GameManager:
 
         self.player.sprite.boost_meter = 1.0
         self.player.sprite.boost_active = False
+        self.player.sprite.brake_active = False
         self.player.sprite.boost_locked_until_full = False
+        self.player.sprite.world_speed_multiplier = 1.0
 
         self.player.sprite.confused = False
         self.player.sprite.confusion_timer = 0
@@ -680,7 +682,12 @@ class GameManager:
 
             # Drawing
             self.screen.fill(ScreenSettings.BG_COLOR)
-            self.background.update(delta_time)
+
+            world_speed_multiplier = 1.0
+            if self.game_active and self.player.sprite:
+                world_speed_multiplier = self.player.sprite.get_world_speed_multiplier()
+
+            self.background.update(delta_time, world_speed_multiplier)
             self.background.draw(self.screen)
             if self.show_volume:
                 self.style.display_volume()
@@ -692,9 +699,10 @@ class GameManager:
                 if not self.audio.channel_1.get_busy():
                     self.audio.load_random_bgm()
                     self.audio.channel_1.play(self.audio.bg_music)
+                self.player.sprite.world_speed_multiplier = world_speed_multiplier
                 self.player.update()
-                self.alien_lasers.update()
-                self.aliens.update()
+                self.alien_lasers.update(world_speed_multiplier)
+                self.aliens.update(world_speed_multiplier)
                 self.powerups.update()
                 self.collisions.update()
                 self.display_hearts()

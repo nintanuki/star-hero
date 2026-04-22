@@ -16,6 +16,7 @@ class PlayerSettings:
     MAX_HEALTH = 3
     SPEED = 2
     SPEED_BOOST = 2
+    BRAKE_WORLD_SPEED_MULT = 0.45
     BOOST_DRAIN_PER_SECOND = 0.35 # meter drained per second while boost is held
     BOOST_RECHARGE_PER_SECOND = 0.25 # meter recharged per second when not boosting
     SCALE = 0.15

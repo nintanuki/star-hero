@@ -36,12 +36,14 @@ class Laser(pygame.sprite.Sprite):
             self.image.fill(self.colors[self.color_index])
 
         self.rect = self.image.get_rect(center = pos)
+        self.pos_y = float(self.rect.y)
         self.speed = speed
         self.should_grow = should_grow
 
-    def move(self):
+    def move(self, speed_multiplier=1.0):
         """Moves the laser vertically based on its speed. Called every frame in update()."""
-        self.rect.y += self.speed
+        self.pos_y += self.speed * speed_multiplier
+        self.rect.y = round(self.pos_y)
 
     def rebuild_surface(self):
         """
@@ -51,6 +53,7 @@ class Laser(pygame.sprite.Sprite):
         old_center = self.rect.center
         self.image = pygame.Surface((self.current_width, LaserSettings.HEIGHT))
         self.rect = self.image.get_rect(center = old_center)
+        self.pos_y = float(self.rect.y)
 
     def animate_rainbow(self):
         """
@@ -117,13 +120,13 @@ class Laser(pygame.sprite.Sprite):
         if self.rect.bottom < 0 or self.rect.top > ScreenSettings.HEIGHT:
             self.kill()
 
-    def update(self):
+    def update(self, speed_multiplier=1.0):
         """
         Handles laser movement, growth (for beams),
         color flickering, and self-destruction when off-screen.
         Called every frame.
         """
-        self.move()
+        self.move(speed_multiplier)
         self.update_size()
         self.update_color()
         self.destroy_if_offscreen()
@@ -183,25 +186,34 @@ class Player(pygame.sprite.Sprite):
         # Boost meter state
         self.boost_meter = 1.0
         self.boost_active = False
+        self.brake_active = False
         self.boost_locked_until_full = False
+        self.world_speed_multiplier = 1.0
 
-    def update_boost_state(self, boost_pressed):
-        """Handles boost drain while held and recharge while inactive."""
+    def update_meter_state(self, boost_pressed, brake_pressed):
+        """Handles shared boost/brake meter drain while held and recharge while inactive."""
         dt = 1 / ScreenSettings.FPS
 
-        # While depleted, prevent boosting again until the meter fully refills.
+        # While depleted, prevent using boost or brake until the meter fully refills.
         if self.boost_locked_until_full:
             self.boost_active = False
+            self.brake_active = False
         elif boost_pressed and self.boost_meter > 0:
             self.boost_active = True
+            self.brake_active = False
+        elif brake_pressed and self.boost_meter > 0:
+            self.boost_active = False
+            self.brake_active = True
         else:
             self.boost_active = False
+            self.brake_active = False
 
-        if self.boost_active:
+        if self.boost_active or self.brake_active:
             self.boost_meter -= PlayerSettings.BOOST_DRAIN_PER_SECOND * dt
             if self.boost_meter <= 0:
                 self.boost_meter = 0
                 self.boost_active = False
+                self.brake_active = False
                 self.boost_locked_until_full = True
         else:
             self.boost_meter += PlayerSettings.BOOST_RECHARGE_PER_SECOND * dt
@@ -212,12 +224,21 @@ class Player(pygame.sprite.Sprite):
     def get_boost_meter(self):
         """Returns a normalized meter value and state for the boost UI."""
         if self.boost_active:
-            return self.boost_meter, 'active'
+            return self.boost_meter, 'boost'
+
+        if self.brake_active:
+            return self.boost_meter, 'brake'
 
         if self.boost_locked_until_full:
             return self.boost_meter, 'cooldown'
 
         return self.boost_meter, 'ready'
+
+    def get_world_speed_multiplier(self):
+        """Returns current world speed multiplier used to scale non-player movement."""
+        if self.brake_active:
+            return PlayerSettings.BRAKE_WORLD_SPEED_MULT
+        return 1.0
 
     def trigger_damage_effect(self):
         """Called when the player takes damage"""
@@ -281,13 +302,18 @@ class Player(pygame.sprite.Sprite):
         
         # Check all connected joysticks for the X button (Button 2)
         controller_boost = False
+        controller_brake = False
         for i in range(pygame.joystick.get_count()):
             joy = pygame.joystick.Joystick(i)
             if joy.get_button(2): # 2 is usually 'X' on Logitech/Xbox layouts
                 controller_boost = True
+            if joy.get_button(3): # 3 is usually 'Y' on Logitech/Xbox layouts
+                controller_brake = True
 
         boost_pressed = keys[pygame.K_f] or controller_boost
-        self.update_boost_state(boost_pressed)
+        brake_pressed = keys[pygame.K_g] or controller_brake
+        self.update_meter_state(boost_pressed, brake_pressed)
+        self.world_speed_multiplier = self.get_world_speed_multiplier()
 
         if self.boost_active:
             current_speed *= PlayerSettings.SPEED_BOOST
@@ -451,7 +477,7 @@ class Player(pygame.sprite.Sprite):
 
     def update_lasers(self):
         """Updates all lasers fired by the player. Called every frame in update()"""
-        self.lasers.update()
+        self.lasers.update(self.world_speed_multiplier)
     
     def update(self):
         """Handles player input for movement and shooting,
@@ -518,6 +544,7 @@ class Alien(pygame.sprite.Sprite):
         # Position setup
         x_pos  = random.randint(20,self.screen_width - 20)
         self.rect = self.image.get_rect(center = (x_pos,random.randint(*AlienSettings.SPAWN_OFFSET)))
+        self.position = pygame.math.Vector2(self.rect.topleft)
 
         # Movement logic
         # Yellow aliens zigzag
@@ -538,7 +565,14 @@ class Alien(pygame.sprite.Sprite):
 
         self.confusion_growth = 0  # Starts at 0, will increase to ScreenSettings.HEIGHT
 
-    def calculate_movement(self):
+    def apply_movement(self, delta_x, delta_y):
+        """Applies sub-pixel movement while keeping rect in sync for collisions."""
+        self.position.x += delta_x
+        self.position.y += delta_y
+        self.rect.x = round(self.position.x)
+        self.rect.y = round(self.position.y)
+
+    def calculate_movement(self, speed_multiplier=1.0):
         """
         Calculates the movement of the alien based on its color and behavior patterns.
         Called every frame in update()
@@ -557,20 +591,20 @@ class Alien(pygame.sprite.Sprite):
             return # Stop moving while confusing the player
         
         # numbers round down if decimals are used? .05 doesn't move and 1 is the same as 1.5, etc
-        if self.color == 'red': self.rect.y += AlienSettings.SPEED['red']
-        elif self.color == 'green': self.rect.y += AlienSettings.SPEED['green']
+        if self.color == 'red':
+            self.apply_movement(0, AlienSettings.SPEED['red'] * speed_multiplier)
+        elif self.color == 'green':
+            self.apply_movement(0, AlienSettings.SPEED['green'] * speed_multiplier)
         elif self.color == 'yellow':
-            self.rect.y += AlienSettings.SPEED['yellow']
+            self.apply_movement(self.yellow_zigzag_direction * 2 * speed_multiplier, AlienSettings.SPEED['yellow'] * speed_multiplier)
             self.yellow_zigzag_counter += 1
             if self.yellow_zigzag_counter >= AlienSettings.ZIGZAG_THRESHOLD:
                 self.yellow_zigzag_counter = 0
                 self.yellow_zigzag_direction *= -1
-            self.rect.x += self.yellow_zigzag_direction * 2
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.yellow_zigzag_direction *= -1
         else: # color is blue
-            self.rect.y += AlienSettings.SPEED['blue']
-            self.rect.x += self.blue_zigzag_direction * 2
+            self.apply_movement(self.blue_zigzag_direction * 2 * speed_multiplier, AlienSettings.SPEED['blue'] * speed_multiplier)
             if self.rect.left < 0 or self.rect.right > self.screen_width:
                 self.blue_zigzag_direction *= -1
 
@@ -587,9 +621,9 @@ class Alien(pygame.sprite.Sprite):
         if self.rect.y >= self.screen_height + 50: # added 50 to give the score time to decrease
             self.kill()
 
-    def update(self):
+    def update(self, speed_multiplier=1.0):
         """Handles movement, animation, and self-destruction when off-screen. Called every frame."""
-        self.calculate_movement()
+        self.calculate_movement(speed_multiplier)
         self.animate()
         self.destroy()
 

@@ -162,10 +162,18 @@ class Style():
             ("POWER: ", [(upgrade_val, upgrade_color)])
         ]
 
-        # --- 3. Rendering ---
-        start_y = 40 
+        # --- 3. Layout Anchors ---
         right_margin = 10
         row_spacing = 15
+
+        # Meter sits directly below the hearts row in the top-right HUD.
+        meter_width = 100
+        meter_height = 8
+        meter_x = ScreenSettings.WIDTH - right_margin - meter_width
+        meter_y = UISettings.HEART_TOP_MARGIN + UISettings.HEART_SPRITE_SIZE[1] + 9
+
+        # Push text rows below the meter so there is clear separation.
+        start_y = meter_y + meter_height + 10
 
         for i, (label, value_segments) in enumerate(rows):
             # Render the white label
@@ -184,26 +192,18 @@ class Style():
                 self.screen.blit(surf, (value_x, y_pos))
                 value_x += surf.get_width()
 
-        # --- 4. Boost Meter ---
+        # --- 4. Boost/Brake Meter ---
         ratio, boost_state = player.get_boost_meter()
 
-        meter_label = self.small_font.render('BOOST', False, 'white')
-        meter_width = 100
-        meter_height = 8
-        meter_x = ScreenSettings.WIDTH - right_margin - meter_width
-        meter_label_x = meter_x + (meter_width - meter_label.get_width()) // 2
-        last_row_y = start_y + ((len(rows) - 1) * row_spacing)
-        boost_label_y = last_row_y + self.small_font.get_height() + 10
-        meter_y = boost_label_y + self.small_font.get_height() + 4
-
-        if boost_state == 'active':
+        if boost_state == 'boost':
             fill_color = 'deepskyblue'
+        elif boost_state == 'brake':
+            fill_color = 'gold'
         elif boost_state == 'cooldown':
             fill_color = 'orange'
         else:
             fill_color = 'limegreen'
 
-        self.screen.blit(meter_label, (meter_label_x, boost_label_y))
         pygame.draw.rect(self.screen, (60, 60, 60), (meter_x, meter_y, meter_width, meter_height), border_radius=3)
         pygame.draw.rect(
             self.screen,

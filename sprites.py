@@ -180,6 +180,45 @@ class Player(pygame.sprite.Sprite):
         self.confused = False
         self.confusion_timer = 0
 
+        # Boost meter state
+        self.boost_meter = 1.0
+        self.boost_active = False
+        self.boost_locked_until_full = False
+
+    def update_boost_state(self, boost_pressed):
+        """Handles boost drain while held and recharge while inactive."""
+        dt = 1 / ScreenSettings.FPS
+
+        # While depleted, prevent boosting again until the meter fully refills.
+        if self.boost_locked_until_full:
+            self.boost_active = False
+        elif boost_pressed and self.boost_meter > 0:
+            self.boost_active = True
+        else:
+            self.boost_active = False
+
+        if self.boost_active:
+            self.boost_meter -= PlayerSettings.BOOST_DRAIN_PER_SECOND * dt
+            if self.boost_meter <= 0:
+                self.boost_meter = 0
+                self.boost_active = False
+                self.boost_locked_until_full = True
+        else:
+            self.boost_meter += PlayerSettings.BOOST_RECHARGE_PER_SECOND * dt
+            if self.boost_meter >= 1:
+                self.boost_meter = 1
+                self.boost_locked_until_full = False
+
+    def get_boost_meter(self):
+        """Returns a normalized meter value and state for the boost UI."""
+        if self.boost_active:
+            return self.boost_meter, 'active'
+
+        if self.boost_locked_until_full:
+            return self.boost_meter, 'cooldown'
+
+        return self.boost_meter, 'ready'
+
     def trigger_damage_effect(self):
         """Called when the player takes damage"""
         self.is_flashing = True
@@ -233,7 +272,7 @@ class Player(pygame.sprite.Sprite):
 
     def get_input(self):
         """Handles player input for movement and shooting. Called every frame in update()"""
-        # 1. Determine current speed (check Keyboard 'F' or Controller 'X')
+        # 1. Determine current speed from timed boost state
         keys = pygame.key.get_pressed()
         current_speed = PlayerSettings.SPEED
 
@@ -247,7 +286,10 @@ class Player(pygame.sprite.Sprite):
             if joy.get_button(2): # 2 is usually 'X' on Logitech/Xbox layouts
                 controller_boost = True
 
-        if keys[pygame.K_f] or controller_boost:
+        boost_pressed = keys[pygame.K_f] or controller_boost
+        self.update_boost_state(boost_pressed)
+
+        if self.boost_active:
             current_speed *= PlayerSettings.SPEED_BOOST
 
         # Player Movement Input

@@ -312,6 +312,10 @@ class GameManager:
         self.player.sprite.rapid_fire_active = False
         self.player.sprite.rapid_fire_start_time = 0
 
+        self.player.sprite.boost_meter = 1.0
+        self.player.sprite.boost_active = False
+        self.player.sprite.boost_locked_until_full = False
+
         self.player.sprite.confused = False
         self.player.sprite.confusion_timer = 0
 

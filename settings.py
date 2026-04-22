@@ -16,6 +16,8 @@ class PlayerSettings:
     MAX_HEALTH = 3
     SPEED = 2
     SPEED_BOOST = 2
+    BOOST_DRAIN_PER_SECOND = 0.35 # meter drained per second while boost is held
+    BOOST_RECHARGE_PER_SECOND = 0.25 # meter recharged per second when not boosting
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
     RAPID_FIRE_TIER_1_COOLDOWN = DEFAULT_LASER_COOLDOWN / 2

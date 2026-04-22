@@ -165,6 +165,7 @@ class Style():
         # --- 3. Rendering ---
         start_y = 40 
         right_margin = 10
+        row_spacing = 15
 
         for i, (label, value_segments) in enumerate(rows):
             # Render the white label
@@ -175,13 +176,42 @@ class Style():
             value_width = sum(surf.get_width() for surf in value_surfaces)
             total_width = label_surf.get_width() + value_width
             x_pos = ScreenSettings.WIDTH - right_margin - total_width
-            y_pos = start_y + (i * 15) # 15 pixel vertical spacing
+            y_pos = start_y + (i * row_spacing)
             
             self.screen.blit(label_surf, (x_pos, y_pos))
             value_x = x_pos + label_surf.get_width()
             for surf in value_surfaces:
                 self.screen.blit(surf, (value_x, y_pos))
                 value_x += surf.get_width()
+
+        # --- 4. Boost Meter ---
+        ratio, boost_state = player.get_boost_meter()
+
+        meter_label = self.small_font.render('BOOST', False, 'white')
+        meter_width = 100
+        meter_height = 8
+        meter_x = ScreenSettings.WIDTH - right_margin - meter_width
+        meter_label_x = meter_x + (meter_width - meter_label.get_width()) // 2
+        last_row_y = start_y + ((len(rows) - 1) * row_spacing)
+        boost_label_y = last_row_y + self.small_font.get_height() + 10
+        meter_y = boost_label_y + self.small_font.get_height() + 4
+
+        if boost_state == 'active':
+            fill_color = 'deepskyblue'
+        elif boost_state == 'cooldown':
+            fill_color = 'orange'
+        else:
+            fill_color = 'limegreen'
+
+        self.screen.blit(meter_label, (meter_label_x, boost_label_y))
+        pygame.draw.rect(self.screen, (60, 60, 60), (meter_x, meter_y, meter_width, meter_height), border_radius=3)
+        pygame.draw.rect(
+            self.screen,
+            fill_color,
+            (meter_x, meter_y, int(meter_width * ratio), meter_height),
+            border_radius=3
+        )
+        pygame.draw.rect(self.screen, 'white', (meter_x, meter_y, meter_width, meter_height), 1, border_radius=3)
 
     def update(self, game_state, save_data, score,
            entering_initials=False,

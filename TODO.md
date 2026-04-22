@@ -9,7 +9,8 @@
 * Volume bar overlaps with level display
 
 ### Ideas for Future Changes and Additions
-* Add easy mode: losing a powerup does not lose a heart + enemies are half score
+* Add sound effects for all new powerups and effects
+* Add floating scores
 * Score bonus + message for destroying multiple enemies at once?
 * Add border to the left and right sides of the screen
 * Add special message for each level?

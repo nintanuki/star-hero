@@ -18,7 +18,7 @@ class PlayerSettings:
     SPEED_BOOST = 2
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
-    RAPID_FIRE_TIER_1_COOLDOWN = DEFAULT_LASER_COOLDOWN // 2
+    RAPID_FIRE_TIER_1_COOLDOWN = DEFAULT_LASER_COOLDOWN / 2
     RAPID_FIRE_TIER_2_COOLDOWN = 150
     RAPID_FIRE_DURATION = 5000 # 5000 milliseconds = 5 seconds
     RAINBOW_BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)

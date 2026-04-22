@@ -35,42 +35,44 @@ class CollisionManager:
                     self.game.explode(alien.rect.centerx, alien.rect.centery) # Trigger explosion animation at alien's position
 
                     # Check if a powerup should drop
-                    if random.random() < AlienSettings.DROP_CHANCE[alien.color]:
-
-                        # If it's a red alien (heart), only spawn if player is hurt
-                        if alien.color == 'red':
-                            if self.game.hearts < PlayerSettings.MAX_HEALTH: # Only drop if player isn't at full health
-                                self.game.spawn_powerup(alien.rect.center, alien.color)
-                        elif alien.color == 'green':
+                    if alien.color == 'red':
+                        # Shield doesn't drop while already active.
+                        if not self.game.player.sprite.shield_active and random.random() < AlienSettings.RED_SHIELD_DROP_CHANCE:
+                            self.game.spawn_powerup(alien.rect.center, 'red_shield')
+                        # Heart drops are still more common, and only useful when hurt.
+                        elif self.game.hearts < PlayerSettings.MAX_HEALTH and random.random() < AlienSettings.DROP_CHANCE['red']:
+                            self.game.spawn_powerup(alien.rect.center, 'red')
+                    elif random.random() < AlienSettings.DROP_CHANCE[alien.color]:
+                        if alien.color == 'green':
                             # Stop dropping if player is already at Hyper (Level 3)
                             if self.game.player.sprite.laser_level < 3:
                                 self.game.spawn_powerup(alien.rect.center, alien.color)
+                        elif alien.color == 'yellow':
+                            # Stop dropping if player is already at Auto (Level 3)
+                            if self.game.player.sprite.rapid_fire_level < 3:
+                                self.game.spawn_powerup(alien.rect.center, alien.color)
                         else:
+                            # Blue/rainbow can still drop even if rainbow is currently active.
                             self.game.spawn_powerup(alien.rect.center, alien.color)
 
     def _alien_lasers(self):
         """Checks for collisions between alien lasers and the player"""
-        # Prevent damage if the player is currently flashing or has the beam powerup (invincible)
-        if self.game.player.sprite.is_flashing or self.game.player.sprite.beam_active: return
-
-        # Cause damage when alien laser hits player
+        player = self.game.player.sprite
         for laser in self.game.alien_lasers:
             if pygame.sprite.spritecollide(laser, self.game.player, False):
-                laser.kill() # Remove the laser on hit
-                self.game.player_damage()
+                laser.kill() # Lasers always stop on player contact.
+                if not player.is_invulnerable():
+                    self.game.player_damage()
 
     def _ship_collisions(self):
         """Checks for collisions between the player's ship and aliens"""
-        # Prevent damage if the player is currently flashing or has the beam powerup (invincible)
-        if self.game.player.sprite.is_flashing or self.game.player.sprite.beam_active: return
-
         # Damage player if their ship collides with an alien
         aliens_crash = pygame.sprite.spritecollide(self.game.player.sprite, self.game.aliens, True)
         for alien in aliens_crash:
             self.game.score += alien.value
             if self.game.hearts > 1:
                 self.game.explode(alien.rect.centerx, alien.rect.centery)
-        if aliens_crash:
+        if aliens_crash and not self.game.player.sprite.is_invulnerable():
             self.game.player_damage()
 
     def _powerups(self):
@@ -85,7 +87,7 @@ class CollisionManager:
                 if powerup.powerup_type == 'laser_upgrade':
                     if self.game.player.sprite.laser_level < 3:
                         self.game.audio.channel_8.play(self.game.audio.powerup_twin)
-                elif powerup.powerup_type in ['rapid_fire', 'rainbow_beam']:
+                elif powerup.powerup_type in ['rapid_fire', 'rainbow_beam', 'shield']:
                     self.game.audio.channel_8.play(self.game.audio.powerup_weapon)
                 
                 self.game.player.sprite.activate_powerup(powerup)
@@ -304,13 +306,12 @@ class GameManager:
         self.player.sprite.laser_time = 0
         self.player.sprite.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
-        self.player.sprite.beam_active = False
-        self.player.sprite.beam_start_time = 0
-        self.player.sprite.twin_laser_active = False
-        self.player.sprite.twin_laser_start_time = 0
+        self.player.sprite.laser_level = 1
         self.player.sprite.rapid_fire_level = 0
-        self.player.sprite.rapid_fire_active = False
-        self.player.sprite.rapid_fire_start_time = 0
+        self.player.sprite.rainbow_beam_active = False
+        self.player.sprite.rainbow_beam_start_time = 0
+        self.player.sprite.shield_active = False
+        self.player.sprite.shield_start_time = 0
 
         self.player.sprite.boost_meter = 1.0
         self.player.sprite.boost_active = False
@@ -450,6 +451,9 @@ class GameManager:
         If the player has any active upgrade or powerup, that is stripped instead of losing a heart.
         """
         player = self.player.sprite
+        if player and player.shield_active:
+            return
+
         has_upgrade = player and (
             player.laser_level > 1 or
             player.rapid_fire_level > 0 or
@@ -710,6 +714,7 @@ class GameManager:
                 self.player.sprite.lasers.draw(self.screen)
                 if self.player_alive:
                     self.player.draw(self.screen)
+                    self.player.sprite.draw_shield_orb(self.screen)
                 self.exploding_sprites.draw(self.screen)
 
                 self.exploding_sprites.update(ExplosionSettings.ANIMATION_SPEED)
@@ -743,6 +748,7 @@ class GameManager:
                         offset = (self.player.sprite.rect.x, self.player.sprite.rect.y)
                         
                         if beam_mask.overlap(self.player.sprite.mask, offset):
+                            self.player.sprite.shield_active = False
                             if not self.player.sprite.confused:
                                 self.player.sprite.confused = True
                                 self.player.sprite.confusion_timer = pygame.time.get_ticks()

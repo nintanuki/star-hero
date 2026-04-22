@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 from settings import *
 
 class Laser(pygame.sprite.Sprite):
@@ -169,11 +170,11 @@ class Player(pygame.sprite.Sprite):
 
         # Powerup States
         self.laser_level = 1 # Tier 1 start
-        self.rapid_fire_level = 0 # 0 = none, 1 = cooldown boost, 2 = timed rapid fire
-        self.rapid_fire_active = False
-        self.rapid_fire_start_time = 0
+        self.rapid_fire_level = 0 # 0 = normal, 1 = rapid, 2 = turbo, 3 = auto
         self.rainbow_beam_active = False
         self.rainbow_beam_start_time = 0
+        self.shield_active = False
+        self.shield_start_time = 0
 
         self.lasers = pygame.sprite.Group()
 
@@ -248,22 +249,28 @@ class Player(pygame.sprite.Sprite):
         # Reset all powerups upon taking damage
         self.laser_level = 1 # Reset to Tier 1
         self.rapid_fire_level = 0
-        self.rapid_fire_active = False
         self.rainbow_beam_active = False
+        self.shield_active = False
         self.update_laser_cooldown()
 
     def update_laser_cooldown(self):
         """Sets the active cooldown from the current powerup state."""
-        self.rapid_fire_level = max(0, min(2, self.rapid_fire_level))
+        self.rapid_fire_level = max(0, min(3, self.rapid_fire_level))
 
         if self.rainbow_beam_active:
             self.laser_cooldown = 0
+        elif self.rapid_fire_level == 3:
+            self.laser_cooldown = PlayerSettings.RAPID_FIRE_TIER_2_COOLDOWN
         elif self.rapid_fire_level == 2:
             self.laser_cooldown = PlayerSettings.RAPID_FIRE_TIER_2_COOLDOWN
         elif self.rapid_fire_level == 1:
             self.laser_cooldown = PlayerSettings.RAPID_FIRE_TIER_1_COOLDOWN
         else:
             self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
+
+    def is_invulnerable(self):
+        """Returns True while any invulnerability source is active."""
+        return self.is_flashing or self.rainbow_beam_active or self.shield_active
 
     def animate_damage(self):
         """Toggles the ship color between original and red tint"""
@@ -345,8 +352,15 @@ class Player(pygame.sprite.Sprite):
 
         shoot_pressed = keyboard_shoot_pressed or controller_shoot_pressed
 
-        # Only check for manual input if NO auto-powerup is active
-        if not (self.rapid_fire_active or self.rainbow_beam_active):
+        if self.rainbow_beam_active:
+            self.shoot_button_held = shoot_pressed
+            return
+
+        # Auto mode allows holding fire, but does not fire on its own.
+        if self.rapid_fire_level == 3:
+            if shoot_pressed and self.ready:
+                self.trigger_shot()
+        else:
             if shoot_pressed and not self.shoot_button_held and self.ready:
                 self.trigger_shot()
 
@@ -390,8 +404,10 @@ class Player(pygame.sprite.Sprite):
             colors = LaserSettings.COLORS['rapid']
         elif is_hyper:
             colors = LaserSettings.COLORS['hyper']
+        elif self.laser_level >= 2:
+            colors = LaserSettings.COLORS['twin']
         else:
-            colors = LaserSettings.COLORS['standard']
+            colors = LaserSettings.COLORS['single']
 
         # 3. Spawn the lasers
         if self.laser_level >= 2:
@@ -422,7 +438,7 @@ class Player(pygame.sprite.Sprite):
             powerup (PowerUp): The powerup object that was collected, which contains information about the type and any cooldown bonuses.
         """
         current_time = pygame.time.get_ticks()
-        
+
         if powerup.powerup_type == 'laser_upgrade':
             if self.laser_level < 3:
                 self.laser_level += 1
@@ -430,36 +446,31 @@ class Player(pygame.sprite.Sprite):
         elif powerup.powerup_type == 'rapid_fire':
             # Only activate rapid fire if the rainbow beam isn't already active
             if not self.rainbow_beam_active:
-                if self.rapid_fire_level == 0:
-                    self.rapid_fire_level = 1
-                else:
-                    self.rapid_fire_level = 2
-                    self.rapid_fire_active = True
-                    self.rapid_fire_start_time = current_time
+                if self.rapid_fire_level < 3:
+                    self.rapid_fire_level += 1
                 self.update_laser_cooldown()
+
+        elif powerup.powerup_type == 'shield':
+            self.shield_active = True
+            self.shield_start_time = current_time
             
         elif powerup.powerup_type == 'rainbow_beam':
             self.rainbow_beam_active = True
             self.rainbow_beam_start_time = current_time
-            self.rapid_fire_active = False # Deactivate rapid fire if it was active, since beam takes priority
-            if self.rapid_fire_level == 2:
-                self.rapid_fire_level = 1
             self.update_laser_cooldown()
 
     def check_powerup_timeout(self):
         """Checks if any time-limited powerups have expired and deactivates them. Called every frame in update()"""
         current_time = pygame.time.get_ticks()
 
-        if self.rapid_fire_active:
-            if current_time - self.rapid_fire_start_time >= PlayerSettings.RAPID_FIRE_DURATION:
-                self.rapid_fire_active = False
-                self.rapid_fire_level = 1
-                self.update_laser_cooldown()
-
         if self.rainbow_beam_active:
             if current_time - self.rainbow_beam_start_time >= PlayerSettings.RAINBOW_BEAM_DURATION:
                 self.rainbow_beam_active = False
                 self.update_laser_cooldown()
+
+        if self.shield_active:
+            if current_time - self.shield_start_time >= PlayerSettings.SHIELD_DURATION:
+                self.shield_active = False
 
     def trigger_shot(self):
         """Helper to handle the act of shooting"""
@@ -472,8 +483,27 @@ class Player(pygame.sprite.Sprite):
         Handles automatic shooting for powerups that require it (like rapid fire and beam).
         Called every frame in update().
         """
-        if (self.rapid_fire_active or self.rainbow_beam_active) and self.ready:
+        if self.rainbow_beam_active and self.ready:
             self.trigger_shot()
+
+    def draw_shield_orb(self, screen):
+        """Draws a flashing cyan orb around the ship while shield is active."""
+        if not self.shield_active:
+            return
+
+        pulse = (pygame.time.get_ticks() // 100) % 2
+        alpha = 150 if pulse == 0 else 70
+        radius = max(self.rect.width, self.rect.height) // 2 + 12
+
+        orb_size = radius * 2 + 6
+        orb = pygame.Surface((orb_size, orb_size), pygame.SRCALPHA)
+        center = (orb_size // 2, orb_size // 2)
+
+        pygame.draw.circle(orb, (80, 255, 255, alpha), center, radius, 3)
+        pygame.draw.circle(orb, (120, 255, 255, alpha // 2), center, radius - 4, 2)
+
+        orb_rect = orb.get_rect(center=self.rect.center)
+        screen.blit(orb, orb_rect)
 
     def update_lasers(self):
         """Updates all lasers fired by the player. Called every frame in update()"""
@@ -672,7 +702,12 @@ class PowerUp(pygame.sprite.Sprite):
 
         current_time = pygame.time.get_ticks()
 
-        if current_time - self.flash_timer >= self.flash_speed:
+        if self.powerup_type == 'rainbow_beam':
+            hue = (current_time // PowerupSettings.RAINBOW_STAR_HUE_DIVISOR) % 360
+            rainbow_color = pygame.Color(0)
+            rainbow_color.hsva = (hue, 100, 100, 100)
+            self.current_color = rainbow_color
+        elif current_time - self.flash_timer >= self.flash_speed:
             self.flash_timer = current_time
 
             # toggle between the orb's color and white
@@ -681,12 +716,25 @@ class PowerUp(pygame.sprite.Sprite):
             else:
                 self.current_color = self.draw_color
 
-        # redraw circle every frame
+        # Clear and redraw the shape every frame.
         self.image.fill((0, 0, 0, 0))
 
-        # For diamonds, we have to redraw the polygon every frame to update the color.
-        # For circles, we can just fill the surface with the new color.
-        if self.shape == 'diamond':
+        if self.shape == 'star':
+            center = (PowerupSettings.RADIUS, PowerupSettings.RADIUS)
+            outer_radius = PowerupSettings.RADIUS
+            inner_radius = max(4, int(outer_radius * 0.45))
+            points = []
+
+            # Build a 5-point star with alternating outer/inner vertices.
+            for i in range(10):
+                angle = math.radians((i * 36) - 90)
+                radius = outer_radius if i % 2 == 0 else inner_radius
+                x = center[0] + int(math.cos(angle) * radius)
+                y = center[1] + int(math.sin(angle) * radius)
+                points.append((x, y))
+
+            pygame.draw.polygon(self.image, self.current_color, points)
+        elif self.shape == 'diamond':
             points = [
                 (PowerupSettings.RADIUS, 0),                    # top
                 (PowerupSettings.RADIUS * 2, PowerupSettings.RADIUS),      # right

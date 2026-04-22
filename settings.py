@@ -23,7 +23,7 @@ class PlayerSettings:
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
     RAPID_FIRE_TIER_1_COOLDOWN = DEFAULT_LASER_COOLDOWN / 2
     RAPID_FIRE_TIER_2_COOLDOWN = 150
-    RAPID_FIRE_DURATION = 5000 # 5000 milliseconds = 5 seconds
+    SHIELD_DURATION = 7000 # how long the shield lasts in milliseconds
     RAINBOW_BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
     DEATH_DELAY = 500
     FLASH_DURATION = 1000 # Total time to flash in milliseconds
@@ -75,6 +75,7 @@ class AlienSettings:
         'yellow': 0.15,
         'blue':   0.10,
         }
+    RED_SHIELD_DROP_CHANCE = 0.05
     
     # Blue alien confusion attack settings
     CONFUSION_CHANCE = 0.1 # chance that a blue alien will trigger the confusion attack
@@ -88,10 +89,11 @@ class LaserSettings:
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4
     COLORS = {
-        'standard': ('green', 'lightgreen'), # Single and Twin
-        'hyper': ('dodgerblue', 'deepskyblue'), # Hyper
-        'rapid': ('yellow', 'gold'), # Rapid (any tier)
-        'hyper_rapid': ('dodgerblue', 'yellow'), # Hyper + Rapid alternation
+        'single': ('green', 'white'),
+        'twin': ('green', 'white'),
+        'hyper': ('cyan', 'white'), # Hyper
+        'rapid': ('yellow', 'white'), # Rapid (any tier)
+        'hyper_rapid': ('cyan', 'yellow'), # Hyper + Rapid alternation
         'alien': ('red', 'white'),
         'rainbow': None 
     }
@@ -117,9 +119,10 @@ class PowerupSettings:
 
     DATA = {
     'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},
+    'red_shield': {'draw_color': (80, 255, 255), 'type': 'shield', 'shape': 'circle'},
     'green':  {'draw_color': (60, 255, 100), 'type': 'laser_upgrade', 'shape': 'diamond'},
-    'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': PlayerSettings.RAPID_FIRE_TIER_2_COOLDOWN},
-    'blue':   {'draw_color': (80, 160, 255), 'type': 'rainbow_beam',       'shape': 'circle', 'cooldown': 0},
+    'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'diamond'},
+    'blue':   {'draw_color': (80, 160, 255), 'type': 'rainbow_beam', 'shape': 'diamond'},
     }
 
 class ExplosionSettings:
@@ -171,18 +174,20 @@ class AudioSettings:
     INTRO_VOL_BOOST = 2.0
     DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
     DEBUG_MUTE = False # set True to silence all audio for debugging
+    MUSIC_DIR = 'music/'
     AUDIO_DIR = 'audio/'
     BGM_PLAYLIST = [
-        # 'star_fox_64_katina.mp3',
+        'star_fox_64_katina.mp3',
         # 'star_fox_64_meteo.mp3',
         # 'star_fox_64_sector_x.mp3',
         # 'star_fox_64_solar_and_sector_y.mp3',
         # 'star_fox_64_titania_and_macbeth.mp3',
         # 'star_fox_snes_corneria.mp3',
         # 'star_fox_snes_meteor.mp3',
+        'Area 6 - Star Fox 64 Restored OST.mp3',
         'star_fox_snes_space_armada.mp3',
         # 'star_fox_snes_venom_asteroid_venom_orbital.mp3',
-        # 'star_hero.mp3'
+        'star_hero.mp3'
     ]
 
 class AssetPaths:

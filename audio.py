@@ -20,9 +20,9 @@ class Audio():
         self.muted = AudioSettings.DEBUG_MUTE
 
         """Music"""
-        self.intro_music = pygame.mixer.Sound('audio/star_hero_intro.ogg')
+        self.intro_music = pygame.mixer.Sound('music/star_hero_intro.ogg')
         # self.intro_music.set_volume(self.master_volume * 2) # Low volume for some reason
-        self.intro_music = pygame.mixer.Sound('audio/star_fox_snes_controls_and_map_select.mp3')
+        self.intro_music = pygame.mixer.Sound('music/star_fox_snes_controls_and_map_select.mp3')
         self.intro_music.set_volume(self._half_effective_volume())
         self.channel_0 = pygame.mixer.Channel(0)
         self.play_intro_music = True # Set to False after user begins, only plays once
@@ -33,7 +33,7 @@ class Audio():
         # --- PRELOAD ALL BGM TRACKS ---
         self.bgm_tracks = []
         for filename in AudioSettings.BGM_PLAYLIST:
-            sound = pygame.mixer.Sound(f"{AudioSettings.AUDIO_DIR}{filename}")
+            sound = pygame.mixer.Sound(f"{AudioSettings.MUSIC_DIR}{filename}")
             sound.set_volume(self._half_effective_volume())
             self.bgm_tracks.append(sound)
 
@@ -42,7 +42,7 @@ class Audio():
 
         # Not tied to a channel?
         # self.player_down = pygame.mixer.Sound('audio/game_over.ogg')
-        self.player_down = pygame.mixer.Sound('audio/star_fox_snes_player_down.mp3')
+        self.player_down = pygame.mixer.Sound('music/star_fox_snes_player_down.mp3')
         self.player_down.set_volume(self._effective_volume())
 
         """

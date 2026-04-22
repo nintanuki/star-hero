@@ -119,47 +119,58 @@ class Style():
         
         # --- 1. Determine Values and Colors ---
         # Status
-        status_val = "CONFUSED" if player.confused else "OKAY"
-        status_color = 'magenta' if player.confused else 'white' # Red for danger, White for OKAY
+        if player.confused:
+            status_val = "CONFUSION"
+            status_color = 'magenta'
+        elif player.shield_active:
+            status_val = "SHIELD"
+            status_color = 'cyan'
+        else:
+            status_val = "OKAY"
+            status_color = 'white'
         
-        # Weapon
+        # Laser
         if player.laser_level == 3:
-            base_weapon_val = "HYPER"
-            base_weapon_color = 'dodgerblue'
+            laser_val = "HYPER"
+            laser_color = 'cyan'
         elif player.laser_level == 2:
-            base_weapon_val = "TWIN"
-            base_weapon_color = 'green'
+            laser_val = "TWIN"
+            laser_color = 'green'
         else:
-            base_weapon_val = "SINGLE"
-            base_weapon_color = 'green'
+            laser_val = "SINGLE"
+            laser_color = 'white'
 
-        if player.rapid_fire_level > 0:
-            if player.laser_level >= 2:
-                weapon_segments = [("RAPID ", 'yellow'), (base_weapon_val, base_weapon_color)]
-            else:
-                weapon_segments = [("RAPID", 'yellow')]
+        # Mode (yellow upgrades)
+        if player.rapid_fire_level == 3:
+            mode_val = "AUTO"
+            mode_color = 'yellow'
+        elif player.rapid_fire_level == 2:
+            mode_val = "TURBO"
+            mode_color = 'yellow'
+        elif player.rapid_fire_level == 1:
+            mode_val = "RAPID"
+            mode_color = 'yellow'
         else:
-            weapon_segments = [(base_weapon_val, base_weapon_color)]
+            mode_val = "NORMAL"
+            mode_color = 'white'
         
-        # Upgrade
-        upgrade_val = "NONE"
-        upgrade_color = 'white'
+        # Power
+        power_val = "NONE"
+        power_color = 'white'
         if player.rainbow_beam_active:
-            upgrade_val = "RAINBOW BEAM"
+            power_val = "RAINBOW BEAM"
             # Create rainbow effect using HSV conversion
             hue = (pygame.time.get_ticks() // 4) % 360
-            upgrade_color = pygame.Color(0)
-            upgrade_color.hsva = (hue, 100, 100, 100)
-        elif player.rapid_fire_active:
-            upgrade_val = "GATLING"
-            upgrade_color = 'yellow'
+            power_color = pygame.Color(0)
+            power_color.hsva = (hue, 100, 100, 100)
 
         # --- 2. Define Rows ---
         # Format: (Label, Value, Value Color)
         rows = [
             ("STATUS: ", [(status_val, status_color)]),
-            ("LASER: ", weapon_segments),
-            ("POWER: ", [(upgrade_val, upgrade_color)])
+            ("LASER: ", [(laser_val, laser_color)]),
+            ("MODE: ", [(mode_val, mode_color)]),
+            ("POWER: ", [(power_val, power_color)])
         ]
 
         # --- 3. Layout Anchors ---

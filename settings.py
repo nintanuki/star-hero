@@ -76,6 +76,8 @@ class AlienSettings:
         'blue':   0.10,
         }
     RED_SHIELD_DROP_CHANCE = 0.05
+    BOMB_DROP_BASE = 0.01
+    BOMB_DROP_BONUS = 0.05
     
     # Blue alien confusion attack settings
     CONFUSION_CHANCE = 0.1 # chance that a blue alien will trigger the confusion attack
@@ -116,6 +118,7 @@ class PowerupSettings:
     RADIUS = 12
     SPEED = 2 # how fast the powerup floats down?
     FLASH_SPEED = 200 # 200 milliseconds .2 seconds?
+    RAINBOW_STAR_HUE_DIVISOR = 4 # lower = faster rainbow cycling
 
     DATA = {
     'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},
@@ -123,7 +126,20 @@ class PowerupSettings:
     'green':  {'draw_color': (60, 255, 100), 'type': 'laser_upgrade', 'shape': 'diamond'},
     'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'diamond'},
     'blue':   {'draw_color': (80, 160, 255), 'type': 'rainbow_beam', 'shape': 'diamond'},
+    'bomb':   {'draw_color': (255, 40, 40),  'type': 'bomb',        'shape': 'circle'},
     }
+
+class BombSettings:
+    """Contains tuning values for bomb inventory, drops, projectile behavior, and blast visuals."""
+    START_COUNT = 3
+    PROJECTILE_RADIUS = 10
+    PROJECTILE_SPEED = -4
+    FLASH_SPEED = 220
+
+    BLAST_START_RADIUS = 10
+    BLAST_MAX_RADIUS = 120
+    BLAST_GROWTH = 5
+    BLAST_ALPHA = 110
 
 class ExplosionSettings:
     """

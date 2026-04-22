@@ -132,6 +132,77 @@ class Laser(pygame.sprite.Sprite):
         self.update_color()
         self.destroy_if_offscreen()
 
+class BombProjectile(pygame.sprite.Sprite):
+    """Represents a launched bomb that travels upward and can be detonated."""
+    def __init__(self, pos):
+        super().__init__()
+        size = BombSettings.PROJECTILE_RADIUS * 2
+        self.image = pygame.Surface((size, size), pygame.SRCALPHA)
+        self.rect = self.image.get_rect(center=pos)
+        self.pos_y = float(self.rect.y)
+        self.speed = BombSettings.PROJECTILE_SPEED
+        self.flash_timer = 0
+        self.current_color = (255, 40, 40)
+        self.base_color = (255, 40, 40)
+        self.flash_color = (255, 180, 180)
+        self._redraw()
+
+    def _redraw(self):
+        self.image.fill((0, 0, 0, 0))
+        center = (BombSettings.PROJECTILE_RADIUS, BombSettings.PROJECTILE_RADIUS)
+        pygame.draw.circle(self.image, self.current_color, center, BombSettings.PROJECTILE_RADIUS)
+        pygame.draw.circle(self.image, (255, 255, 255), center, BombSettings.PROJECTILE_RADIUS, 1)
+
+    def move(self, speed_multiplier=1.0):
+        self.pos_y += self.speed * speed_multiplier
+        self.rect.y = round(self.pos_y)
+
+    def animate(self):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.flash_timer >= BombSettings.FLASH_SPEED:
+            self.flash_timer = current_time
+            if self.current_color == self.base_color:
+                self.current_color = self.flash_color
+            else:
+                self.current_color = self.base_color
+            self._redraw()
+
+    def destroy_if_offscreen(self):
+        if self.rect.bottom < 0:
+            self.kill()
+
+    def update(self, speed_multiplier=1.0):
+        self.move(speed_multiplier)
+        self.animate()
+        self.destroy_if_offscreen()
+
+class BombBlast(pygame.sprite.Sprite):
+    """Represents the expanding area-of-effect ring created by a bomb detonation."""
+    def __init__(self, center):
+        super().__init__()
+        self.center = center
+        self.radius = BombSettings.BLAST_START_RADIUS
+        self.max_radius = BombSettings.BLAST_MAX_RADIUS
+        self.hit_aliens = set()
+        self.image = pygame.Surface((1, 1), pygame.SRCALPHA)
+        self.rect = self.image.get_rect(center=center)
+        self._redraw()
+
+    def _redraw(self):
+        diameter = max(2, self.radius * 2)
+        self.image = pygame.Surface((diameter, diameter), pygame.SRCALPHA)
+        center = (diameter // 2, diameter // 2)
+        pygame.draw.circle(self.image, (255, 235, 80, BombSettings.BLAST_ALPHA), center, self.radius)
+        pygame.draw.circle(self.image, (255, 255, 190, 220), center, self.radius, 3)
+        self.rect = self.image.get_rect(center=self.center)
+
+    def update(self):
+        self.radius += BombSettings.BLAST_GROWTH
+        if self.radius >= self.max_radius:
+            self.kill()
+            return
+        self._redraw()
+
 class Player(pygame.sprite.Sprite):
     """
     Represents the player's ship. Handles movement, shooting, powerup effects,
@@ -175,6 +246,8 @@ class Player(pygame.sprite.Sprite):
         self.rainbow_beam_start_time = 0
         self.shield_active = False
         self.shield_start_time = 0
+        self.bombs = BombSettings.START_COUNT
+        self.bomb_projectiles = pygame.sprite.Group()
 
         self.lasers = pygame.sprite.Group()
 
@@ -190,6 +263,27 @@ class Player(pygame.sprite.Sprite):
         self.brake_active = False
         self.boost_locked_until_full = False
         self.world_speed_multiplier = 1.0
+
+    def launch_bomb(self):
+        """Launches a bomb if available and none is currently in flight."""
+        if self.bombs <= 0:
+            return False
+        if self.bomb_projectiles:
+            return False
+
+        self.bomb_projectiles.add(BombProjectile(self.rect.midtop))
+        self.bombs -= 1
+        return True
+
+    def detonate_air_bomb(self):
+        """Detonates the in-flight bomb and returns its center, if one exists."""
+        if not self.bomb_projectiles:
+            return None
+
+        bomb = self.bomb_projectiles.sprites()[0]
+        detonation_center = bomb.rect.center
+        bomb.kill()
+        return detonation_center
 
     def update_meter_state(self, boost_pressed, brake_pressed):
         """Handles shared boost/brake meter drain while held and recharge while inactive."""
@@ -458,6 +552,8 @@ class Player(pygame.sprite.Sprite):
             self.rainbow_beam_active = True
             self.rainbow_beam_start_time = current_time
             self.update_laser_cooldown()
+        elif powerup.powerup_type == 'bomb':
+            self.bombs += 1
 
     def check_powerup_timeout(self):
         """Checks if any time-limited powerups have expired and deactivates them. Called every frame in update()"""
@@ -508,6 +604,10 @@ class Player(pygame.sprite.Sprite):
     def update_lasers(self):
         """Updates all lasers fired by the player. Called every frame in update()"""
         self.lasers.update(self.world_speed_multiplier)
+
+    def update_bombs(self):
+        """Updates any active in-flight bomb."""
+        self.bomb_projectiles.update(self.world_speed_multiplier)
     
     def update(self):
         """Handles player input for movement and shooting,
@@ -521,6 +621,7 @@ class Player(pygame.sprite.Sprite):
         self.check_powerup_timeout()
         self.animate_damage()
         self.update_lasers()
+        self.update_bombs()
 
         if self.confused:
             if pygame.time.get_ticks() - self.confusion_timer >= PlayerSettings.CONFUSION_TIMEOUT:

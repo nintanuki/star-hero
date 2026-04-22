@@ -3,7 +3,7 @@ import sys, random, time
 import json
 from settings import *
 from animations import Background, Explosion, CRT
-from sprites import Laser, Player, Alien, PowerUp
+from sprites import Laser, Player, Alien, PowerUp, BombBlast
 from style import Style
 from audio import Audio
 import debug
@@ -30,30 +30,37 @@ class CollisionManager:
                     laser.kill()
 
                 for alien in aliens_hit:
-                    self.game.score += alien.value # Add points for each alien hit
-                    self.game.adjust_difficulty() # Adjust difficulty based on new score
-                    self.game.explode(alien.rect.centerx, alien.rect.centery) # Trigger explosion animation at alien's position
+                    self.game.handle_alien_destroyed(alien)
 
-                    # Check if a powerup should drop
-                    if alien.color == 'red':
-                        # Shield doesn't drop while already active.
-                        if not self.game.player.sprite.shield_active and random.random() < AlienSettings.RED_SHIELD_DROP_CHANCE:
-                            self.game.spawn_powerup(alien.rect.center, 'red_shield')
-                        # Heart drops are still more common, and only useful when hurt.
-                        elif self.game.hearts < PlayerSettings.MAX_HEALTH and random.random() < AlienSettings.DROP_CHANCE['red']:
-                            self.game.spawn_powerup(alien.rect.center, 'red')
-                    elif random.random() < AlienSettings.DROP_CHANCE[alien.color]:
-                        if alien.color == 'green':
-                            # Stop dropping if player is already at Hyper (Level 3)
-                            if self.game.player.sprite.laser_level < 3:
-                                self.game.spawn_powerup(alien.rect.center, alien.color)
-                        elif alien.color == 'yellow':
-                            # Stop dropping if player is already at Auto (Level 3)
-                            if self.game.player.sprite.rapid_fire_level < 3:
-                                self.game.spawn_powerup(alien.rect.center, alien.color)
-                        else:
-                            # Blue/rainbow can still drop even if rainbow is currently active.
-                            self.game.spawn_powerup(alien.rect.center, alien.color)
+    def _player_bombs(self):
+        """Checks collisions for active bomb projectiles and starts bomb blasts on impact."""
+        player = self.game.player.sprite
+        for bomb in player.bomb_projectiles.sprites():
+            aliens_hit = pygame.sprite.spritecollide(bomb, self.game.aliens, True)
+            if not aliens_hit:
+                continue
+
+            for alien in aliens_hit:
+                self.game.handle_alien_destroyed(alien)
+
+            blast_center = bomb.rect.center
+            bomb.kill()
+            self.game.trigger_bomb_blast(blast_center)
+
+    def _bomb_blasts(self):
+        """Applies bomb blast damage to aliens in the expanding area."""
+        for blast in self.game.bomb_blasts:
+            nearby_aliens = pygame.sprite.spritecollide(blast, self.game.aliens, False)
+            for alien in nearby_aliens:
+                if id(alien) in blast.hit_aliens:
+                    continue
+
+                dx = alien.rect.centerx - blast.center[0]
+                dy = alien.rect.centery - blast.center[1]
+                if (dx * dx) + (dy * dy) <= (blast.radius * blast.radius):
+                    blast.hit_aliens.add(id(alien))
+                    alien.kill()
+                    self.game.handle_alien_destroyed(alien)
 
     def _alien_lasers(self):
         """Checks for collisions between alien lasers and the player"""
@@ -87,7 +94,7 @@ class CollisionManager:
                 if powerup.powerup_type == 'laser_upgrade':
                     if self.game.player.sprite.laser_level < 3:
                         self.game.audio.channel_8.play(self.game.audio.powerup_twin)
-                elif powerup.powerup_type in ['rapid_fire', 'rainbow_beam', 'shield']:
+                elif powerup.powerup_type in ['rapid_fire', 'rainbow_beam', 'shield', 'bomb']:
                     self.game.audio.channel_8.play(self.game.audio.powerup_weapon)
                 
                 self.game.player.sprite.activate_powerup(powerup)
@@ -95,6 +102,8 @@ class CollisionManager:
     def update(self):
         """Checks all collisions"""
         self._player_lasers()
+        self._player_bombs()
+        self._bomb_blasts()
         self._alien_lasers()
         self._ship_collisions()
         self._powerups()
@@ -148,6 +157,7 @@ class GameManager:
         # Player setup
         player_sprite = Player((ScreenSettings.CENTER),self.audio)
         self.player = pygame.sprite.GroupSingle(player_sprite)
+        self.player.sprite.bombs = BombSettings.START_COUNT
         self.player_alive = True
 
         # Score setup
@@ -190,6 +200,7 @@ class GameManager:
 
         # Explosion setup
         self.exploding_sprites = pygame.sprite.Group()
+        self.bomb_blasts = pygame.sprite.Group()
 
         # Audio setup
         self.play_intro_music = True # Set to False after user begins, only plays once
@@ -299,7 +310,9 @@ class GameManager:
         self.alien_lasers.empty()
         self.powerups.empty()
         self.exploding_sprites.empty()
+        self.bomb_blasts.empty()
         self.player.sprite.lasers.empty()
+        self.player.sprite.bomb_projectiles.empty()
 
         # Reset player state
         self.player.sprite.ready = True
@@ -312,6 +325,7 @@ class GameManager:
         self.player.sprite.rainbow_beam_start_time = 0
         self.player.sprite.shield_active = False
         self.player.sprite.shield_start_time = 0
+        self.player.sprite.bombs = BombSettings.START_COUNT
 
         self.player.sprite.boost_meter = 1.0
         self.player.sprite.boost_active = False
@@ -366,6 +380,70 @@ class GameManager:
             color (str): The color of the powerup to spawn, which determines its type and effect
         """
         self.powerups.add(PowerUp(pos, color))
+
+    def get_bomb_drop_chance(self, alien_value):
+        """Returns a rare bomb-drop chance weighted by alien point value."""
+        all_values = AlienSettings.POINTS.values()
+        min_value = min(all_values)
+        max_value = max(all_values)
+
+        if max_value == min_value:
+            return AlienSettings.BOMB_DROP_BASE
+
+        value_ratio = (alien_value - min_value) / (max_value - min_value)
+        return AlienSettings.BOMB_DROP_BASE + (AlienSettings.BOMB_DROP_BONUS * value_ratio)
+
+    def try_spawn_alien_drop(self, alien):
+        """Handles standard drops and rare bomb drops for a defeated alien."""
+        spawned_standard_drop = False
+
+        if alien.color == 'red':
+            # Shield doesn't drop while already active.
+            if not self.player.sprite.shield_active and random.random() < AlienSettings.RED_SHIELD_DROP_CHANCE:
+                self.spawn_powerup(alien.rect.center, 'red_shield')
+                spawned_standard_drop = True
+            # Heart drops are still more common, and only useful when hurt.
+            elif self.hearts < PlayerSettings.MAX_HEALTH and random.random() < AlienSettings.DROP_CHANCE['red']:
+                self.spawn_powerup(alien.rect.center, 'red')
+                spawned_standard_drop = True
+        else:
+            can_drop_color_powerup = True
+
+            if alien.color == 'green':
+                # Stop dropping if player is already at Hyper (Level 3)
+                can_drop_color_powerup = self.player.sprite.laser_level < 3
+            elif alien.color == 'yellow':
+                # Stop dropping if player is already at Auto (Level 3)
+                can_drop_color_powerup = self.player.sprite.rapid_fire_level < 3
+
+            if can_drop_color_powerup and random.random() < AlienSettings.DROP_CHANCE[alien.color]:
+                # Blue/rainbow can still drop even if rainbow is currently active.
+                self.spawn_powerup(alien.rect.center, alien.color)
+                spawned_standard_drop = True
+
+        # Rare bomb drop only when a standard drop did not spawn.
+        if not spawned_standard_drop and random.random() < self.get_bomb_drop_chance(alien.value):
+            self.spawn_powerup(alien.rect.center, 'bomb')
+
+    def handle_alien_destroyed(self, alien):
+        """Awards score, triggers explosion, and evaluates drops after an alien is destroyed."""
+        self.score += alien.value
+        self.adjust_difficulty()
+        self.explode(alien.rect.centerx, alien.rect.centery)
+        self.try_spawn_alien_drop(alien)
+
+    def trigger_bomb_blast(self, center):
+        """Spawns an expanding bomb blast orb at the given center position."""
+        self.bomb_blasts.add(BombBlast(center))
+
+    def handle_bomb_input(self):
+        """Launches a bomb on first press or detonates the active bomb on second press."""
+        detonation_center = self.player.sprite.detonate_air_bomb()
+        if detonation_center:
+            self.trigger_bomb_blast(detonation_center)
+            return
+
+        self.player.sprite.launch_bomb()
 
     def alien_shoot(self):
         """Spawns a new alien laser from a random alien"""
@@ -588,6 +666,10 @@ class GameManager:
                     if event.button == 5:
                         self.adjust_master_volume(0.1, show_overlay=True)
 
+                    # B Button (Launch bomb / detonate active bomb)
+                    if event.button == 1 and self.game_active:
+                        self.handle_bomb_input()
+
                 # Keyboard input
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_F11:
@@ -599,6 +681,8 @@ class GameManager:
                         self.pause()
                     if event.key == pygame.K_m:
                         self.toggle_debug_mute()
+                    if event.key == pygame.K_b and self.game_active:
+                        self.handle_bomb_input()
                     if event.key == pygame.K_KP_PLUS or event.key == pygame.K_EQUALS:
                         self.adjust_master_volume(0.1, show_overlay=True)
                     elif event.key == pygame.K_KP_MINUS or event.key == pygame.K_MINUS:
@@ -708,10 +792,12 @@ class GameManager:
                 self.alien_lasers.update(world_speed_multiplier)
                 self.aliens.update(world_speed_multiplier)
                 self.powerups.update()
+                self.bomb_blasts.update()
                 self.collisions.update()
                 self.display_hearts()
 
                 self.player.sprite.lasers.draw(self.screen)
+                self.player.sprite.bomb_projectiles.draw(self.screen)
                 if self.player_alive:
                     self.player.draw(self.screen)
                     self.player.sprite.draw_shield_orb(self.screen)
@@ -765,6 +851,7 @@ class GameManager:
                 self.aliens.draw(self.screen)
                 self.alien_lasers.draw(self.screen)
                 self.powerups.draw(self.screen)
+                self.bomb_blasts.draw(self.screen)
 
                 self.style.update('game_active',self.save_data,self.score) # Display score and high score
                 self.style.display_player_status(self.player.sprite) # Display player status info under hearts

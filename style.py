@@ -203,6 +203,10 @@ class Style():
                 self.screen.blit(surf, (value_x, y_pos))
                 value_x += surf.get_width()
 
+        bombs_surf = self.small_font.render(f'BOMBS = {player.bombs}', False, 'white')
+        bombs_rect = bombs_surf.get_rect(topright=(ScreenSettings.WIDTH - right_margin, start_y + (len(rows) * row_spacing) + 6))
+        self.screen.blit(bombs_surf, bombs_rect)
+
         # --- 4. Boost/Brake Meter ---
         ratio, boost_state = player.get_boost_meter()
 

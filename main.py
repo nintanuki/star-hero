@@ -440,13 +440,26 @@ class GameManager:
     def player_damage(self):
         """
         Handles logic for when the player takes damage,
-        including reducing hearts, triggering flash effect, playing alarms, and handling death
+        including reducing hearts, triggering flash effect, playing alarms, and handling death.
+        If the player has any active upgrade or powerup, that is stripped instead of losing a heart.
         """
+        player = self.player.sprite
+        has_upgrade = player and (
+            player.laser_level > 1 or
+            player.rapid_fire_level > 0 or
+            player.rainbow_beam_active
+        )
+
+        if has_upgrade:
+            # Strip upgrades/powerups but don't deduct a heart
+            player.trigger_damage_effect()
+            return
+
         self.hearts -= 1
         
         # Trigger the visual flash effect
-        if self.player.sprite:
-            self.player.sprite.trigger_damage_effect()
+        if player:
+            player.trigger_damage_effect()
 
         # Handle alarms
         if self.hearts == 2:

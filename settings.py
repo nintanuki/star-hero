@@ -85,9 +85,10 @@ class LaserSettings:
     PLAYER_LASER_SPEED = -8
     ALIEN_LASER_SPEED = 4
     COLORS = {
-        'standard': ('green', 'white'), # Tier 1 & 2
-        'hyper': ('cyan', 'white'),    # Tier 3
-        'rapid': ('yellow', 'white'),
+        'standard': ('green', 'lightgreen'), # Single and Twin
+        'hyper': ('dodgerblue', 'deepskyblue'), # Hyper
+        'rapid': ('yellow', 'gold'), # Rapid (any tier)
+        'hyper_rapid': ('dodgerblue', 'yellow'), # Hyper + Rapid alternation
         'alien': ('red', 'white'),
         'rainbow': None 
     }

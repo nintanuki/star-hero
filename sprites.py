@@ -306,6 +306,7 @@ class Player(pygame.sprite.Sprite):
         """Spawns lasers based on current powerup state. Handles twin lasers, rapid fire, and beam logic."""
         is_rainbow_beam = self.rainbow_beam_active
         is_hyper = (self.laser_level == 3) # Tier 3 check
+        has_rapid = self.rapid_fire_level > 0
         
         # 1. Determine the behavior and growth of the rainbow beam
         width = LaserSettings.RAINBOW_BEAM_WIDTH if is_rainbow_beam else LaserSettings.DEFAULT_WIDTH
@@ -314,7 +315,10 @@ class Player(pygame.sprite.Sprite):
         # 2. Assign colors based on priority
         if self.rainbow_beam_active:
             colors = "rainbow"
-        elif self.rapid_fire_active:
+        elif has_rapid and is_hyper:
+            # Hyper + Rapid alternates blue and yellow.
+            colors = LaserSettings.COLORS['hyper_rapid']
+        elif has_rapid:
             colors = LaserSettings.COLORS['rapid']
         elif is_hyper:
             colors = LaserSettings.COLORS['hyper']

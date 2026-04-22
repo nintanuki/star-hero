@@ -124,14 +124,22 @@ class Style():
         
         # Weapon
         if player.laser_level == 3:
-            weapon_val = "HYPER"
-            weapon_color = 'cyan'
+            base_weapon_val = "HYPER"
+            base_weapon_color = 'dodgerblue'
         elif player.laser_level == 2:
-            weapon_val = "TWIN"
-            weapon_color = 'green'
+            base_weapon_val = "TWIN"
+            base_weapon_color = 'green'
         else:
-            weapon_val = "NORMAL"
-            weapon_color = 'white'
+            base_weapon_val = "SINGLE"
+            base_weapon_color = 'green'
+
+        if player.rapid_fire_level > 0:
+            if player.laser_level >= 2:
+                weapon_segments = [("RAPID ", 'yellow'), (base_weapon_val, base_weapon_color)]
+            else:
+                weapon_segments = [("RAPID", 'yellow')]
+        else:
+            weapon_segments = [(base_weapon_val, base_weapon_color)]
         
         # Upgrade
         upgrade_val = "NONE"
@@ -143,34 +151,37 @@ class Style():
             upgrade_color = pygame.Color(0)
             upgrade_color.hsva = (hue, 100, 100, 100)
         elif player.rapid_fire_active:
-            upgrade_val = "RAPID FIRE"
+            upgrade_val = "GATLING"
             upgrade_color = 'yellow'
 
         # --- 2. Define Rows ---
         # Format: (Label, Value, Value Color)
         rows = [
-            ("STATUS: ", status_val, status_color),
-            ("LASER: ", weapon_val, weapon_color),
-            ("POWER: ", upgrade_val, upgrade_color)
+            ("STATUS: ", [(status_val, status_color)]),
+            ("LASER: ", weapon_segments),
+            ("POWER: ", [(upgrade_val, upgrade_color)])
         ]
 
         # --- 3. Rendering ---
         start_y = 40 
         right_margin = 10
 
-        for i, (label, value, val_color) in enumerate(rows):
+        for i, (label, value_segments) in enumerate(rows):
             # Render the white label
             label_surf = self.small_font.render(label, False, 'white')
-            # Render the colored value
-            val_surf = self.small_font.render(value, False, val_color)
+            value_surfaces = [self.small_font.render(text, False, color) for text, color in value_segments]
             
             # Calculate positions to align the entire line to the right
-            total_width = label_surf.get_width() + val_surf.get_width()
+            value_width = sum(surf.get_width() for surf in value_surfaces)
+            total_width = label_surf.get_width() + value_width
             x_pos = ScreenSettings.WIDTH - right_margin - total_width
             y_pos = start_y + (i * 15) # 15 pixel vertical spacing
             
             self.screen.blit(label_surf, (x_pos, y_pos))
-            self.screen.blit(val_surf, (x_pos + label_surf.get_width(), y_pos))
+            value_x = x_pos + label_surf.get_width()
+            for surf in value_surfaces:
+                self.screen.blit(surf, (value_x, y_pos))
+                value_x += surf.get_width()
 
     def update(self, game_state, save_data, score,
            entering_initials=False,

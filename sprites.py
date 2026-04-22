@@ -166,6 +166,7 @@ class Player(pygame.sprite.Sprite):
 
         # Powerup States
         self.laser_level = 1 # Tier 1 start
+        self.rapid_fire_level = 0 # 0 = none, 1 = cooldown boost, 2 = timed rapid fire
         self.rapid_fire_active = False
         self.rapid_fire_start_time = 0
         self.rainbow_beam_active = False
@@ -186,9 +187,23 @@ class Player(pygame.sprite.Sprite):
 
         # Reset all powerups upon taking damage
         self.laser_level = 1 # Reset to Tier 1
+        self.rapid_fire_level = 0
         self.rapid_fire_active = False
         self.rainbow_beam_active = False
-        self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
+        self.update_laser_cooldown()
+
+    def update_laser_cooldown(self):
+        """Sets the active cooldown from the current powerup state."""
+        self.rapid_fire_level = max(0, min(2, self.rapid_fire_level))
+
+        if self.rainbow_beam_active:
+            self.laser_cooldown = 0
+        elif self.rapid_fire_level == 2:
+            self.laser_cooldown = PlayerSettings.RAPID_FIRE_TIER_2_COOLDOWN
+        elif self.rapid_fire_level == 1:
+            self.laser_cooldown = PlayerSettings.RAPID_FIRE_TIER_1_COOLDOWN
+        else:
+            self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
     def animate_damage(self):
         """Toggles the ship color between original and red tint"""
@@ -343,15 +358,21 @@ class Player(pygame.sprite.Sprite):
         elif powerup.powerup_type == 'rapid_fire':
             # Only activate rapid fire if the rainbow beam isn't already active
             if not self.rainbow_beam_active:
-                self.rapid_fire_active = True
-                self.rapid_fire_start_time = current_time
-                self.laser_cooldown = powerup.cooldown_bonus
+                if self.rapid_fire_level == 0:
+                    self.rapid_fire_level = 1
+                else:
+                    self.rapid_fire_level = 2
+                    self.rapid_fire_active = True
+                    self.rapid_fire_start_time = current_time
+                self.update_laser_cooldown()
             
         elif powerup.powerup_type == 'rainbow_beam':
             self.rainbow_beam_active = True
             self.rainbow_beam_start_time = current_time
             self.rapid_fire_active = False # Deactivate rapid fire if it was active, since beam takes priority
-            self.laser_cooldown = powerup.cooldown_bonus
+            if self.rapid_fire_level == 2:
+                self.rapid_fire_level = 1
+            self.update_laser_cooldown()
 
     def check_powerup_timeout(self):
         """Checks if any time-limited powerups have expired and deactivates them. Called every frame in update()"""
@@ -360,12 +381,13 @@ class Player(pygame.sprite.Sprite):
         if self.rapid_fire_active:
             if current_time - self.rapid_fire_start_time >= PlayerSettings.RAPID_FIRE_DURATION:
                 self.rapid_fire_active = False
-                self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
+                self.rapid_fire_level = 1
+                self.update_laser_cooldown()
 
         if self.rainbow_beam_active:
             if current_time - self.rainbow_beam_start_time >= PlayerSettings.RAINBOW_BEAM_DURATION:
                 self.rainbow_beam_active = False
-                self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
+                self.update_laser_cooldown()
 
     def trigger_shot(self):
         """Helper to handle the act of shooting"""

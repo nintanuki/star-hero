@@ -18,7 +18,9 @@ class PlayerSettings:
     SPEED_BOOST = 2
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
-    RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
+    RAPID_FIRE_TIER_1_COOLDOWN = DEFAULT_LASER_COOLDOWN / 2
+    RAPID_FIRE_TIER_2_COOLDOWN = 150
+    RAPID_FIRE_DURATION = 5000 # 5000 milliseconds = 5 seconds
     RAINBOW_BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
     DEATH_DELAY = 500
     FLASH_DURATION = 1000 # Total time to flash in milliseconds
@@ -112,7 +114,7 @@ class PowerupSettings:
     DATA = {
     'red':    {'draw_color': (255, 80, 80),  'type': 'heal',       'shape': 'heart'},
     'green':  {'draw_color': (60, 255, 100), 'type': 'laser_upgrade', 'shape': 'diamond'},
-    'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': 150},
+    'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'circle', 'cooldown': PlayerSettings.RAPID_FIRE_TIER_2_COOLDOWN},
     'blue':   {'draw_color': (80, 160, 255), 'type': 'rainbow_beam',       'shape': 'circle', 'cooldown': 0},
     }
 

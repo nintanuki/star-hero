@@ -482,6 +482,8 @@ class GameManager:
                         pygame.display.toggle_fullscreen()
                     if event.key == pygame.K_ESCAPE:
                         self.unpause_game()
+                    if event.key == pygame.K_m:
+                        self.toggle_debug_mute()
 
                 # Check for Controller Start Button (Button 7)
                 if event.type == pygame.JOYBUTTONDOWN:
@@ -494,17 +496,27 @@ class GameManager:
 
                     # L1/R1 for Volume
                     if event.button == 4: # L1
-                        self.audio.master_volume -= 0.1
-                        if self.audio.master_volume < 0: self.audio.master_volume = 0
-                        self.audio.update()
+                        self.adjust_master_volume(-0.1)
                     if event.button == 5: # R1
-                        self.audio.master_volume += 0.1
-                        if self.audio.master_volume > 1: self.audio.master_volume = 1
-                        self.audio.update()
+                        self.adjust_master_volume(0.1)
 
             self.screen.fill((0, 0, 0))
             self.style.update('pause', self.save_data, self.score)
             pygame.display.update()
+
+    def toggle_debug_mute(self):
+        """Flips debug mute and immediately reapplies all audio volumes."""
+        AudioSettings.DEBUG_MUTE = not AudioSettings.DEBUG_MUTE
+        self.audio.update()
+
+    def adjust_master_volume(self, delta, show_overlay=False):
+        """Adjusts volume with clamping and optionally shows the HUD volume bar."""
+        self.audio.master_volume = max(0.0, min(1.0, self.audio.master_volume + delta))
+        self.audio.update()
+
+        if show_overlay:
+            pygame.time.set_timer(self.volume_display_timer, UISettings.VOLUME_DISPLAY_TIME)
+            self.show_volume = True
 
     def unpause_game(self):
         """Helper to handle unpausing logic"""
@@ -546,17 +558,11 @@ class GameManager:
 
                     # L1 Button (Decrease Volume)
                     if event.button == 4:
-                        self.audio.master_volume -= 0.1
-                        if self.audio.master_volume < 0: self.audio.master_volume = 0
-                        self.audio.update()
-                        self.style.volume_display_timer = pygame.time.get_ticks()
+                        self.adjust_master_volume(-0.1, show_overlay=True)
 
                     # R1 Button (Increase Volume)
                     if event.button == 5:
-                        self.audio.master_volume += 0.1
-                        if self.audio.master_volume > 1: self.audio.master_volume = 1
-                        self.audio.update()
-                        self.style.volume_display_timer = pygame.time.get_ticks()
+                        self.adjust_master_volume(0.1, show_overlay=True)
 
                 # Keyboard input
                 if event.type == pygame.KEYDOWN:
@@ -568,20 +574,11 @@ class GameManager:
                         self.audio.channel_6.play(self.audio.pause_sound)
                         self.pause()
                     if event.key == pygame.K_m:
-                        AudioSettings.DEBUG_MUTE = not AudioSettings.DEBUG_MUTE
-                        self.audio.update()
+                        self.toggle_debug_mute()
                     if event.key == pygame.K_KP_PLUS or event.key == pygame.K_EQUALS:
-                        self.audio.master_volume += 0.1
-                        self.audio.master_volume = min(self.audio.master_volume, 1.0)
-                        self.audio.update()
-                        pygame.time.set_timer(self.volume_display_timer,UISettings.VOLUME_DISPLAY_TIME)
-                        self.show_volume = True
+                        self.adjust_master_volume(0.1, show_overlay=True)
                     elif event.key == pygame.K_KP_MINUS or event.key == pygame.K_MINUS:
-                        self.audio.master_volume -= 0.1
-                        self.audio.master_volume = max(self.audio.master_volume, 0.0)
-                        self.audio.update()
-                        pygame.time.set_timer(self.volume_display_timer,UISettings.VOLUME_DISPLAY_TIME)
-                        self.show_volume = True
+                        self.adjust_master_volume(-0.1, show_overlay=True)
                 if event.type == self.volume_display_timer:
                     self.show_volume = False
                     pygame.time.set_timer(self.volume_display_timer,0)

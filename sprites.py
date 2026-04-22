@@ -159,6 +159,7 @@ class Player(pygame.sprite.Sprite):
         self.is_red = False
 
         self.ready = True
+        self.shoot_button_held = False
         
         self.laser_time = 0
         self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
@@ -250,16 +251,23 @@ class Player(pygame.sprite.Sprite):
                 self.rect.y += (joy.get_axis(1) * current_speed * direction_mod)
 
         # 3. MANUAL Shooting (Only for standard weapon)
+        # Trigger one shot per button press, not while the button is held.
+        keyboard_shoot_pressed = keys[pygame.K_SPACE]
+        controller_shoot_pressed = False
+        for i in range(pygame.joystick.get_count()):
+            joy = pygame.joystick.Joystick(i)
+            if joy.get_button(0):
+                controller_shoot_pressed = True
+                break
+
+        shoot_pressed = keyboard_shoot_pressed or controller_shoot_pressed
+
         # Only check for manual input if NO auto-powerup is active
         if not (self.rapid_fire_active or self.rainbow_beam_active):
-            # Keyboard
-            if keys[pygame.K_SPACE] and self.ready:
+            if shoot_pressed and not self.shoot_button_held and self.ready:
                 self.trigger_shot()
-            # Controller (A Button)
-            for i in range(pygame.joystick.get_count()):
-                joy = pygame.joystick.Joystick(i)
-                if joy.get_button(0) and self.ready:
-                    self.trigger_shot()
+
+        self.shoot_button_held = shoot_pressed
 
     def recharge(self):
         """Recharges the player's laser based on cooldown. Called every frame in update()"""

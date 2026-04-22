@@ -567,6 +567,9 @@ class GameManager:
                         self.audio.channel_1.pause()
                         self.audio.channel_6.play(self.audio.pause_sound)
                         self.pause()
+                    if event.key == pygame.K_m:
+                        AudioSettings.DEBUG_MUTE = not AudioSettings.DEBUG_MUTE
+                        self.audio.update()
                     if event.key == pygame.K_KP_PLUS or event.key == pygame.K_EQUALS:
                         self.audio.master_volume += 0.1
                         self.audio.master_volume = min(self.audio.master_volume, 1.0)

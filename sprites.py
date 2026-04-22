@@ -195,7 +195,7 @@ class Player(pygame.sprite.Sprite):
         """Sets the active cooldown from the current powerup state."""
         if self.rainbow_beam_active:
             self.laser_cooldown = 0
-        elif self.rapid_fire_active and self.rapid_fire_level == 2:
+        elif self.rapid_fire_level == 2:
             self.laser_cooldown = PowerupSettings.DATA['yellow']['cooldown']
         elif self.rapid_fire_level >= 1:
             self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN // 2
@@ -350,7 +350,6 @@ class Player(pygame.sprite.Sprite):
             if not self.rainbow_beam_active:
                 if self.rapid_fire_level == 0:
                     self.rapid_fire_level = 1
-                    self.rapid_fire_active = False
                 else:
                     self.rapid_fire_level = 2
                     self.rapid_fire_active = True

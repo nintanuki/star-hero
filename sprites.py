@@ -196,9 +196,9 @@ class Player(pygame.sprite.Sprite):
         if self.rainbow_beam_active:
             self.laser_cooldown = 0
         elif self.rapid_fire_level == 2:
-            self.laser_cooldown = PowerupSettings.DATA['yellow']['cooldown']
-        elif self.rapid_fire_level >= 1:
-            self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN // 2
+            self.laser_cooldown = PlayerSettings.RAPID_FIRE_TIER_2_COOLDOWN
+        elif self.rapid_fire_level == 1:
+            self.laser_cooldown = PlayerSettings.RAPID_FIRE_TIER_1_COOLDOWN
         else:
             self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 

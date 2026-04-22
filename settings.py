@@ -18,7 +18,7 @@ class PlayerSettings:
     SPEED_BOOST = 2
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
-    RAPID_FIRE_DURATION = 10000 # 10000 milliseconds = 10 seconds
+    RAPID_FIRE_DURATION = 5000 # 5000 milliseconds = 5 seconds
     RAINBOW_BEAM_DURATION = 5000        # 5 seconds (shorter than rapid fire)
     DEATH_DELAY = 500
     FLASH_DURATION = 1000 # Total time to flash in milliseconds

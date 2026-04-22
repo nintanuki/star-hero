@@ -308,6 +308,7 @@ class GameManager:
         self.player.sprite.beam_start_time = 0
         self.player.sprite.twin_laser_active = False
         self.player.sprite.twin_laser_start_time = 0
+        self.player.sprite.rapid_fire_level = 0
         self.player.sprite.rapid_fire_active = False
         self.player.sprite.rapid_fire_start_time = 0
 

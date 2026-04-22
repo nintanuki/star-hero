@@ -38,7 +38,7 @@ class AlienSettings:
     LASER_RATE = 400 # lower numbers = more lasers
     MIN_LASER_RATE = 100  # Hard limit on how fast they shoot
 
-    DIFFICULTY_STEP = 2500 # Increase difficulty every 2500 points
+    DIFFICULTY_STEP = 5000 # Increase difficulty every x amount of points
 
     SPAWN_OFFSET = (-300, -100)
     COLOR = ['red', 'green', 'yellow', 'blue']

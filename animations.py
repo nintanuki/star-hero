@@ -5,11 +5,14 @@ from settings import *
 # see https://www.youtube.com/watch?v=VUFvY349ess for more details
 class Background(pygame.sprite.Sprite):
     """Creates a scrolling space themed background"""
-    def __init__(self,groups):
+    def __init__(self, groups):
         """
         Initializes the background by loading a space-themed image,
         creating a surface that is twice the height of the original image for seamless scrolling,
         and setting the initial position of the background.
+
+        Args:
+            groups: The sprite group(s) this background should be added to.
         """
         super().__init__(groups)
         bg_image = pygame.image.load(AssetPaths.BACKGROUND).convert()
@@ -25,11 +28,18 @@ class Background(pygame.sprite.Sprite):
 
         self.scroll_speed = ScreenSettings.DEFAULT_BG_SCROLL_SPEED
 
-    def update(self,delta_time, speed_multiplier=1.0):
+    def update(self, delta_time, speed_multiplier=1.0):
         """
         Updates the position of the background to create a scrolling effect
         by moving it downwards based on the defined scroll speed and the time elapsed
         since the last update, and resets its position when it has scrolled completely.
+
+        Args:
+            delta_time (float): Time in seconds elapsed since the last frame, used
+                to ensure scroll speed is frame-rate independent.
+            speed_multiplier (float): A scalar applied to the scroll speed each
+                frame. Values below 1.0 slow the background (e.g. when brake is
+                active); values above 1.0 speed it up.
         """
         self.pos.y += self.scroll_speed * delta_time * speed_multiplier
         if self.rect.top >= 0:
@@ -42,6 +52,10 @@ class Explosion(pygame.sprite.Sprite):
         """
         Initializes the explosion animation by loading a sprite sheet,
         extracting individual frames, and setting the initial position of the explosion.
+
+        Args:
+            pos_x (int): The x-coordinate of the explosion's center.
+            pos_y (int): The y-coordinate of the explosion's center.
         """
         super().__init__()
         self.is_animating = False
@@ -61,21 +75,40 @@ class Explosion(pygame.sprite.Sprite):
     # https://www.youtube.com/watch?v=M6e3_8LHc7A
     # https://www.youtube.com/watch?v=M6e3_8LHc7A 
     @staticmethod # use static method because it does not use the self argument
-    def get_image(sheet, frame, width ,height, scale):
-        """Extracts a single frame from a sprite sheet and scales it to the desired size."""
+    def get_image(sheet, frame, width, height, scale):
+        """Extracts a single frame from a sprite sheet and scales it to the desired size.
+
+        Args:
+            sheet (pygame.Surface): The full sprite sheet surface.
+            frame (int): Zero-based index of the frame to extract.
+            width (int): Width in pixels of a single frame on the sprite sheet.
+            height (int): Height in pixels of a single frame on the sprite sheet.
+            scale (float): Scale factor applied to the extracted frame.
+
+        Returns:
+            pygame.Surface: A scaled surface containing the requested frame.
+        """
         surf = pygame.Surface((width,height), pygame.SRCALPHA) # pygame.SRCALPHA gives the surface per-pixel-transparency
         surf.blit(sheet,(0,0),((frame*width),0,width,height))
         surf = pygame.transform.scale(surf, (width * scale, height * scale))
         return surf
 
     def explode(self):
-        """Starts the explosion animation by resetting the current sprite index and setting the is_animating flag to True."""
+        """Starts the explosion animation by setting the is_animating flag to True.
+
+        Must be called after the sprite is added to a group; the animation
+        advances each frame via update().
+        """
         self.is_animating = True
 
     def update(self, speed):
         """
-        Updates the explosion animation by advancing the current sprite index based on the animation speed,
-        and kills the sprite when the animation is complete.
+        Advances the explosion animation frame and removes the sprite when complete.
+
+        Args:
+            speed (float): How much to advance the frame index each call.
+                Larger values play the animation faster. Typically supplied
+                from ExplosionSettings.ANIMATION_SPEED.
         """
         if self.is_animating:
             self.current_sprite += speed
@@ -86,11 +119,15 @@ class Explosion(pygame.sprite.Sprite):
 
 class CRT:
     """Creates a CRT monitor effect"""
-    def __init__(self,screen):
+    def __init__(self, screen):
         """
         Initializes the CRT effect by loading a TV overlay image,
         scaling it to fit the screen,
         and storing a reference to the screen for drawing.
+
+        Args:
+            screen (pygame.Surface): The main display surface that the CRT
+                overlay will be composited onto each frame.
         """
         super().__init__()
         self.screen = screen
@@ -98,7 +135,7 @@ class CRT:
         self.tv = pygame.transform.scale(self.tv,(ScreenSettings.RESOLUTION))
 
     def create_crt_lines(self):
-        """Draws horizontal lines across the screen to create a CRT effect"""
+        """Draws evenly-spaced horizontal scanlines onto the TV overlay surface to simulate a CRT monitor."""
         line_height = 3
         line_amount = int(ScreenSettings.HEIGHT / line_height)
         for line in range(line_amount):
@@ -107,8 +144,11 @@ class CRT:
 
     def draw(self):
         """
-        Draws the CRT effect on the screen by randomly adjusting the alpha transparency
-        of the TV overlay and creating horizontal lines across the screen.
+        Composites the CRT overlay onto the screen.
+
+        Randomizes the TV overlay's alpha each frame within CRT_ALPHA_RANGE to
+        simulate the subtle flicker of a real CRT monitor, then draws scanlines
+        and blits the overlay on top of the rendered game scene.
         """
         self.tv.set_alpha(random.randint(*ScreenSettings.CRT_ALPHA_RANGE))
         self.create_crt_lines()

@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import os
 from settings import *
 
 class Laser(pygame.sprite.Sprite):
@@ -134,7 +135,13 @@ class Laser(pygame.sprite.Sprite):
 
 class BombProjectile(pygame.sprite.Sprite):
     """Represents a launched bomb that travels upward and can be detonated."""
+
     def __init__(self, pos):
+        """Initialize bomb projectile sprite state.
+
+        Args:
+            pos (tuple[int, int]): Spawn position, typically at the player's ship nose.
+        """
         super().__init__()
         size = BombSettings.PROJECTILE_RADIUS * 2
         self.image = pygame.Surface((size, size), pygame.SRCALPHA)
@@ -142,22 +149,38 @@ class BombProjectile(pygame.sprite.Sprite):
         self.pos_y = float(self.rect.y)
         self.speed = BombSettings.PROJECTILE_SPEED
         self.flash_timer = 0
-        self.current_color = (255, 40, 40)
-        self.base_color = (255, 40, 40)
-        self.flash_color = (255, 180, 180)
+        self.current_color = (10, 10, 10)
+        self.base_color = (10, 10, 10)
+        self.flash_color = (55, 55, 55)
+        self.outline_color = (255, 40, 40)
         self._redraw()
 
     def _redraw(self):
+        """Rebuild the projectile surface with the current flash color."""
         self.image.fill((0, 0, 0, 0))
-        center = (BombSettings.PROJECTILE_RADIUS, BombSettings.PROJECTILE_RADIUS)
-        pygame.draw.circle(self.image, self.current_color, center, BombSettings.PROJECTILE_RADIUS)
-        pygame.draw.circle(self.image, (255, 255, 255), center, BombSettings.PROJECTILE_RADIUS, 1)
+        radius = BombSettings.PROJECTILE_RADIUS
+        center = (radius, radius)
+        hex_points = []
+        for i in range(6):
+            angle = math.radians((i * 60) - 30)
+            x = center[0] + radius * math.cos(angle)
+            y = center[1] + radius * math.sin(angle)
+            hex_points.append((round(x), round(y)))
+
+        pygame.draw.polygon(self.image, self.current_color, hex_points)
+        pygame.draw.polygon(self.image, self.outline_color, hex_points, 2)
 
     def move(self, speed_multiplier=1.0):
+        """Advance projectile upward with frame-scaled world speed.
+
+        Args:
+            speed_multiplier (float): World-speed scalar from boost/brake state.
+        """
         self.pos_y += self.speed * speed_multiplier
         self.rect.y = round(self.pos_y)
 
     def animate(self):
+        """Toggle bomb color at fixed intervals to create a flashing warning effect."""
         current_time = pygame.time.get_ticks()
         if current_time - self.flash_timer >= BombSettings.FLASH_SPEED:
             self.flash_timer = current_time
@@ -168,17 +191,29 @@ class BombProjectile(pygame.sprite.Sprite):
             self._redraw()
 
     def destroy_if_offscreen(self):
+        """Remove projectile once it leaves the top edge of the screen."""
         if self.rect.bottom < 0:
             self.kill()
 
     def update(self, speed_multiplier=1.0):
+        """Run bomb projectile movement, flash animation, and cleanup.
+
+        Args:
+            speed_multiplier (float): World-speed scalar from boost/brake state.
+        """
         self.move(speed_multiplier)
         self.animate()
         self.destroy_if_offscreen()
 
 class BombBlast(pygame.sprite.Sprite):
     """Represents the expanding area-of-effect ring created by a bomb detonation."""
+
     def __init__(self, center):
+        """Initialize a blast pulse at the detonation center.
+
+        Args:
+            center (tuple[int, int]): Screen-space center position of detonation.
+        """
         super().__init__()
         self.center = center
         self.radius = BombSettings.BLAST_START_RADIUS
@@ -189,14 +224,16 @@ class BombBlast(pygame.sprite.Sprite):
         self._redraw()
 
     def _redraw(self):
+        """Rebuild blast surface to match the current radius."""
         diameter = max(2, self.radius * 2)
         self.image = pygame.Surface((diameter, diameter), pygame.SRCALPHA)
         center = (diameter // 2, diameter // 2)
-        pygame.draw.circle(self.image, (255, 235, 80, BombSettings.BLAST_ALPHA), center, self.radius)
-        pygame.draw.circle(self.image, (255, 255, 190, 220), center, self.radius, 3)
+        pygame.draw.circle(self.image, (255, 255, 255, BombSettings.BLAST_ALPHA), center, self.radius)
+        pygame.draw.circle(self.image, (255, 255, 255, 235), center, self.radius, 3)
         self.rect = self.image.get_rect(center=self.center)
 
     def update(self):
+        """Expand the blast radius each frame and destroy once max size is reached."""
         self.radius += BombSettings.BLAST_GROWTH
         if self.radius >= self.max_radius:
             self.kill()
@@ -265,7 +302,11 @@ class Player(pygame.sprite.Sprite):
         self.world_speed_multiplier = 1.0
 
     def launch_bomb(self):
-        """Launches a bomb if available and none is currently in flight."""
+        """Launch a bomb if inventory is available and no bomb is currently airborne.
+
+        Returns:
+            bool: True when a bomb was launched; otherwise False.
+        """
         if self.bombs <= 0:
             return False
         if self.bomb_projectiles:
@@ -276,7 +317,12 @@ class Player(pygame.sprite.Sprite):
         return True
 
     def detonate_air_bomb(self):
-        """Detonates the in-flight bomb and returns its center, if one exists."""
+        """Detonate the active in-flight bomb, if present.
+
+        Returns:
+            tuple[int, int] | None: Detonation center when a bomb is active;
+                otherwise None.
+        """
         if not self.bomb_projectiles:
             return None
 
@@ -286,7 +332,12 @@ class Player(pygame.sprite.Sprite):
         return detonation_center
 
     def update_meter_state(self, boost_pressed, brake_pressed):
-        """Handles shared boost/brake meter drain while held and recharge while inactive."""
+        """Update boost/brake state machine and shared energy meter.
+
+        Args:
+            boost_pressed (bool): Whether boost input is currently held.
+            brake_pressed (bool): Whether brake input is currently held.
+        """
         dt = 1 / ScreenSettings.FPS
 
         # While depleted, prevent using boost or brake until the meter fully refills.
@@ -317,7 +368,11 @@ class Player(pygame.sprite.Sprite):
                 self.boost_locked_until_full = False
 
     def get_boost_meter(self):
-        """Returns a normalized meter value and state for the boost UI."""
+        """Return current boost meter ratio and semantic state for HUD rendering.
+
+        Returns:
+            tuple[float, str]: Meter ratio in [0, 1] and one of boost/brake/cooldown/ready.
+        """
         if self.boost_active:
             return self.boost_meter, 'boost'
 
@@ -330,7 +385,11 @@ class Player(pygame.sprite.Sprite):
         return self.boost_meter, 'ready'
 
     def get_world_speed_multiplier(self):
-        """Returns current world speed multiplier used to scale non-player movement."""
+        """Return current world-speed scalar used by non-player entities.
+
+        Returns:
+            float: Brake multiplier while braking, otherwise 1.0.
+        """
         if self.brake_active:
             return PlayerSettings.BRAKE_WORLD_SPEED_MULT
         return 1.0
@@ -363,7 +422,11 @@ class Player(pygame.sprite.Sprite):
             self.laser_cooldown = PlayerSettings.DEFAULT_LASER_COOLDOWN
 
     def is_invulnerable(self):
-        """Returns True while any invulnerability source is active."""
+        """Check whether damage should currently be ignored for the player.
+
+        Returns:
+            bool: True when flashing, shielded, or rainbow-beam invulnerable.
+        """
         return self.is_flashing or self.rainbow_beam_active or self.shield_active
 
     def animate_damage(self):
@@ -394,66 +457,96 @@ class Player(pygame.sprite.Sprite):
 
     def get_input(self):
         """Handles player input for movement and shooting. Called every frame in update()"""
-        # 1. Determine current speed from timed boost state
-        keys = pygame.key.get_pressed()
-        current_speed = PlayerSettings.SPEED
+        keys = pygame.key.get_pressed() # Get keyboard state once to avoid multiple calls per frame
+        base_speed = PlayerSettings.SPEED # Base speed before any boosts or brakes
+        direction = -1 if self.confused else 1  # Confusion inverts all movement
 
-        # Determine direction: if confused, multiply by -1 to invert
-        direction_mod = -1 if self.confused else 1
-        
-        # Check all connected joysticks for the X button (Button 2)
-        controller_boost = False
-        controller_brake = False
+        # --- Collect all controller state in a single pass ---
+        # Rather than looping over joysticks multiple times, we gather everything here.
+        left_boost_held = right_boost_held = forward_boost_held = False
+        brake_held = shoot_held = False
+        joystick_x = joystick_y = 0.0
+
+        # We loop through all connected joysticks and check the relevant buttons and axes.
         for i in range(pygame.joystick.get_count()):
             joy = pygame.joystick.Joystick(i)
-            if joy.get_button(2): # 2 is usually 'X' on Logitech/Xbox layouts
-                controller_boost = True
-            if joy.get_button(3): # 3 is usually 'Y' on Logitech/Xbox layouts
-                controller_brake = True
+            left_boost_held    |= joy.get_button(ControllerSettings.L1_BUTTON)
+            right_boost_held   |= joy.get_button(ControllerSettings.R1_BUTTON)
+            forward_boost_held |= joy.get_button(ControllerSettings.Y_BUTTON)
+            brake_held         |= joy.get_button(ControllerSettings.X_BUTTON)
+            shoot_held         |= joy.get_button(ControllerSettings.A_BUTTON)
+            x, y = joy.get_axis(ControllerSettings.LEFT_STICK_X), joy.get_axis(ControllerSettings.LEFT_STICK_Y)
+            if abs(x) > PlayerSettings.JOYSTICK_DEADZONE: joystick_x = x
+            if abs(y) > PlayerSettings.JOYSTICK_DEADZONE: joystick_y = y
 
-        boost_pressed = keys[pygame.K_f] or controller_boost
-        brake_pressed = keys[pygame.K_g] or controller_brake
-        self.update_meter_state(boost_pressed, brake_pressed)
+        # --- Update the boost/brake meter based on what's being held ---
+        keyboard_boost_held = keys[pygame.K_f]
+
+        # Check if the player is actually moving in a boostable direction.
+        # Boost should only drain the meter if it's doing something useful.
+        moving_left    = keys[pygame.K_a] or keys[pygame.K_LEFT]  or joystick_x < -PlayerSettings.JOYSTICK_DEADZONE
+        moving_right   = keys[pygame.K_d] or keys[pygame.K_RIGHT] or joystick_x >  PlayerSettings.JOYSTICK_DEADZONE
+        moving_forward = keys[pygame.K_w] or keys[pygame.K_UP]    or joystick_y < -PlayerSettings.JOYSTICK_DEADZONE
+
+        # Boost only counts if a boost button matches the direction being moved
+        left_boost_active    = left_boost_held    and moving_left
+        right_boost_active   = right_boost_held   and moving_right
+        forward_boost_active = forward_boost_held and moving_forward
+        keyboard_boost_active = keyboard_boost_held and (moving_left or moving_right or moving_forward)
+
+        any_boost_held = left_boost_active or right_boost_active or forward_boost_active or keyboard_boost_active
+        self.update_meter_state(any_boost_held, keys[pygame.K_g] or brake_held)
         self.world_speed_multiplier = self.get_world_speed_multiplier()
 
-        if self.boost_active:
-            current_speed *= PlayerSettings.SPEED_BOOST
+        # Boost only applies if the meter has charge and the system is active
+        boost_available = self.boost_active and self.boost_meter > 0
 
-        # Player Movement Input
-        # Keyboard input (WASD or Arrow Keys)
-        if (keys[pygame.K_w] or keys[pygame.K_UP]): self.rect.y -= (current_speed * direction_mod)
-        if (keys[pygame.K_s] or keys[pygame.K_DOWN]): self.rect.y += (current_speed * direction_mod)
-        if (keys[pygame.K_a] or keys[pygame.K_LEFT]): self.rect.x -= (current_speed * direction_mod)
-        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]): self.rect.x += (current_speed * direction_mod)
+        # --- Helper: returns boosted or base speed depending on whether the condition is met ---
+        def boosted_speed(boost_condition):
+            if boost_available and boost_condition:
+                return base_speed * PlayerSettings.SPEED_BOOST
+            return base_speed
 
-        # Controller input (Left Joystick)
-        for i in range(pygame.joystick.get_count()):
-            joy = pygame.joystick.Joystick(i)
-            if abs(joy.get_axis(0)) > PlayerSettings.JOYSTICK_DEADZONE:
-                self.rect.x += (joy.get_axis(0) * current_speed * direction_mod)
-            if abs(joy.get_axis(1)) > PlayerSettings.JOYSTICK_DEADZONE:
-                self.rect.y += (joy.get_axis(1) * current_speed * direction_mod)
+        # --- Keyboard movement (WASD / Arrow Keys) ---
+        # Vertical movement has no boost, so we always use base_speed
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
+            self.rect.y -= boosted_speed(forward_boost_held or keyboard_boost_held) * direction
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            self.rect.y += base_speed * direction
 
-        # 3. MANUAL Shooting (Only for standard weapon)
-        # Trigger one shot per button press, not while the button is held.
-        keyboard_shoot_pressed = keys[pygame.K_SPACE]
-        controller_shoot_pressed = False
-        for i in range(pygame.joystick.get_count()):
-            joy = pygame.joystick.Joystick(i)
-            if joy.get_button(0):
-                controller_shoot_pressed = True
-                break
+        # Horizontal movement can be boosted per-direction via L1/R1
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            self.rect.x -= boosted_speed(left_boost_held or keyboard_boost_held) * direction
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            self.rect.x += boosted_speed(right_boost_held or keyboard_boost_held) * direction
 
-        shoot_pressed = keyboard_shoot_pressed or controller_shoot_pressed
+        # --- Controller left stick movement ---
+        # Boost applies to horizontal left/right based on stick direction + button held
+        if joystick_x:
+            moving_left  = joystick_x < 0 and left_boost_held
+            moving_right = joystick_x > 0 and right_boost_held
+            self.rect.x += joystick_x * boosted_speed(moving_left or moving_right) * direction
 
+        # Boost applies to forward (upward) stick movement via Y button
+        if joystick_y:
+            moving_forward = forward_boost_held and joystick_y < 0
+            self.rect.y += joystick_y * boosted_speed(moving_forward) * direction
+
+        # --- Shooting ---
+        # Space bar or controller A button both trigger shooting
+        shoot_pressed = keys[pygame.K_SPACE] or shoot_held
+
+        # Rainbow beam fires automatically via handle_auto_shooting(), so we just
+        # track the button state here and skip manual fire logic entirely
         if self.rainbow_beam_active:
             self.shoot_button_held = shoot_pressed
             return
 
-        # Auto mode allows holding fire, but does not fire on its own.
+        # Auto fire (rapid_fire level 3) allows holding the button
         if self.rapid_fire_level == 3:
             if shoot_pressed and self.ready:
                 self.trigger_shot()
+        # All other modes require a fresh press (no holding)
         else:
             if shoot_pressed and not self.shoot_button_held and self.ready:
                 self.trigger_shot()
@@ -481,8 +574,10 @@ class Player(pygame.sprite.Sprite):
     def shoot_laser(self):
         """Spawns lasers based on current powerup state. Handles twin lasers, rapid fire, and beam logic."""
         is_rainbow_beam = self.rainbow_beam_active
-        is_hyper = (self.laser_level == 3) # Tier 3 check
+        is_hyper = (self.laser_level == 4)
+        is_piercing = self.laser_level >= 3
         has_rapid = self.rapid_fire_level > 0
+        laser_speed = LaserSettings.PLAYER_LASER_SPEED * 2 if is_hyper else LaserSettings.PLAYER_LASER_SPEED
         
         # 1. Determine the behavior and growth of the rainbow beam
         width = LaserSettings.RAINBOW_BEAM_WIDTH if is_rainbow_beam else LaserSettings.DEFAULT_WIDTH
@@ -491,13 +586,14 @@ class Player(pygame.sprite.Sprite):
         # 2. Assign colors based on priority
         if self.rainbow_beam_active:
             colors = "rainbow"
-        elif has_rapid and is_hyper:
-            # Hyper + Rapid alternates blue and yellow.
+        elif has_rapid and is_piercing:
             colors = LaserSettings.COLORS['hyper_rapid']
         elif has_rapid:
             colors = LaserSettings.COLORS['rapid']
         elif is_hyper:
             colors = LaserSettings.COLORS['hyper']
+        elif self.laser_level == 3:
+            colors = LaserSettings.COLORS['burst']
         elif self.laser_level >= 2:
             colors = LaserSettings.COLORS['twin']
         else:
@@ -507,19 +603,19 @@ class Player(pygame.sprite.Sprite):
         if self.laser_level >= 2:
             # Left laser
             self.lasers.add(Laser((self.rect.centerx - offset, self.rect.centery), 
-                                LaserSettings.PLAYER_LASER_SPEED, colors, width, 
-                                should_grow=is_rainbow_beam, is_piercing=is_hyper))
+                                laser_speed, colors, width, 
+                                should_grow=is_rainbow_beam, is_piercing=is_piercing))
             # Right laser
             self.lasers.add(Laser((self.rect.centerx + offset, self.rect.centery), 
-                                LaserSettings.PLAYER_LASER_SPEED, colors, width, 
-                                should_grow=is_rainbow_beam, is_piercing=is_hyper))
+                                laser_speed, colors, width, 
+                                should_grow=is_rainbow_beam, is_piercing=is_piercing))
         else:
             # Level 1: Single laser
-            self.lasers.add(Laser(self.rect.center, LaserSettings.PLAYER_LASER_SPEED, 
-                                colors, width, should_grow=is_rainbow_beam, is_piercing=is_hyper))
+            self.lasers.add(Laser(self.rect.center, laser_speed, 
+                                colors, width, should_grow=is_rainbow_beam, is_piercing=is_piercing))
             
         
-        if self.laser_level == 3 or self.rainbow_beam_active:
+        if self.laser_level >= 3 or self.rainbow_beam_active:
             self.audio.channel_10.play(self.audio.hyper_sound)
         else:
             self.audio.channel_3.play(self.audio.laser_sound)
@@ -534,7 +630,7 @@ class Player(pygame.sprite.Sprite):
         current_time = pygame.time.get_ticks()
 
         if powerup.powerup_type == 'laser_upgrade':
-            if self.laser_level < 3:
+            if self.laser_level < 4:
                 self.laser_level += 1
                 
         elif powerup.powerup_type == 'rapid_fire':
@@ -583,7 +679,11 @@ class Player(pygame.sprite.Sprite):
             self.trigger_shot()
 
     def draw_shield_orb(self, screen):
-        """Draws a flashing cyan orb around the ship while shield is active."""
+        """Draw a pulsing shield orb around the player's ship while shield is active.
+
+        Args:
+            screen (pygame.Surface): Destination surface for shield rendering.
+        """
         if not self.shield_active:
             return
 
@@ -655,8 +755,8 @@ class Alien(pygame.sprite.Sprite):
 
         # 1. Load the frames
         self.frames = []
-        path1 = f'{AssetPaths.GRAPHICS_DIR}{self.color}1.png'
-        path2 = f'{AssetPaths.GRAPHICS_DIR}{self.color}2.png'
+        path1 = os.path.join(AssetPaths.GRAPHICS_DIR, f'{self.color}1.png')
+        path2 = os.path.join(AssetPaths.GRAPHICS_DIR, f'{self.color}2.png')
 
         # Load frame 1
         self.frames.append(pygame.image.load(path1).convert_alpha())
@@ -697,7 +797,12 @@ class Alien(pygame.sprite.Sprite):
         self.confusion_growth = 0  # Starts at 0, will increase to ScreenSettings.HEIGHT
 
     def apply_movement(self, delta_x, delta_y):
-        """Applies sub-pixel movement while keeping rect in sync for collisions."""
+        """Apply sub-pixel deltas and keep rect coordinates synchronized.
+
+        Args:
+            delta_x (float): Horizontal movement delta in pixels.
+            delta_y (float): Vertical movement delta in pixels.
+        """
         self.position.x += delta_x
         self.position.y += delta_y
         self.rect.x = round(self.position.x)
@@ -706,7 +811,9 @@ class Alien(pygame.sprite.Sprite):
     def calculate_movement(self, speed_multiplier=1.0):
         """
         Calculates the movement of the alien based on its color and behavior patterns.
-        Called every frame in update()
+
+        Args:
+            speed_multiplier (float): World-speed scalar applied to alien motion.
         """
         # Check for confusion attack trigger (only for blue aliens with the ability)
         if self.can_confuse and not self.has_projected:
@@ -753,7 +860,11 @@ class Alien(pygame.sprite.Sprite):
             self.kill()
 
     def update(self, speed_multiplier=1.0):
-        """Handles movement, animation, and self-destruction when off-screen. Called every frame."""
+        """Update alien behavior for one frame.
+
+        Args:
+            speed_multiplier (float): World-speed scalar applied to movement.
+        """
         self.calculate_movement(speed_multiplier)
         self.animate()
         self.destroy()

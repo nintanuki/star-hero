@@ -1,3 +1,6 @@
+import os
+
+
 class ScreenSettings:
     """Holds all the settings related to the game screen, such as dimensions, frame rate, background color, and other visual parameters."""
     WIDTH = 600
@@ -17,7 +20,7 @@ class PlayerSettings:
     SPEED = 2
     SPEED_BOOST = 2
     BRAKE_WORLD_SPEED_MULT = 0.45
-    BOOST_DRAIN_PER_SECOND = 0.35 # meter drained per second while boost is held
+    BOOST_DRAIN_PER_SECOND = 0.70 # meter drained per second while boost is held
     BOOST_RECHARGE_PER_SECOND = 0.25 # meter recharged per second when not boosting
     SCALE = 0.15
     DEFAULT_LASER_COOLDOWN = 600 # lower numbers = faster rate of fire
@@ -30,6 +33,16 @@ class PlayerSettings:
     FLASH_INTERVAL = 50 # How fast it toggles (smaller = faster flicker)
     JOYSTICK_DEADZONE = 0.2
     CONFUSION_TIMEOUT = 4000 # how long the confusion effect lasts after being hit by a blue alien attack (in milliseconds)
+
+class ControllerSettings:
+    """Holds all the settings related to the game controller, including button mappings and joystick axes."""
+    A_BUTTON = 0
+    X_BUTTON = 2
+    Y_BUTTON = 3
+    L1_BUTTON = 4
+    R1_BUTTON = 5
+    LEFT_STICK_X = 0
+    LEFT_STICK_Y = 1
 
 class AlienSettings:
     """
@@ -93,6 +106,7 @@ class LaserSettings:
     COLORS = {
         'single': ('green', 'white'),
         'twin': ('green', 'white'),
+        'burst': ('cyan', 'white'),
         'hyper': ('cyan', 'white'), # Hyper
         'rapid': ('yellow', 'white'), # Rapid (any tier)
         'hyper_rapid': ('cyan', 'yellow'), # Hyper + Rapid alternation
@@ -133,12 +147,12 @@ class BombSettings:
     """Contains tuning values for bomb inventory, drops, projectile behavior, and blast visuals."""
     START_COUNT = 3
     PROJECTILE_RADIUS = 10
-    PROJECTILE_SPEED = -4
+    PROJECTILE_SPEED = -2
     FLASH_SPEED = 220
 
     BLAST_START_RADIUS = 10
-    BLAST_MAX_RADIUS = 120
-    BLAST_GROWTH = 5
+    BLAST_MAX_RADIUS = 160
+    BLAST_GROWTH = 3
     BLAST_ALPHA = 110
 
 class ExplosionSettings:
@@ -158,7 +172,7 @@ class FontSettings:
     including the path to the font file, sizes for different text elements,
     and the color of the text.
     """
-    FONT = 'font/Pixeled.ttf'
+    FONT = os.path.join(os.path.dirname(__file__), 'font', 'Pixeled.ttf')
     SMALL = 10
     MEDIUM = 20
     LARGE = 30
@@ -190,26 +204,19 @@ class AudioSettings:
     INTRO_VOL_BOOST = 2.0
     DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
     DEBUG_MUTE = False # set True to silence all audio for debugging
-    MUSIC_DIR = 'music/'
-    AUDIO_DIR = 'audio/'
+    BASE_DIR = os.path.dirname(__file__)
+    MUSIC_DIR = os.path.join(BASE_DIR, 'music')
+    AUDIO_DIR = os.path.join(BASE_DIR, 'audio')
     BGM_PLAYLIST = [
-        'star_fox_64_katina.mp3',
-        # 'star_fox_64_meteo.mp3',
-        # 'star_fox_64_sector_x.mp3',
-        # 'star_fox_64_solar_and_sector_y.mp3',
-        # 'star_fox_64_titania_and_macbeth.mp3',
-        # 'star_fox_snes_corneria.mp3',
-        # 'star_fox_snes_meteor.mp3',
-        'Area 6 - Star Fox 64 Restored OST.mp3',
-        'star_fox_snes_space_armada.mp3',
-        # 'star_fox_snes_venom_asteroid_venom_orbital.mp3',
         'star_hero.mp3'
     ]
 
 class AssetPaths:
-    GRAPHICS_DIR = 'graphics/'
-    BACKGROUND = 'graphics/background.png'
-    EXPLOSION = 'graphics/explosion.png'
-    PLAYER = 'graphics/player_ship.png'
-    HEART = 'graphics/heart.png'
-    TV = 'graphics/tv.png'
+    """Centralized filesystem paths for static graphics used by the game."""
+    BASE_DIR = os.path.dirname(__file__)
+    GRAPHICS_DIR = os.path.join(BASE_DIR, 'graphics')
+    BACKGROUND = os.path.join(GRAPHICS_DIR, 'background.png')
+    EXPLOSION = os.path.join(GRAPHICS_DIR, 'explosion.png')
+    PLAYER = os.path.join(GRAPHICS_DIR, 'player_ship.png')
+    HEART = os.path.join(GRAPHICS_DIR, 'heart.png')
+    TV = os.path.join(GRAPHICS_DIR, 'tv.png')

@@ -1,4 +1,5 @@
 ### Issues That Need to be Fixed
+* Volume goes up and down when player enters initials!
 * Confusion beam sound still plays when game is paused
 * Player can hold button down for laser, disable this so they have to press the buttone very time
 * Logic for leaderboard scores and initials uses a lot of code and functions. Put into it's own class?
@@ -9,6 +10,14 @@
 * Volume bar overlaps with level display
 
 ### Ideas for Future Changes and Additions
+* Change every reference to break with "time slow"
+* Boost should only drain meter if player is MOVING IN THE DIRECTION that boost is giving them. If the hold L1 while moving right, the boost drains and they don't go any faster...
+* Changed controller buttons but did not update or add features to keyboard for boost, volume, etc
+* Cleanup player's get input method, it's a mess, there are two separate loops for joystick
+* No sound effect for bombs or when you lose a powerup yet
+* Bombs should only be dropped by red enemies. Because they are not tiered, red enemies need to have different chances for each of their powerups. Commonality should be bombs > hearts > shield
+* Add indicator for when the shield is about to disappear
+* Change boost/time slow to L1 and R1 (which is which?) and move volume to D-Pad
 * Add sound effects for all new powerups and effects
 * Add floating scores
 * Score bonus + message for destroying multiple enemies at once?
@@ -47,3 +56,4 @@
 ### Misc Notes
 * Use `channel_#.play(music, -1)` to loop instead?
 * Try [pygame.mixer.music](https://www.pygame.org/docs/ref/music.html) instead of the sound class for music, gives more control like queue music.
+* The dark blue for HYPER in the status is too dark to read, change to CYAN or flashing colors like rainbow beam. Consider doing the same for auto, fast flashing. Change sound effect for hyper to something that sounds very powerful (x wing or tie fighter laser sounds?)

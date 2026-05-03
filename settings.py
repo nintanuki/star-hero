@@ -1,5 +1,16 @@
 import os
 
+class ColorSettings:
+    """Defines the RGB color values for various named colors used throughout the game, such as for drawing lasers, powerups, and other visual elements."""
+    COLORS = {
+        'RED': (255, 80, 80),
+        'GREEN': (60, 255, 100),
+        'YELLOW': (255, 220, 60),
+        'BLUE': (80, 160, 255),
+        'WHITE': (255, 255, 255),
+        'CYAN': (80, 255, 255),
+        'BLACK': (0, 0, 0)
+    }
 
 class ScreenSettings:
     """Holds all the settings related to the game screen, such as dimensions, frame rate, background color, and other visual parameters."""
@@ -10,6 +21,7 @@ class ScreenSettings:
     FPS = 120
     BG_COLOR = (30, 30, 30) # Not visibile since we are using a scrolling image
     CRT_ALPHA_RANGE = (75, 90)
+    CRT_SCANLINE_HEIGHT = 3 # vertical pixels between scanlines drawn on the CRT overlay
     DEFAULT_BG_SCROLL_SPEED = 50
     BG_SCROLL_STEP = 25 # how many pixels the background moves each difficulty step (lower = smoother, higher = more noticeable)
     BG_SCROLL_MAX = 500 # maximum scroll speed for the background, to prevent it from becoming too fast at high scores
@@ -37,10 +49,16 @@ class PlayerSettings:
 class ControllerSettings:
     """Holds all the settings related to the game controller, including button mappings and joystick axes."""
     A_BUTTON = 0
+    B_BUTTON = 1
     X_BUTTON = 2
     Y_BUTTON = 3
     L1_BUTTON = 4
     R1_BUTTON = 5
+    BACK_BUTTON = 6
+    START_BUTTON = 7
+    # Held simultaneously, this chord exits the game from anywhere — matches the
+    # arcade cabinet panel labels (L1+R1+START+SELECT).
+    QUIT_COMBO = (START_BUTTON, BACK_BUTTON, L1_BUTTON, R1_BUTTON)
     LEFT_STICK_X = 0
     LEFT_STICK_Y = 1
 
@@ -70,8 +88,11 @@ class AlienSettings:
         'yellow': 3,
         'blue':   5
         }
-    
+
     ZIGZAG_THRESHOLD = 100 # how wide the zigzag pattern is for yellow aliens (in pixels)
+    # Aliens are killed once they fall this many pixels past the bottom edge.
+    # The cushion prevents them dying mid-score-display.
+    OFFSCREEN_MARGIN = 50
 
     # Point values for each alien color
     POINTS = {
@@ -83,19 +104,25 @@ class AlienSettings:
 
     # Probability of each alien dropping a powerup upon destruction, by color
     DROP_CHANCE = {
-        'red':    0.25,
+        'red':    0.20,
         'green':  0.20,
-        'yellow': 0.15,
+        'yellow': 0.20,
         'blue':   0.10,
-        }
-    RED_SHIELD_DROP_CHANCE = 0.05
-    BOMB_DROP_BASE = 0.01
-    BOMB_DROP_BONUS = 0.05
-    
+    }
+
     # Blue alien confusion attack settings
     CONFUSION_CHANCE = 0.1 # chance that a blue alien will trigger the confusion attack
     CONFUSION_STOP_Y = ScreenSettings.HEIGHT // 2 # Halfway down screen
     CONFUSION_DURATION = 3000 # How long the alien stays to project it's confusion attack (in milliseconds)
+    # Visual tuning for the downward-fanning confusion beam (drawn by Alien
+    # while is_confusing is True). The beam starts narrow and widens by a
+    # fraction of its current length each frame.
+    CONFUSION_BEAM_TOP_WIDTH = 10
+    CONFUSION_BEAM_WIDEN_RATIO = 0.2
+    CONFUSION_BEAM_GROWTH_PER_FRAME = 15
+    CONFUSION_BEAM_COLOR = (200, 0, 255, 80)
+    # Tint the player ship is multiplied by while confused (purple/magenta).
+    CONFUSION_PLAYER_TINT = (200, 0, 255, 255)
 
 class LaserSettings:
     """Contains all the settings related to lasers fired by both the player and aliens, including dimensions, speeds, and colors for different laser types."""
@@ -111,7 +138,7 @@ class LaserSettings:
         'rapid': ('yellow', 'white'), # Rapid (any tier)
         'hyper_rapid': ('cyan', 'yellow'), # Hyper + Rapid alternation
         'alien': ('red', 'white'),
-        'rainbow': None 
+        'rainbow': None
     }
 
     # Rainbow Beam Settings
@@ -139,7 +166,7 @@ class PowerupSettings:
     'red_shield': {'draw_color': (80, 255, 255), 'type': 'shield', 'shape': 'circle'},
     'green':  {'draw_color': (60, 255, 100), 'type': 'laser_upgrade', 'shape': 'diamond'},
     'yellow': {'draw_color': (255, 220, 60), 'type': 'rapid_fire', 'shape': 'diamond'},
-    'blue':   {'draw_color': (80, 160, 255), 'type': 'rainbow_beam', 'shape': 'diamond'},
+    'blue':   {'draw_color': (80, 160, 255), 'type': 'rainbow_beam', 'shape': 'star'},
     'bomb':   {'draw_color': (255, 40, 40),  'type': 'bomb',        'shape': 'circle'},
     }
 
@@ -150,10 +177,19 @@ class BombSettings:
     PROJECTILE_SPEED = -2
     FLASH_SPEED = 220
 
+    # Projectile colors flip between BASE and FLASH every FLASH_SPEED ms.
+    PROJECTILE_BASE_COLOR = (10, 10, 10)
+    PROJECTILE_FLASH_COLOR = (55, 55, 55)
+    PROJECTILE_OUTLINE_COLOR = (255, 40, 40)
+    PROJECTILE_OUTLINE_WIDTH = 2
+
     BLAST_START_RADIUS = 10
     BLAST_MAX_RADIUS = 160
     BLAST_GROWTH = 3
     BLAST_ALPHA = 110
+    BLAST_RING_ALPHA = 235
+    BLAST_RING_WIDTH = 3
+    BLAST_FILL_COLOR = (255, 255, 255)
 
 class ExplosionSettings:
     """
@@ -172,7 +208,7 @@ class FontSettings:
     including the path to the font file, sizes for different text elements,
     and the color of the text.
     """
-    FONT = os.path.join(os.path.dirname(__file__), 'font', 'Pixeled.ttf')
+    FONT = os.path.join(os.path.dirname(__file__), 'assets', 'font', 'Pixeled.ttf')
     SMALL = 10
     MEDIUM = 20
     LARGE = 30
@@ -188,7 +224,21 @@ class UISettings:
     HEART_SPRITE_SIZE = (24, 24)
     HEART_SPACING = 10
     HEART_TOP_MARGIN = 8
+    HEART_RIGHT_MARGIN = 30 # space between rightmost heart and screen edge
     VOLUME_DISPLAY_TIME = 1000
+
+    # Player status row anchored under the hearts row.
+    STATUS_RIGHT_MARGIN = 10
+    STATUS_ROW_SPACING = 15
+    # Boost meter geometry — sits directly under the hearts.
+    BOOST_METER_WIDTH = 100
+    BOOST_METER_HEIGHT = 8
+    # Vertical gap between the hearts row and the meter.
+    BOOST_METER_TOP_GAP = 9
+    # Vertical gap between the meter and the first status row.
+    BOOST_METER_BOTTOM_GAP = 10
+    # Vertical gap between the last status row and the bombs row.
+    BOMBS_ROW_TOP_GAP = 16
 
     # Volume Bar Settings
     MAX_VOLUME = 1000
@@ -204,17 +254,22 @@ class AudioSettings:
     INTRO_VOL_BOOST = 2.0
     DEFAULT_MASTER_VOLUME = 0.5 # default value is 1.0
     DEBUG_MUTE = False # set True to silence all audio for debugging
+    # All bundled media now lives under a single assets/ folder
+    # (assets/audio, assets/font, assets/graphics, assets/music) so the
+    # project root only carries code + docs + saves.
     BASE_DIR = os.path.dirname(__file__)
-    MUSIC_DIR = os.path.join(BASE_DIR, 'music')
-    AUDIO_DIR = os.path.join(BASE_DIR, 'audio')
+    ASSETS_DIR = os.path.join(BASE_DIR, 'assets')
+    MUSIC_DIR = os.path.join(ASSETS_DIR, 'music')
+    AUDIO_DIR = os.path.join(ASSETS_DIR, 'audio')
     BGM_PLAYLIST = [
-        'star_hero.mp3'
+        'star_hero.ogg'
     ]
 
 class AssetPaths:
     """Centralized filesystem paths for static graphics used by the game."""
     BASE_DIR = os.path.dirname(__file__)
-    GRAPHICS_DIR = os.path.join(BASE_DIR, 'graphics')
+    ASSETS_DIR = os.path.join(BASE_DIR, 'assets')
+    GRAPHICS_DIR = os.path.join(ASSETS_DIR, 'graphics')
     BACKGROUND = os.path.join(GRAPHICS_DIR, 'background.png')
     EXPLOSION = os.path.join(GRAPHICS_DIR, 'explosion.png')
     PLAYER = os.path.join(GRAPHICS_DIR, 'player_ship.png')

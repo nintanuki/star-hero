@@ -1,4 +1,4 @@
-# Star Hero <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/player_ship.png" height="32">
+# Star Hero <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/player_ship.png" height="32">
 
 Star Hero is a vertically scrolling, space-themed shoot'em up built with Python and Pygame.
 
@@ -57,7 +57,8 @@ py star-hero/main.py
 - Hold `G`: Brake (slows world speed while meter is available)
 - `B`: Launch bomb / detonate active bomb
 - `F11`: Toggle fullscreen
-- `Esc`: Pause/unpause
+- `Enter`: Pause/unpause
+- `Esc`: Quit to arcade launcher
 - `+` / `-`: Increase or decrease volume
 
 ### Controller (Logitech-style mapping)
@@ -103,15 +104,15 @@ py star-hero/main.py
 
 Each alien behaves differently and awards different points:
 
-- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/red1.png" width="20" height="16"> Red Alien: Slow, drops hearts. **100 points**
-- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/green1.png" width="20" height="16"> Green Alien: Medium speed, drops laser upgrades. **200 points**
-- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/yellow1.png" width="20" height="16"> Yellow Alien: Fast zigzag movement, drops rapid fire. **300 points**
-- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/graphics/blue1.png" width="20" height="10"> Blue Alien: Very fast and rare, may use confusion beam, drops rainbow beam. **500 points**
+- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/red1.png" width="20" height="16"> Red Alien: Slow, drops hearts. **100 points**
+- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/green1.png" width="20" height="16"> Green Alien: Medium speed, drops laser upgrades. **200 points**
+- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/yellow1.png" width="20" height="16"> Yellow Alien: Fast zigzag movement, drops rapid fire. **300 points**
+- <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/blue1.png" width="20" height="10"> Blue Alien: Very fast and rare, may use confusion beam, drops rainbow beam. **500 points**
 
 ## Attributions
 
-- Graphics attributions: [graphics/attributions.md](graphics/attributions.md)
-- Audio attributions: [audio/attributions.md](audio/attributions.md)
+- Graphics attributions: [assets/graphics/attributions.md](assets/graphics/attributions.md)
+- Audio attributions: [assets/audio/attributions.md](assets/audio/attributions.md)
 
 ## Learning Resources
 

@@ -4,10 +4,14 @@ Star Hero is a vertically scrolling, space-themed shoot'em up built with Python 
 
 This project started as a learning game and continues to grow with new polish, mechanics, and balance updates.
 
+## Status
+
+**Phase: Playable, polishing.** Full run loop, leaderboard, four alien types, weapon tiers, shield, rainbow beam, bombs, and difficulty ramp all work end-to-end. Active work is bug fixes, balance, and stretch features. See [docs/TODO.md](docs/TODO.md) for the live backlog.
+
 ## Requirements
 
 - [Python](https://www.python.org/) 3.10+
-- [Pygame](https://www.pygame.org/)
+- [Pygame](https://www.pygame.org/) 2.5+
 
 Install Pygame:
 
@@ -17,23 +21,13 @@ pip install pygame
 
 ## Run the Game
 
-From the repository root, run through the launcher:
+From this folder:
 
-```bash
+```powershell
 python main.py
 ```
 
-Or run Star Hero directly:
-
-```bash
-python star-hero/main.py
-```
-
-If your Windows environment uses `py`:
-
-```bash
-py star-hero/main.py
-```
+Or via the cabinet launcher: repo root → `python main.py` → **Mr. Navarro's Games → Original Games → Star Hero**.
 
 ## Core Gameplay Rules
 
@@ -108,6 +102,17 @@ Each alien behaves differently and awards different points:
 - <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/green1.png" width="20" height="16"> Green Alien: Medium speed, drops laser upgrades. **200 points**
 - <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/yellow1.png" width="20" height="16"> Yellow Alien: Fast zigzag movement, drops rapid fire. **300 points**
 - <img src="https://raw.githubusercontent.com/frankiebry/star-hero/refs/heads/main/assets/graphics/blue1.png" width="20" height="10"> Blue Alien: Very fast and rare, may use confusion beam, drops rainbow beam. **500 points**
+
+## Documentation
+
+Read these in order before contributing:
+
+1. **[README.md](README.md)** — *(this file)* what the project is and how to run it.
+2. **[docs/TODO.md](docs/TODO.md)** — phased roadmap, known bugs, and open questions.
+3. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — how the code actually works.
+4. **[docs/CHANGELOG.md](docs/CHANGELOG.md)** — append-only history of every change.
+5. **[docs/TESTING.md](docs/TESTING.md)** — manual smoke-test checklist after changes.
+6. **[.github/copilot-instructions.md](.github/copilot-instructions.md)** — required reading for every editor, human or AI.
 
 ## Attributions
 
